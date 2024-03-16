@@ -1,14 +1,16 @@
-
-.login-locations {
+.register-page-bg-color{
     background-color: rgba(52, 152, 219, 49%);
+}
+.login-locations {
     height: 50vh;
     width: 35vw;
     margin-top: 20vh;
     margin-left: 60vw;
+    @apply register-page-bg-color
 }
 
+
 .login-full-container {
-    background-color: rgba(52, 152, 219, 49%);
     height: 100vh;
     width: 100vw;
 }
@@ -33,13 +35,26 @@
     }
 }
 
+@keyframes bigger-contain-context {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 
 .login-container-anima {
     animation-name: move-down-and-show;
-    animation-duration: 3s;
+    animation-duration: 2.5s;
 }
 
 .login-full-anima {
     animation-name: bigger-contain;
-    animation-duration:2s;
+    animation-duration: 1.7s;
+}
+
+.login-full-context-anima {
+    animation-name: bigger-contain-context;
+    animation-duration: 1.7s;
 }
