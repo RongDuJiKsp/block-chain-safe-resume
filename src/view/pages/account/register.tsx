@@ -106,9 +106,16 @@ export default RegisterPage;
 
 function SelectIdentityComponent() {
     const registerInfo = useContext(RegisterInfoSetterContext);
+    const keys = Object.keys(UserIdentityEnum);
+    const onSelect = (type: string): void => {
+        registerInfo.infoSetter?.call(null, val => ({...val, userIdentity: type as UserIdentityEnum}));
+    }
     return <div>
-        SelectIdentity
-        <button className={"button-3d button"} onClick={registerInfo.nextStep}></button>
+        <div className={"flex justify-center gap-14"}>
+            {keys.map(val => val !== UserIdentityEnum.None &&
+                <button className={"button button-3d button-pill"}
+                        onClick={() => onSelect(val)}>{val}</button>)}
+        </div>
     </div>
 }
 

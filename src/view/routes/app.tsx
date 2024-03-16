@@ -5,7 +5,7 @@ import LoginPage from "../pages/account/login.tsx";
 export function AppRoutes() {
     return <Routes>
         <Route path={"/register"} element={<RegisterPage/>}/>
-        <Route path={"/login"} element={<LoginPage/>}/>
-        <Route path={"/*"} element={<Navigate to={"/login"} replace={true}/>}/>
+        <Route path={"/login/*"} element={<LoginPage/>}/>
+        <Route path={"/*"} element={<Navigate to={"/login/user"} replace={true}/>}/>
     </Routes>
 }

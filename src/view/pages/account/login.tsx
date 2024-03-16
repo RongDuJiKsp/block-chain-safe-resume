@@ -4,7 +4,7 @@ import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {createFromIconfontCN} from "@ant-design/icons";
-import {Link} from "react-router-dom";
+import {Link, NavLink, Route, Routes} from "react-router-dom";
 
 const IconFont = createFromIconfontCN({
     scriptUrl: [
@@ -26,28 +26,58 @@ const identityOption: DefaultOptionType[] = [
 ];
 
 function LoginComponent() {
-    return <Form>
-        <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
-            <Input/>
-        </Form.Item>
-        <Form.Item<LoginFormType> name={"identity"} label={"身份"}>
-            <Select placeholder={"请选择你的身份"} options={identityOption}/>
-        </Form.Item>
+
+    return <div className={"flex flex-col justify-around h-full"}>
+        <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
+        <Form>
+            <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
+                <Input/>
+            </Form.Item>
+            <Form.Item<LoginFormType> name={"identity"} label={"身份"}>
+                <Select placeholder={"请选择你的身份"} options={identityOption}/>
+            </Form.Item>
+        </Form>
         <div className={"flex justify-center"}>
-            <button className={"my-auto button button-primary button-3d"}>点击登录</button>
+            <button className={"button button-raised button-primary button-3d"}>点击登录</button>
         </div>
-    </Form>
+        <div className={"text-center text-sm"}>
+            <div>
+                没有账号？<Link to={"/register"}>点我注册</Link>
+            </div>
+        </div>
+    </div>
 }
+
+function AdminLoginComponent() {
+    return <div className={"flex flex-col justify-around h-full"}>
+        <div className={"text-center text-2xl  font-bold "}>欢迎来到安全简历部署管理系统</div>
+        <Form>
+            <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
+                <Input/>
+            </Form.Item>
+        </Form>
+        <div className={"flex justify-center"}>
+            <button className={"button button-raised button-pill button-action button-3d"}>进入管理系统</button>
+        </div>
+    </div>
+}
+
 
 function LoginPage() {
     return <div>
         <div
-            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-between container-shadow"}>
-            <div className={"text-center text-2xl my-2 font-bold "}>欢迎来到安全简历登录系统</div>
-            <div className={"mx-7"}>
-                <LoginComponent/>
+            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around container-shadow"}>
+            <div className={"text-right pr-5 basis-1/6 pt-2"}>
+                切换
+                {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
+                    <NavLink to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
             </div>
-            <div className={"my-8 text-center text-sm"}>没有账号？<Link to={"/register"}>点我注册</Link></div>
+            <div className={"mx-7 basis-4/5"}>
+                <Routes>
+                    <Route path={"/user"} element={<LoginComponent/>}/>
+                    <Route path={"/admin"} element={<AdminLoginComponent/>}/>
+                </Routes>
+            </div>
         </div>
     </div>
 }

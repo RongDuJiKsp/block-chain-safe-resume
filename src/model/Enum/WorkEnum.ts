@@ -1,3 +1,3 @@
 export enum UserIdentityEnum {
-    None, Applicant, Recruiter, KeyKeeper,
+    None = "None", Applicant = "Applicant", Recruiter = "Recruiter", KeyKeeper = "KeyKeeper",
 }
