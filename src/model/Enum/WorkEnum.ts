@@ -1,3 +1,3 @@
-export enum UserClassesEnum {
-    None, CA, Employer, Employee,
+export enum UserIdentityEnum {
+    None, Applicant, Recruiter, KeyKeeper,
 }

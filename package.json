@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.3",
     "@types/node": "^20.11.28",
+    "alova": "^2.17.1",
+    "antd": "^5.15.2",
     "gm-crypto": "^0.1.12",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
