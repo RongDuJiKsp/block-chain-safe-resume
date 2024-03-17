@@ -13,7 +13,7 @@ CREATE TABLE usersResource (
     PrivateKeys VARCHAR(255) NOT NULL
 );
 CREATE TABLE users (
-    name VARCHAR(50) NOT NULL,
+    hashID VARCHAR(255) NOT NULL,
     ETHAccounts VARCHAR(255) NOT NULL,
     identity VARCHAR(50) NOT NULL
 );
