@@ -273,6 +273,7 @@ function FillInInformationComponent() {
 }
 
 function CheckInformationComponent() {
+    const {message} = App.useApp();
     const [isLoading, setLoading] = useBoolean();
     const registerInfo = useContext(RegisterInfoSetterContext);
     const operateHooks = {
@@ -283,8 +284,15 @@ function CheckInformationComponent() {
             registerInfo.lastStep?.call(null);
         },
         onFinish() {
+            if (isLoading) return;
             setLoading.setTrue();
-            onUploadServer().then(() => registerInfo.nextStep?.call(null));
+            onUploadServer().then(() => {
+                setLoading.setFalse();
+                registerInfo.nextStep?.call(null);
+            }).catch(err => {
+                message.error("发生了错误:" + err).then();
+                setLoading.setFalse();
+            });
         }
     }
     const onUploadServer = async () => {
