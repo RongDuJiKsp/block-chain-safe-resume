@@ -39,7 +39,7 @@ def register(hashID,identity,user):
         condition = f'select * from users where hashID=%s'
         cur.execute(condition, (hashID,))
         if cur.fetchone():
-            user['status'] = "hashID已经存在"
+            user['message'] = "hashID已经存在"
             return json.dumps(user)
 
         #获取ETHAccounts
@@ -58,7 +58,8 @@ def register(hashID,identity,user):
             #更新ETHAccounts状态
             condition = f"DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'";
             cur.execute(condition)
-            user['status'] = "注册成功"
+            user['status'] = 1
+            user['message'] = "注册成功"
             user['hashID'] = hashID
             user['ETHAccounts'] = ETHAccounts
             user['PrivateKeys'] = PrivateKeys

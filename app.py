@@ -20,24 +20,25 @@ CORS(app, supports_credentials=True)
 def registerRoute():
     data = request.get_json()
     user = {
-        'status': '注册失败',
+        'status': 0,
         'hashID': '',
         'identity': '',
         'ETHAccounts': '',
-        'PrivateKeys': ''
+        'PrivateKeys': '',
+        'message':'注册失败'
     }
     try:
         if data['hashID'] is None or data['identity'] is None:
-            user['status'] = "用户名或身份信息不能为空"
+            user['message'] = "用户名或身份信息不能为空"
             return json.dumps(user)
         else:
             if verifyIdentity(data['identity']):
                 return register(data['hashID'], data['identity'], user)
             else:
-                user['status'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+                user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
                 return json.dumps(user)
     except Exception as e:
-        user['status'] = "注册失败"
+        user['message'] = "注册失败"
         return json.dumps(user)
 
 
