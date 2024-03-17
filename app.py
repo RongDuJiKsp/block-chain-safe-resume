@@ -15,27 +15,29 @@ app.config.from_object(settings.Configs)  # 加载flask项目配置
 
 @app.route('/register',methods=["POST"])
 def registerRoute():
-    data = request.form.to_dict()
+    data = request.get_json()
     user = {
         'status': '注册失败',
         'username': '',
+        'identity': '',
         'ETHAccounts': '',
         'PrivateKeys': ''
     }
-    if data['username'] is not None:
+    if data['username'] is None or data['identity'] is None:
+           user['status'] = "用户名或身份信息不能为空"
+           return json.dumps(user)
+    else:
         username = data['username']
+
         if verifyUsername(username):
-            return register(username,user)
+            return register(username,data['identity'] ,user)
         else:
             user['status'] = "用户名需要4到16位的字母、数字、下划线或减号"
             return json.dumps(user)
-    else:
-        user['status'] = "用户名不能为空"
-        return json.dumps(user)
 
 @app.route('/login',methods=["POST"])
 def loginRoute():
-    data = request.form.to_dict()
+    data = request.get_json()
     print(data['username'])
     print(data['password'])
     return jsonify(data)

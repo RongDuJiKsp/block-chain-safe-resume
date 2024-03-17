@@ -16,7 +16,7 @@ def verifyUsername(username):
     else:
         return 0
 
-def register(username,user):
+def register(username,identity,user):
     with pymysql.connect(host='127.0.0.1', user='root', password='123456', database='safe_resume') as conn, conn.cursor() as cur:
         #判断用户名是否已经存在
         condition = 'select * from users where name=%s'
@@ -34,8 +34,8 @@ def register(username,user):
 
 
         #插入用户信息
-        condition = 'insert into users(name,ETHAccounts) values(%s,%s);'
-        cur.execute(condition, (username, ETHAccounts))
+        condition = 'insert into users(name,ETHAccounts,identity) values(%s,%s,%s);'
+        cur.execute(condition, (username, ETHAccounts,identity))
 
         if cur.rowcount:
             #更新ETHAccounts状态
@@ -45,6 +45,7 @@ def register(username,user):
             user['username'] = username
             user['ETHAccounts'] = ETHAccounts
             user['PrivateKeys'] = PrivateKeys
+            user['identity'] = identity
             return json.dumps(user)
         else:
             return json.dumps(user)

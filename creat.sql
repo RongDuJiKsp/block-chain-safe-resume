@@ -14,7 +14,8 @@ CREATE TABLE usersResource (
 );
 CREATE TABLE users (
     name VARCHAR(50) NOT NULL,
-    ETHAccounts VARCHAR(255) NOT NULL
+    ETHAccounts VARCHAR(255) NOT NULL,
+    identity VARCHAR(50) NOT NULL
 );
 INSERT INTO usersResource (ETHAccounts, PrivateKeys)
 VALUES
