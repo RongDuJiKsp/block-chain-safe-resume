@@ -36,14 +36,14 @@ def verifyPrivateKeys(PrivateKeys):
 def register(hashID,identity,user):
     with pymysql.connect(host='127.0.0.1', user='root', password='123456', database='safe_resume') as conn, conn.cursor() as cur:
         #判断用户名是否已经存在
-        condition = 'select * from users where hashID=%s'
+        condition = f'select * from users where hashID=%s'
         cur.execute(condition, (hashID,))
         if cur.fetchone():
             user['status'] = "hashID已经存在"
             return json.dumps(user)
 
         #获取ETHAccounts
-        condition = 'select ETHAccounts,PrivateKeys from usersResource limit 1'
+        condition = f'select ETHAccounts,PrivateKeys from usersResource limit 1'
         cur.execute(condition)
         results = cur.fetchall()
         ETHAccounts = results[0][0]
@@ -51,12 +51,12 @@ def register(hashID,identity,user):
 
 
         #插入用户信息
-        condition = 'insert into users(hashID,ETHAccounts,identity) values(%s,%s,%s);'
+        condition = f'insert into users(hashID,ETHAccounts,identity) values(%s,%s,%s);'
         cur.execute(condition, (hashID, ETHAccounts,identity))
 
         if cur.rowcount:
             #更新ETHAccounts状态
-            condition = "DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'";
+            condition = f"DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'";
             cur.execute(condition)
             user['status'] = "注册成功"
             user['hashID'] = hashID
