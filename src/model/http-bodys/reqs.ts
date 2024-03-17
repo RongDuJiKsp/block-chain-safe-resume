@@ -17,11 +17,12 @@ export interface RegisterReq {
 
 export interface BaseRes {
     status: number;
+    message:string;
 }
 
 export interface RegisterRes extends BaseRes {
     "hashID": string,
     "identity": string,
     "ETHAccounts": string,
-    "PrivateKeys": string
+    "PrivateKeys": string,
 }

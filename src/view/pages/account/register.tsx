@@ -1,5 +1,5 @@
 import "./register.css"
-import {App, Form, Input, Steps} from "antd";
+import {App, Form, Input, Result, Steps} from "antd";
 import React, {
     createContext,
     Dispatch,
@@ -26,6 +26,10 @@ import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entit
 import {StepInformation} from "../../../model/interface/util.ts";
 import {alovaClientImpl} from "../../../controller/net/netClientImpl.ts";
 import {RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
+import {useBoolean} from "ahooks";
+import {ResultStatusType} from "antd/es/result";
+import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
+import {useNavigate} from "react-router-dom";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -126,7 +130,8 @@ function RegisterPage() {
                     res: registerRes,
                     resSetter: setRegisterRes
                 }}>
-                    {StepElements.map((val, index) => currentStep === index && val.element)}
+                    {StepElements.map((val, index) => currentStep === index &&
+                        <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
                 </RegisterInfoSetterContext.Provider>
             </div>
         </div>
@@ -182,8 +187,8 @@ function SelectIdentityComponent() {
         </div>
         <div className={"basis-1/12"}>
             <div className={"h-full flex justify-center gap-14"}>
-                {keys.map(val => val !== UserIdentityEnum.None &&
-                    <button className={"button button-3d button-pill"}
+                {keys.map((val, index) => val !== UserIdentityEnum.None &&
+                    <button key={"select-id-button" + index} className={"button button-3d button-pill"}
                             onClick={() => setSelectedIdentity(val as UserIdentityEnum)}>{val}</button>)}
             </div>
         </div>
@@ -268,6 +273,7 @@ function FillInInformationComponent() {
 }
 
 function CheckInformationComponent() {
+    const [isLoading, setLoading] = useBoolean();
     const registerInfo = useContext(RegisterInfoSetterContext);
     const operateHooks = {
         onRestart() {
@@ -277,6 +283,7 @@ function CheckInformationComponent() {
             registerInfo.lastStep?.call(null);
         },
         onFinish() {
+            setLoading.setTrue();
             onUploadServer().then(() => registerInfo.nextStep?.call(null));
         }
     }
@@ -320,7 +327,9 @@ function CheckInformationComponent() {
         <div className={"basis-1/5"}>
             <div className={"w-2/3 flex justify-around mx-auto"}>
                 <button className={"button button-3d button-caution"} onClick={operateHooks.onRestart}>重新填写</button>
-                <button className={"button button-3d button-primary"} onClick={operateHooks.onFinish}>确认提交</button>
+                <button className={"button button-3d button-primary"} onClick={operateHooks.onFinish}>
+                    {isLoading ? <span><LoadingOutlined/>提交中</span> : "确认提交"}
+                </button>
                 <button className={"button button-3d button-royal"} onClick={operateHooks.onLastStep}>上一步</button>
             </div>
         </div>
@@ -328,7 +337,23 @@ function CheckInformationComponent() {
 }
 
 function GetResultComponent() {
-    return <div>
-        Well done
+    const {res} = useContext(RegisterInfoSetterContext);
+    const {message} = App.useApp();
+    const navigate = useNavigate();
+    const onDownload = () => {
+        FileSystemImpl.downloadToFile(new Blob(["PrivateKeyValue : " + res?.PrivateKeys]), `${res?.ETHAccounts} of ${res?.hashID}`, "key").then(() => message.success("下载成功！"))
+    }
+    const onReturnPage = () => {
+        navigate("/", {replace: true});
+    }
+    return <div className={"h-full  flex flex-col justify-around "}>
+        <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
+            <Result status={res ? "success" : "error"} title={res?.status ? "注册成功" : "注册失败，请重试"}
+                    extra={[res?.status && <button className={"button button-3d button-action"} key={"btn-01"}
+                                                   onClick={onDownload}>保存key</button>,
+                        <button className={"button button-3d button-primary"} key={"btn-02"}
+                                onClick={onReturnPage}>返回登录</button>]}
+                    subTitle={res?.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.message}/>
+        </div>
     </div>
 }
