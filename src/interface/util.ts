@@ -10,4 +10,5 @@ export type ConfigTable<List extends string | number, ValuesType> = {
 }
 export interface ComponentUtils{
     getIconLabel(labelValue:string, elementName:string):ReactNode;
+    getQuestionLabel(labelValue:string,tipsValue:string):ReactNode;
 }

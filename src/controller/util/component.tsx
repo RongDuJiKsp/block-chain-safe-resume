@@ -1,6 +1,7 @@
-import {createFromIconfontCN} from "@ant-design/icons";
+import {createFromIconfontCN, QuestionCircleTwoTone} from "@ant-design/icons";
 import {ComponentUtils} from "../../interface/util.ts";
 import React from "react";
+import {Tooltip} from "antd";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const IconFont = createFromIconfontCN({
@@ -12,5 +13,8 @@ const IconFont = createFromIconfontCN({
 export const componentUtils: ComponentUtils = {
     getIconLabel(value: string, element: string): React.ReactNode {
         return <span><IconFont type={element}/>&nbsp;{value}</span>
+    },
+    getQuestionLabel(labelValue: string, tipsValue: string): React.ReactNode {
+        return <span> {labelValue} <Tooltip title={tipsValue} color={"blue-inverse"}><QuestionCircleTwoTone twoToneColor={"#919191"}/></Tooltip> </span>
     }
 }
