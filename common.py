@@ -26,21 +26,25 @@ def register(username,user):
             return json.dumps(user)
 
         #获取ETHAccounts
-        condition = 'select ETHAccounts from usersResource limit 1'
+        condition = 'select ETHAccounts,PrivateKeys from usersResource limit 1'
         cur.execute(condition)
-        result = cur.fetchall()[0][0]
+        results = cur.fetchall()
+        ETHAccounts = results[0][0]
+        PrivateKeys = results[0][1]
+
 
         #插入用户信息
         condition = 'insert into users(name,ETHAccounts) values(%s,%s);'
-        cur.execute(condition, (username, result))
+        cur.execute(condition, (username, ETHAccounts))
 
         if cur.rowcount:
             #更新ETHAccounts状态
-            condition = "DELETE FROM usersResource WHERE ETHAccounts='"+result+"'";
+            condition = "DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'";
             cur.execute(condition)
             user['status'] = "注册成功"
             user['username'] = username
-            user['ETHAccounts'] = result
+            user['ETHAccounts'] = ETHAccounts
+            user['PrivateKeys'] = PrivateKeys
             return json.dumps(user)
         else:
             return json.dumps(user)

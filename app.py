@@ -19,7 +19,8 @@ def registerRoute():
     user = {
         'status': '注册失败',
         'username': '',
-        'ETHAccounts': ''
+        'ETHAccounts': '',
+        'PrivateKeys': ''
     }
     if data['username'] is not None:
         username = data['username']
