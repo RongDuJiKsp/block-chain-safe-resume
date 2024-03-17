@@ -22,6 +22,10 @@ import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {cryptoOfHash} from "../../../controller/crypto/hash.ts";
 import {ruleConfig} from "../../../config/backendrule.config.ts";
+import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entity/user.ts";
+import {StepInformation} from "../../../model/interface/util.ts";
+import {alovaClientImpl} from "../../../controller/net/netClientImpl.ts";
+import {RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -30,36 +34,33 @@ function getDescriptionWithStep(targetStep: number, currentStep: number, descrip
     else return "Well done";
 }
 
-interface UserRegisterInfo {
-    userIdentity: UserIdentityEnum;
-    userName: string;
-    userIDCard: string;
-    userAnoKey: string;
-    infoHash: string
+
+interface RegisterUserInfo extends BasicUserInfo {
+    inputInfo: HashedUserRegisterInformation
 }
 
-const userRegisterInfoDefaultValue: UserRegisterInfo = {
-    userAnoKey: "", userIDCard: "", userIdentity: UserIdentityEnum.None, userName: "", infoHash: ""
+const userRegisterInfoDefaultValue: RegisterUserInfo = {
+    inputInfo: {userAnoKey: "", userIDCard: "", userIdentity: UserIdentityEnum.None, userName: ""},
+    hash: "",
+    privateKey: "",
+    identity: UserIdentityEnum.None,
+    nick: ""
 }
+
 
 interface StateManager {
     nextStep?: () => void;
     lastStep?: () => void;
     reStart?: () => void;
-    infoSetter?: Dispatch<SetStateAction<UserRegisterInfo>>
-    info: UserRegisterInfo
+    infoSetter?: Dispatch<SetStateAction<RegisterUserInfo>>
+    info: RegisterUserInfo,
+    resSetter?: Dispatch<SetStateAction<RegisterRes | undefined>>
+    res?: RegisterRes
 
 }
 
 const RegisterInfoSetterContext = createContext<StateManager>({info: userRegisterInfoDefaultValue});
 
-
-interface StepInformation {
-    title: string;
-    focusDescription: string;
-    noFocusIcon: ReactElement;
-    element: ReactElement
-}
 
 const StepElements: StepInformation[] = [
     {
@@ -89,7 +90,8 @@ const StepElements: StepInformation[] = [
 
 function RegisterPage() {
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [userInfo, setUSerInfo] = useState<UserRegisterInfo>(userRegisterInfoDefaultValue);
+    const [userInfo, setUSerInfo] = useState<RegisterUserInfo>(userRegisterInfoDefaultValue);
+    const [registerRes, setRegisterRes] = useState<RegisterRes>();
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
             title: val.title,
@@ -120,7 +122,9 @@ function RegisterPage() {
                     info: userInfo,
                     infoSetter: setUSerInfo,
                     lastStep: setLastStep,
-                    reStart: reStart
+                    reStart: reStart,
+                    res: registerRes,
+                    resSetter: setRegisterRes
                 }}>
                     {StepElements.map((val, index) => currentStep === index && val.element)}
                 </RegisterInfoSetterContext.Provider>
@@ -141,7 +145,11 @@ function SelectIdentityComponent() {
             message.error("You can't continue with None").then();
             return;
         }
-        registerInfo.infoSetter?.call(null, v => ({...v, userIdentity: selectedIdentity}));
+        registerInfo.infoSetter?.call(null, (v): RegisterUserInfo => ({
+            ...v,
+            inputInfo: {...v.inputInfo, userIdentity: selectedIdentity},
+            identity: selectedIdentity
+        }));
         registerInfo.nextStep?.call(null);
     }
 
@@ -191,23 +199,26 @@ function SelectIdentityComponent() {
 
 function FillInInformationComponent() {
     const registerInfo = useContext(RegisterInfoSetterContext);
-    const [formRef] = Form.useForm<UserRegisterInfo>();
+    const [formRef] = Form.useForm<HashedUserRegisterInformation>();
     const onConformAndNext = () => {
-        registerInfo.infoSetter?.call(null, (prevState): UserRegisterInfo => {
-            const infoVal: UserRegisterInfo = {
-                ...formRef.getFieldsValue(),
-                infoHash: "",
-                userIdentity: prevState.userIdentity
+        registerInfo.infoSetter?.call(null, (prevState): RegisterUserInfo => {
+            const infoVal: HashedUserRegisterInformation = {
+                ...formRef.getFieldsValue(), userIdentity: prevState.identity
             }
-            infoVal.infoHash = cryptoOfHash.hashData(JSON.stringify(infoVal));
-            console.log(infoVal);
-            return infoVal;
+            return {
+                ...prevState,
+                inputInfo: infoVal,
+                hash: cryptoOfHash.hashData(JSON.stringify(infoVal)),
+                nick: formRef.getFieldValue("nick")
+            }
         });
 
         registerInfo.nextStep?.call(null);
     }
     const onFirstLoad = useCallback(() => {
-        formRef.setFieldsValue(registerInfo.info);
+        formRef.setFieldsValue(registerInfo.info.inputInfo);
+        formRef.setFieldValue("nick", registerInfo.info.nick);
+
     }, [formRef, registerInfo.info])
     useEffect(() => {
         onFirstLoad();
@@ -219,26 +230,31 @@ function FillInInformationComponent() {
         <div className={"basis-3/5 pl-12"}>
             <Form className={"flex flex-col gap-12 w-2/3 my-auto"} form={formRef} labelCol={{span: 8}}
                   wrapperCol={{span: 16}} onFinish={onConformAndNext}>
-                <Form.Item<UserRegisterInfo> name={"userName"}
-                                             rules={[{required: true, message: "姓名不能为空"}, {
-                                                 min: 2,
-                                                 max: 30,
-                                                 message: "姓名不符合要求"
-                                             }]}
-                                             label={componentUtils.getQuestionLabel("姓名", "您的姓名用于计算您的身份hash，我们承诺您的姓名只在本地参与运算，不会上传到服务器。")}>
+                <Form.Item<HashedUserRegisterInformation> name={"userName"}
+                                                          rules={[{required: true, message: "姓名不能为空"}, {
+                                                              min: 2,
+                                                              max: 30,
+                                                              message: "姓名不符合要求"
+                                                          }]}
+                                                          label={componentUtils.getQuestionLabel("姓名", "您的姓名用于计算您的身份hash，我们承诺您的姓名只在本地参与运算，不会上传到服务器。")}>
                     <Input/>
                 </Form.Item>
-                <Form.Item<UserRegisterInfo> name={"userIDCard"}
-                                             rules={[{required: true, message: "身份证或数字id不能为空"}, {
-                                                 pattern: ruleConfig.identityCardRegexp,
-                                                 len: 18,
-                                                 message: "身份证号不符合要求"
-                                             }]}
-                                             label={componentUtils.getQuestionLabel("身份证号或数字id", "您的身份证号码仅和您的姓名用于计算您的身份hash，我们承诺您的身份证号码只在本地参与运算，不会上传到服务器。")}>
+                <Form.Item<HashedUserRegisterInformation> name={"userIDCard"}
+                                                          rules={[{required: true, message: "身份证或数字id不能为空"}, {
+                                                              pattern: ruleConfig.identityCardRegexp,
+                                                              len: 18,
+                                                              message: "身份证号不符合要求"
+                                                          }]}
+                                                          label={componentUtils.getQuestionLabel("身份证号或数字id", "您的身份证号码仅和您的姓名用于计算您的身份hash，我们承诺您的身份证号码只在本地参与运算，不会上传到服务器。")}>
                     <Input/>
                 </Form.Item>
-                <Form.Item<UserRegisterInfo> name={"userAnoKey"} rules={[{required: true, message: "请填写安全语句"}]}
-                                             label={componentUtils.getQuestionLabel("安全语句", "您的安全语句用于混淆计算出来的hash，以防止恶意分子获取到您的信息后恶意注册影响您的正常使用，安全语句可以是任意内容，但请记住已便于找回hash")}>
+                <Form.Item<RegisterUserInfo> name={"nick"} rules={[{required: true, message: "昵称不能为空！"}]}
+                                             label={"昵称"}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item<HashedUserRegisterInformation> name={"userAnoKey"}
+                                                          rules={[{required: true, message: "请填写安全语句"}]}
+                                                          label={componentUtils.getQuestionLabel("安全语句", "您的安全语句用于混淆计算出来的hash，以防止恶意分子获取到您的信息后恶意注册影响您的正常使用，安全语句可以是任意内容，但请记住已便于找回hash")}>
                     <Input.TextArea autoSize={{minRows: 5, maxRows: 5}}/>
                 </Form.Item>
                 <Form.Item className={"flex justify-center"}>
@@ -261,15 +277,46 @@ function CheckInformationComponent() {
             registerInfo.lastStep?.call(null);
         },
         onFinish() {
-            registerInfo.nextStep?.call(null);
+            onUploadServer().then(() => registerInfo.nextStep?.call(null));
         }
+    }
+    const onUploadServer = async () => {
+        const reqBody: RegisterReq = {
+            identity: registerInfo.info.identity,
+            hashID: registerInfo.info.hash,
+            nickname: registerInfo.info.nick
+        }
+        registerInfo.resSetter?.call(null, await alovaClientImpl.Post<RegisterRes>("/register", reqBody));
     }
 
     return <div className={"login-full-context-anima h-full flex flex-col justify-around"}>
         <div className={"basis-1/12 text-xl text-center "}>
             <div className={"mt-5"}> 请核对您的个人信息是否正确，一经注册，无法修改！</div>
         </div>
-        <div className={"basis-3/5 border-2 border-purple-300 bg-pale"}></div>
+        <div className={"basis-3/5 border-2 border-purple-300 bg-pale"}>
+            <div className={"px-[22%] flex flex-col justify-around h-full"}>
+                <p>
+                    您的姓名 : {registerInfo.info.inputInfo.userName}
+                </p>
+                <p>
+                    您的身份证号 : {registerInfo.info.inputInfo.userIDCard}
+                </p>
+                <p>
+                    您的注册身份 : {registerInfo.info.inputInfo.userIdentity}
+                </p>
+                <p>
+                    您的安全语句 : {registerInfo.info.inputInfo.userAnoKey}
+                </p>
+                <p>
+                    您的昵称 : {registerInfo.info.nick}
+                </p>
+                <p>
+                    系统计算的hash:<br/>
+                    {registerInfo.info.hash}
+                </p>
+
+            </div>
+        </div>
         <div className={"basis-1/5"}>
             <div className={"w-2/3 flex justify-around mx-auto"}>
                 <button className={"button button-3d button-caution"} onClick={operateHooks.onRestart}>重新填写</button>

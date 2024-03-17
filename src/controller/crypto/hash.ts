@@ -1,6 +1,6 @@
 import {SM4} from "gm-crypto"
 import crypto from "crypto"
-import {CryptoOfHash} from "../../interface/crypto";
+import {CryptoOfHash} from "../../model/interface/crypto";
 
 export const cryptoOfHash: CryptoOfHash = {
     encryptedData(originalData, key) {

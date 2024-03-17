@@ -8,7 +8,7 @@ export const fileConfig={
     supposedType:"application/json;charset=utf8"
 }
 export const serverConfig={
-    backendUrl:"http://localhost:8080"
+    backendUrl:"http://localhost:5000"
 }
 export const fileSuffixConfig=new Map([
     ["application/pdf","pdf"],

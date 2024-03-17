@@ -1,5 +1,5 @@
 import {createFromIconfontCN, QuestionCircleTwoTone} from "@ant-design/icons";
-import {ComponentUtils} from "../../interface/util.ts";
+import {ComponentUtils} from "../../model/interface/util.ts";
 import React from "react";
 import {Tooltip} from "antd";
 

@@ -1,4 +1,4 @@
-import {UserFileSystem} from "../../interface/util.ts";
+import {UserFileSystem} from "../../model/interface/util.ts";
 
 export const FileSystemImpl: UserFileSystem = {
 

@@ -1,4 +1,4 @@
-import {ReactNode} from "react";
+import {ReactElement, ReactNode} from "react";
 
 export interface UserFileSystem {
     downloadToFile(file: BinFile, prefix: string, suffix: string): Promise<void>;
@@ -11,4 +11,10 @@ export type ConfigTable<List extends string | number, ValuesType> = {
 export interface ComponentUtils{
     getIconLabel(labelValue:string, elementName:string):ReactNode;
     getQuestionLabel(labelValue:string,tipsValue:string):ReactNode;
+}
+export interface StepInformation {
+    title: string;
+    focusDescription: string;
+    noFocusIcon: ReactElement;
+    element: ReactElement
 }
