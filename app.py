@@ -6,13 +6,13 @@
 # @介绍    :
 import json
 
-import settings
+from settings import Configs
 from common import *
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-app.config.from_object(settings.Configs)  # 加载flask项目配置
+app.config.from_object(Configs)  # 加载flask项目配置
 CORS(app, supports_credentials=True)
 
 
@@ -25,7 +25,7 @@ def registerRoute():
         'identity': '',
         'ETHAccounts': '',
         'PrivateKeys': '',
-        'message':'注册失败'
+        'message': '注册失败'
     }
     try:
         if data['hashID'] is None or data['identity'] is None:
@@ -38,7 +38,7 @@ def registerRoute():
                 user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
                 return json.dumps(user)
     except Exception as e:
-        user['message'] = "注册失败"
+        user['message'] = "注册失败 原因 {}".format(str(e))
         return json.dumps(user)
 
 
@@ -59,4 +59,4 @@ def loginRoute():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=5000, debug=True)

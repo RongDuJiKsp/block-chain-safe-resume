@@ -7,13 +7,16 @@
 import json
 import re
 import pymysql
+from settings import Configs
+
 
 def verifyIdentity(identity):
-    list=["Applicant","Recruiter","KeyKeeper"]
+    list = ["Applicant", "Recruiter", "KeyKeeper"]
     if identity in list:
         return 1
     else:
         return 0
+
 
 def verifyPrivateKeys(PrivateKeys):
     list = [
@@ -33,30 +36,30 @@ def verifyPrivateKeys(PrivateKeys):
     else:
         return 0
 
-def register(hashID,identity,user):
-    with pymysql.connect(host='127.0.0.1', user='root', password='123456', database='safe_resume') as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
+
+def register(hashID, identity, user):
+    with pymysql.connect(host=Configs.host, user=Configs.user, password=Configs.user, database=Configs.db) as conn, conn.cursor() as cur:
+        # 判断用户名是否已经存在
         condition = f'select * from users where hashID=%s'
         cur.execute(condition, (hashID,))
         if cur.fetchone():
             user['message'] = "hashID已经存在"
             return json.dumps(user)
 
-        #获取ETHAccounts
+        # 获取ETHAccounts
         condition = f'select ETHAccounts,PrivateKeys from usersResource limit 1'
         cur.execute(condition)
         results = cur.fetchall()
         ETHAccounts = results[0][0]
         PrivateKeys = results[0][1]
 
-
-        #插入用户信息
+        # 插入用户信息
         condition = f'insert into users(hashID,ETHAccounts,identity) values(%s,%s,%s);'
-        cur.execute(condition, (hashID, ETHAccounts,identity))
+        cur.execute(condition, (hashID, ETHAccounts, identity))
 
         if cur.rowcount:
-            #更新ETHAccounts状态
-            condition = f"DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'";
+            # 更新ETHAccounts状态
+            condition = f"DELETE FROM usersResource WHERE ETHAccounts='"+ETHAccounts+"'"
             cur.execute(condition)
             user['status'] = 1
             user['message'] = "注册成功"
@@ -67,5 +70,3 @@ def register(hashID,identity,user):
             return json.dumps(user)
         else:
             return json.dumps(user)
-
-
