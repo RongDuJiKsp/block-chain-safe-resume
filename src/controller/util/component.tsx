@@ -6,6 +6,7 @@ import {Tooltip} from "antd";
 // eslint-disable-next-line react-refresh/only-export-components
 const IconFont = createFromIconfontCN({
     scriptUrl: [
+        '//at.alicdn.com/t/c/font_4471939_e4rdj0nhnpn.js',
         '//at.alicdn.com/t/font_1788044_0dwu4guekcwr.js',
         '//at.alicdn.com/t/font_1788592_a5xf2bdic3u.js',
     ],

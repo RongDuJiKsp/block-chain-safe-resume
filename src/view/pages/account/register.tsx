@@ -1,15 +1,6 @@
 import "./register.css"
 import {App, Form, Input, Result, Steps} from "antd";
-import React, {
-    createContext,
-    Dispatch,
-    ReactElement,
-    SetStateAction,
-    useCallback,
-    useContext,
-    useEffect,
-    useState
-} from "react";
+import React, {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import {StepProps} from "antd/es/steps";
 import {
     CheckCircleOutlined,
@@ -27,7 +18,6 @@ import {StepInformation} from "../../../model/interface/util.ts";
 import {alovaClientImpl} from "../../../controller/net/netClientImpl.ts";
 import {RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {useBoolean} from "ahooks";
-import {ResultStatusType} from "antd/es/result";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 
@@ -177,7 +167,7 @@ function SelectIdentityComponent() {
                 <p className={"text-lg"}>
                     Key keeper:<br/>
                     Key keeper 通过安全通道接收 Applicant 的子密钥，并可以接收保管人
-                    Key keeper可以通过提供以下方式从Recruiter获得部分资金用于下载简历:<br/>
+                    Key keeper可以通过提供以下方式从Recruiter获得部分token:<br/>
                     子项通过智能合约正确执行，并协助恢复对称密钥。
                 </p>
             </div>
@@ -254,7 +244,7 @@ function FillInInformationComponent() {
                     <Input/>
                 </Form.Item>
                 <Form.Item<RegisterUserInfo> name={"nick"} rules={[{required: true, message: "昵称不能为空！"}]}
-                                             label={"昵称"}>
+                                             label={componentUtils.getQuestionLabel("用户昵称", "用户昵称用于便于记忆的唯一标识一个用户，请确保您的昵称便于记忆")}>
                     <Input/>
                 </Form.Item>
                 <Form.Item<HashedUserRegisterInformation> name={"userAnoKey"}
@@ -356,12 +346,19 @@ function GetResultComponent() {
     }
     return <div className={"h-full  flex flex-col justify-around "}>
         <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
-            <Result status={res ? "success" : "error"} title={res?.status ? "注册成功" : "注册失败，请重试"}
-                    extra={[res?.status && <button className={"button button-3d button-action"} key={"btn-01"}
-                                                   onClick={onDownload}>保存key</button>,
-                        <button className={"button button-3d button-primary"} key={"btn-02"}
-                                onClick={onReturnPage}>返回登录</button>]}
+            <Result status={res?.status ? "success" : "error"} title={res?.status ? "注册成功" : "注册失败，请重试"}
+                    extra={<span className={"flex justify-center gap-14"}>
+                             <button className={"button button-3d button-action"} onClick={onDownload}
+                                     style={{display: res?.status ? "inline-block" : "none"}}>
+                                 保存key
+                             </button>
+                             <button className={"button button-3d button-primary"} onClick={onReturnPage}>
+                              返回登录
+                            </button>
+                             </span>}
                     subTitle={res?.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.message}/>
         </div>
     </div>
 }
+
+

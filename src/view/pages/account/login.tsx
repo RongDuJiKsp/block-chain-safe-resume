@@ -3,15 +3,8 @@ import {Form, Input, Select} from "antd"
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
-import {createFromIconfontCN} from "@ant-design/icons";
 import {Link, NavLink, Route, Routes} from "react-router-dom";
 
-const IconFont = createFromIconfontCN({
-    scriptUrl: [
-        '//at.alicdn.com/t/font_1788044_0dwu4guekcwr.js',
-        '//at.alicdn.com/t/font_1788592_a5xf2bdic3u.js',
-    ],
-});
 
 type LoginFormType = {
     keyword: string,
@@ -20,10 +13,32 @@ type LoginFormType = {
 }
 
 const identityOption: DefaultOptionType[] = [
-    {value: "Applicant", label: componentUtils.getIconLabel("Applicant", "icon-python")},
-    {value: "Recruiter", label: componentUtils.getIconLabel("Recruiter", "icon-python")},
-    {value: "KeyKeeper", label: componentUtils.getIconLabel("KeyKeeper", "icon-python")}
+    {value: "Applicant", label: componentUtils.getIconLabel("Applicant", "icon-Owner-1")},
+    {value: "Recruiter", label: componentUtils.getIconLabel("Recruiter", "icon-search")},
+    {value: "KeyKeeper", label: componentUtils.getIconLabel("KeyKeeper", "icon-key")}
 ];
+
+
+function LoginPage() {
+    return <div>
+        <div
+            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around container-shadow"}>
+            <div className={"text-right pr-5 basis-1/6 pt-2"}>
+                切换
+                {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
+                    <NavLink to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
+            </div>
+            <div className={"mx-7 basis-4/5"}>
+                <Routes>
+                    <Route path={"/user"} element={<LoginComponent/>}/>
+                    <Route path={"/admin"} element={<AdminLoginComponent/>}/>
+                </Routes>
+            </div>
+        </div>
+    </div>
+}
+
+export default LoginPage;
 
 function LoginComponent() {
 
@@ -61,25 +76,3 @@ function AdminLoginComponent() {
         </div>
     </div>
 }
-
-
-function LoginPage() {
-    return <div>
-        <div
-            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around container-shadow"}>
-            <div className={"text-right pr-5 basis-1/6 pt-2"}>
-                切换
-                {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
-                    <NavLink to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
-            </div>
-            <div className={"mx-7 basis-4/5"}>
-                <Routes>
-                    <Route path={"/user"} element={<LoginComponent/>}/>
-                    <Route path={"/admin"} element={<AdminLoginComponent/>}/>
-                </Routes>
-            </div>
-        </div>
-    </div>
-}
-
-export default LoginPage;
