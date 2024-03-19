@@ -1,12 +1,11 @@
-import {atom} from "jotai/vanilla/atom";
+import {atom, useAtomValue} from "jotai";
 import {BasicUserInfo} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
-import {useAtomValue} from "jotai/react/useAtomValue";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {serverConfig} from "../../../config/net.config.ts";
-import {RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
+import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 
 export const alovaClientImpl = createAlova({
@@ -27,6 +26,8 @@ interface UserWorkValue {
 
 interface UserWorkMethod {
     registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
+
+    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<BaseRes>
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -38,6 +39,13 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     },
     useMethod(): UserWorkMethod {
         return {
+            async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<BaseRes> {
+                const reqBody: LoginReq = {
+                    identity,
+                    PrivateKeys: privateKey
+                }
+                return alovaClientImpl.Post<BaseRes>("/login", reqBody);
+            },
             async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
                     nickname, hashID, identity
@@ -46,4 +54,12 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             }
         }
     }
+}
+export const AdminWorkHooks: AtomHooks<Record<string, never>, Record<string, never>> = {
+    useMethod(): Record<string, never> {
+        return {};
+    }, useValue(): Record<string, never> {
+        return {};
+    }
+
 }

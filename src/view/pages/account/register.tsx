@@ -19,7 +19,7 @@ import {RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {useBoolean} from "ahooks";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Atom/UserWorkHooks.ts";
+import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {

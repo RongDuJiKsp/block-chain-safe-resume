@@ -26,7 +26,7 @@ function LoginPage() {
             <div className={"text-right pr-5 basis-1/6 pt-2"}>
                 切换
                 {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
-                    <NavLink to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
+                    <NavLink key={r[0]} to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
             </div>
             <div className={"mx-7 basis-4/5"}>
                 <Routes>
