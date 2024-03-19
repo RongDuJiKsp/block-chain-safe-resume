@@ -1,6 +1,7 @@
 import {SM4} from "gm-crypto"
 import crypto from "crypto"
-import {CryptoOfHash} from "../../model/interface/crypto";
+import {CryptoOfHash, HashToTranslate} from "../../model/interface/crypto";
+import {HashedUserRegisterInformation} from "../../model/entity/user.ts";
 
 export const cryptoOfHash: CryptoOfHash = {
     encryptedData(originalData, key) {
@@ -20,4 +21,10 @@ export const cryptoOfHash: CryptoOfHash = {
         hash.update(data);
         return hash.digest('hex');
     },
+}
+export const hashToTranslate: HashToTranslate = {
+    getHashOfUserInfo(info: HashedUserRegisterInformation): string {
+        return cryptoOfHash.hashData(JSON.stringify(info));
+    }
+
 }

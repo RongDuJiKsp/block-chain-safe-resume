@@ -11,15 +11,15 @@ import {
 } from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {componentUtils} from "../../../controller/util/component.tsx";
-import {cryptoOfHash} from "../../../controller/crypto/hash.ts";
+import {hashToTranslate} from "../../../controller/crypto/hash.ts";
 import {ruleConfig} from "../../../config/backendrule.config.ts";
 import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entity/user.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {alovaClientImpl} from "../../../controller/net/netClientImpl.ts";
-import {RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
+import {RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {useBoolean} from "ahooks";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
+import {UserWorkHooks} from "../../../controller/Hooks/Atom/UserWorkHooks.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -203,7 +203,7 @@ function FillInInformationComponent() {
             return {
                 ...prevState,
                 inputInfo: infoVal,
-                hash: cryptoOfHash.hashData(JSON.stringify(infoVal)),
+                hash: hashToTranslate.getHashOfUserInfo(infoVal),
                 nick: formRef.getFieldValue("nick")
             }
         });
@@ -263,6 +263,7 @@ function FillInInformationComponent() {
 }
 
 function CheckInformationComponent() {
+    const userWork = UserWorkHooks.useMethod();
     const {message} = App.useApp();
     const [isLoading, setLoading] = useBoolean();
     const registerInfo = useContext(RegisterInfoSetterContext);
@@ -276,22 +277,15 @@ function CheckInformationComponent() {
         onFinish() {
             if (isLoading) return;
             setLoading.setTrue();
-            onUploadServer().then(() => {
+            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then(() => {
                 setLoading.setFalse();
                 registerInfo.nextStep?.call(null);
             }).catch(err => {
                 message.error("发生了错误:" + err).then();
                 setLoading.setFalse();
             });
+
         }
-    }
-    const onUploadServer = async () => {
-        const reqBody: RegisterReq = {
-            identity: registerInfo.info.identity,
-            hashID: registerInfo.info.hash,
-            nickname: registerInfo.info.nick
-        }
-        registerInfo.resSetter?.call(null, await alovaClientImpl.Post<RegisterRes>("/register", reqBody));
     }
 
     return <div className={"login-full-context-anima h-full flex flex-col justify-around"}>
