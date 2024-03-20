@@ -6,34 +6,31 @@
 # @介绍    :
 import json
 
-from settings import Configs
 from common import *
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-app.config.from_object(Configs)  # 加载flask项目配置
-CORS(app, supports_credentials=True)
-
 
 @app.route('/register', methods=["POST"])
 def registerRoute():
     data = request.get_json()
     user = {
         'status': 0,
+        'username': '',
         'hashID': '',
         'identity': '',
         'ETHAccounts': '',
+        'PublicKeys': '',
         'PrivateKeys': '',
         'message': '注册失败'
     }
     try:
-        if data['hashID'] is None or data['identity'] is None:
+        if data['hashID'] is None or data['identity'] is None or data['username'] is None:
             user['message'] = "用户名或身份信息不能为空"
             return json.dumps(user)
         else:
             if verifyIdentity(data['identity']):
-                return register(data['hashID'], data['identity'], user)
+                return register(data, user)
             else:
                 user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
                 return json.dumps(user)
@@ -47,16 +44,33 @@ def loginRoute():
     data = request.get_json()
     login = {
         'status': 0,
+        'username': '',
     }
-    try:
-        if verifyPrivateKeys(data['PrivateKeys']):
-            login['status'] = 1
+    if data['identity']=='Applicant':
+        try:
+            username=verifyPrivateKeys(data['PrivateKeys'], data['username'])
+            if not (username is None):
+                login['status'] = 1
+                login['username'] = username
+                return json.dumps(login)
+            else:
+                return json.dumps(login)
+        except Exception as e:
             return json.dumps(login)
-        else:
+    elif data['identity']=='Recruiter':
+        try:
+            login['status']=verifyRecruiter(data['username'])
+            if login['status']==1:
+                login['username'] = data['username']
+                return json.dumps(login)
+            else:
+                return json.dumps(login)
+        except Exception as e:
             return json.dumps(login)
-    except Exception as e:
-        return json.dumps(login)
 
+@app.route('/upload', methods=["POST"])
+def uploadRoute():
+    return 1;
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
