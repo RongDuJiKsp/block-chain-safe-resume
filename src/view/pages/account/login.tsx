@@ -5,6 +5,8 @@ import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {Link, NavLink, Route, Routes} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {useBoolean} from "ahooks";
+import {LoadingOutlined} from "@ant-design/icons";
 
 
 type LoginFormType = {
@@ -44,12 +46,19 @@ export default LoginPage;
 
 function LoginComponent() {
     const workMethod = UserWorkHooks.useMethod();
+    const [isLoading, loadingAction] = useBoolean();
     const {message} = App.useApp()
 
     const onLogin = (val: LoginFormType) => {
+        if (isLoading) return;
+        loadingAction.setTrue();
         workMethod.loginAsync(val.identity, val.identity).then(r => {
             if (r.status) message.success("登录成功").then();
             else message.error("登录失败").then();
+            loadingAction.setFalse();
+        }).catch(e => {
+            console.error(e);
+            loadingAction.setFalse();
         })
     };
 
@@ -63,7 +72,9 @@ function LoginComponent() {
                 <Select placeholder={"请选择你的身份"} options={identityOption}/>
             </Form.Item>
             <div className={"flex justify-center"}>
-                <button className={"button button-raised button-primary button-3d"}>点击登录</button>
+                <button className={"button button-raised button-primary button-3d"}>
+                    <div className={"w-24"}>{isLoading ? <span><LoadingOutlined/> 正在登录</span> : <span>点击登录</span>}</div>
+                </button>
             </div>
         </Form>
         <div className={"text-center text-sm"}>

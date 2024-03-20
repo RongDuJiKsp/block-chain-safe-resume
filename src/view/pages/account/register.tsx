@@ -203,7 +203,7 @@ function FillInInformationComponent() {
     const [formRef] = Form.useForm<RegisterFormType>();
     const onConformAndNext = (val: RegisterFormType) => {
         registerInfo.infoSetter?.call(null, (prevState): RegisterUserInfo => {
-            const {name, IDCard, safeKey,nickName} = val;
+            const {name, IDCard, safeKey, nickName} = val;
             const {identity, privateKey} = prevState;
             const infoVal: HashedUserRegisterInformation = {
                 userName: name,
@@ -340,7 +340,9 @@ function CheckInformationComponent() {
             <div className={"w-2/3 flex justify-around mx-auto"}>
                 <button className={"button button-3d button-caution"} onClick={operateHooks.onRestart}>重新填写</button>
                 <button className={"button button-3d button-primary"} onClick={operateHooks.onFinish}>
-                    {isLoading ? <span><LoadingOutlined/>提交中</span> : "确认提交"}
+                    <div className={"w-24"}>{isLoading ?
+                        <span><LoadingOutlined/> 正在提交</span> :
+                        <span>确认提交</span>}</div>
                 </button>
                 <button className={"button button-3d button-royal"} onClick={operateHooks.onLastStep}>上一步</button>
             </div>
