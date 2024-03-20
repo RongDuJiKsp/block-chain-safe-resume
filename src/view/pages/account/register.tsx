@@ -190,7 +190,12 @@ function SelectIdentityComponent() {
         </div>
     </div>
 }
-
+interface RegisterFormType{
+    name:string;
+    IDCard:string;
+    nick:string;
+    safeKey:string;
+}
 
 function FillInInformationComponent() {
     const registerInfo = useContext(RegisterInfoSetterContext);

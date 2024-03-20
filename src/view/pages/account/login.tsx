@@ -1,9 +1,10 @@
 import "./login.css"
-import {Form, Input, Select} from "antd"
+import {App, Form, Input, Select} from "antd"
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {Link, NavLink, Route, Routes} from "react-router-dom";
+import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 
 
 type LoginFormType = {
@@ -26,7 +27,8 @@ function LoginPage() {
             <div className={"text-right pr-5 basis-1/6 pt-2"}>
                 切换
                 {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
-                    <NavLink key={r[0]} to={r[1]} className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
+                    <NavLink key={r[0]} to={r[1]}
+                             className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
             </div>
             <div className={"mx-7 basis-4/5"}>
                 <Routes>
@@ -41,20 +43,29 @@ function LoginPage() {
 export default LoginPage;
 
 function LoginComponent() {
+    const workMethod = UserWorkHooks.useMethod();
+    const {message} = App.useApp()
+
+    const onLogin = (val: LoginFormType) => {
+        workMethod.loginAsync(val.identity, val.identity).then(r => {
+            if (r.status) message.success("登录成功").then();
+            else message.error("登录失败").then();
+        })
+    };
 
     return <div className={"flex flex-col justify-around h-full"}>
         <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
-        <Form>
+        <Form<LoginFormType> onFinish={onLogin}>
             <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
                 <Input/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} label={"身份"}>
                 <Select placeholder={"请选择你的身份"} options={identityOption}/>
             </Form.Item>
+            <div className={"flex justify-center"}>
+                <button className={"button button-raised button-primary button-3d"}>点击登录</button>
+            </div>
         </Form>
-        <div className={"flex justify-center"}>
-            <button className={"button button-raised button-primary button-3d"}>点击登录</button>
-        </div>
         <div className={"text-center text-sm"}>
             <div>
                 没有账号？<Link to={"/register"}>点我注册</Link>
