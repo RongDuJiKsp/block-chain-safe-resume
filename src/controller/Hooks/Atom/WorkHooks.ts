@@ -1,4 +1,4 @@
-import {atom, useAtomValue} from "jotai";
+import {atom, useAtomValue, useSetAtom} from "jotai";
 import {BasicUserInfo} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
@@ -27,7 +27,9 @@ interface UserWorkValue {
 interface UserWorkMethod {
     registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
 
-    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<BaseRes>
+    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<BaseRes>;
+
+    logout(): void;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -38,13 +40,25 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
         }
     },
     useMethod(): UserWorkMethod {
+        const setInfo = useSetAtom(userInfoAtom);
         return {
+            logout(): void {
+                // setInfo(null);
+            },
             async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<BaseRes> {
+
                 const reqBody: LoginReq = {
                     identity,
                     PrivateKeys: privateKey
                 }
-                return alovaClientImpl.Post<BaseRes>("/login", reqBody);
+                console.log(reqBody);
+                const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
+                console.log(res);
+                const info: BasicUserInfo = {
+                    hash: "", identity: identity, nick: "", privateKey: privateKey
+                }
+                setInfo(info)
+                return res;
             },
             async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
