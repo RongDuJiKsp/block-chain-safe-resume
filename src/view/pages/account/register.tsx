@@ -190,35 +190,50 @@ function SelectIdentityComponent() {
         </div>
     </div>
 }
-interface RegisterFormType{
-    name:string;
-    IDCard:string;
-    nick:string;
-    safeKey:string;
+
+interface RegisterFormType {
+    name: string;
+    IDCard: string;
+    nickName: string;
+    safeKey: string;
 }
 
 function FillInInformationComponent() {
     const registerInfo = useContext(RegisterInfoSetterContext);
-    const [formRef] = Form.useForm<HashedUserRegisterInformation>();
-    const onConformAndNext = () => {
+    const [formRef] = Form.useForm<RegisterFormType>();
+    const onConformAndNext = (val: RegisterFormType) => {
         registerInfo.infoSetter?.call(null, (prevState): RegisterUserInfo => {
+            const {name, IDCard, safeKey,nickName} = val;
+            const {identity, privateKey} = prevState;
             const infoVal: HashedUserRegisterInformation = {
-                ...formRef.getFieldsValue(), userIdentity: prevState.identity
-            }
-            return {
-                ...prevState,
+                userName: name,
+                userIDCard: IDCard,
+                userAnoKey: safeKey,
+                userIdentity: identity
+            };
+            const userInfo: RegisterUserInfo = {
+                identity: identity,
+                privateKey: privateKey,
                 inputInfo: infoVal,
                 hash: hashToTranslate.getHashOfUserInfo(infoVal),
-                nick: formRef.getFieldValue("nick")
+                nick: nickName
             }
+            console.log(userInfo);
+            return userInfo;
         });
 
         registerInfo.nextStep?.call(null);
     }
     const onFirstLoad = useCallback(() => {
-        formRef.setFieldsValue(registerInfo.info.inputInfo);
-        formRef.setFieldValue("nick", registerInfo.info.nick);
-
+        const {nick, inputInfo} = registerInfo.info;
+        const {userName, userIDCard, userAnoKey} = inputInfo;
+        const formVal: RegisterFormType = {
+            nickName: nick,
+            name: userName,
+            IDCard: userIDCard,
+            safeKey: userAnoKey,
+        }
+        formRef.setFieldsValue(formVal);
     }, [formRef, registerInfo.info])
     useEffect(() => {
         onFirstLoad();
@@ -228,33 +243,33 @@ function FillInInformationComponent() {
             请在此填写用户信息
         </div>
         <div className={"basis-3/5 pl-12"}>
-            <Form className={"flex flex-col gap-12 w-2/3 my-auto"} form={formRef} labelCol={{span: 8}}
-                  wrapperCol={{span: 16}} onFinish={onConformAndNext}>
-                <Form.Item<HashedUserRegisterInformation> name={"userName"}
-                                                          rules={[{required: true, message: "姓名不能为空"}, {
-                                                              min: 2,
-                                                              max: 30,
-                                                              message: "姓名不符合要求"
-                                                          }]}
-                                                          label={componentUtils.getQuestionLabel("姓名", "您的姓名用于计算您的身份hash，我们承诺您的姓名只在本地参与运算，不会上传到服务器。")}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item<HashedUserRegisterInformation> name={"userIDCard"}
-                                                          rules={[{required: true, message: "身份证或数字id不能为空"}, {
-                                                              pattern: ruleConfig.identityCardRegexp,
-                                                              len: 18,
-                                                              message: "身份证号不符合要求"
-                                                          }]}
-                                                          label={componentUtils.getQuestionLabel("身份证号或数字id", "您的身份证号码仅和您的姓名用于计算您的身份hash，我们承诺您的身份证号码只在本地参与运算，不会上传到服务器。")}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item<RegisterUserInfo> name={"nick"} rules={[{required: true, message: "昵称不能为空！"}]}
+            <Form<RegisterFormType> className={"flex flex-col gap-12 w-2/3 my-auto"} form={formRef} labelCol={{span: 8}}
+                                    wrapperCol={{span: 16}} onFinish={onConformAndNext}>
+                <Form.Item<RegisterFormType> name={"nickName"} rules={[{required: true, message: "昵称不能为空！"}]}
                                              label={componentUtils.getQuestionLabel("用户昵称", "用户昵称用于便于记忆的唯一标识一个用户，请确保您的昵称便于记忆")}>
                     <Input/>
                 </Form.Item>
-                <Form.Item<HashedUserRegisterInformation> name={"userAnoKey"}
-                                                          rules={[{required: true, message: "请填写安全语句"}]}
-                                                          label={componentUtils.getQuestionLabel("安全语句", "您的安全语句用于混淆计算出来的hash，以防止恶意分子获取到您的信息后恶意注册影响您的正常使用，安全语句可以是任意内容，但请记住已便于找回hash")}>
+                <Form.Item<RegisterFormType> name={"name"}
+                                             rules={[{required: true, message: "姓名不能为空"}, {
+                                                 min: 2,
+                                                 max: 30,
+                                                 message: "姓名不符合要求"
+                                             }]}
+                                             label={componentUtils.getQuestionLabel("姓名", "您的姓名用于计算您的身份hash，我们承诺您的姓名只在本地参与运算，不会上传到服务器。")}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item<RegisterFormType> name={"IDCard"}
+                                             rules={[{required: true, message: "身份证或数字id不能为空"}, {
+                                                 pattern: ruleConfig.identityCardRegexp,
+                                                 len: 18,
+                                                 message: "身份证号不符合要求"
+                                             }]}
+                                             label={componentUtils.getQuestionLabel("身份证号或数字id", "您的身份证号码仅和您的姓名用于计算您的身份hash，我们承诺您的身份证号码只在本地参与运算，不会上传到服务器。")}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item<RegisterFormType> name={"safeKey"}
+                                             rules={[{required: true, message: "请填写安全语句"}]}
+                                             label={componentUtils.getQuestionLabel("安全语句", "您的安全语句用于混淆计算出来的hash，以防止恶意分子获取到您的信息后恶意注册影响您的正常使用，安全语句可以是任意内容，但请记住已便于找回hash")}>
                     <Input.TextArea autoSize={{minRows: 5, maxRows: 5}}/>
                 </Form.Item>
                 <Form.Item className={"flex justify-center"}>
