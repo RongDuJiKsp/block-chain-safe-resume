@@ -8,10 +8,17 @@ export interface UserFileSystem {
 export type ConfigTable<List extends string | number, ValuesType> = {
     [key in List]: ValuesType
 }
-export interface ComponentUtils{
-    getIconLabel(labelValue:string, elementName:string):ReactNode;
-    getQuestionLabel(labelValue:string,tipsValue:string):ReactNode;
+
+export interface ComponentUtils {
+    getIconLabel(labelValue: string, elementName: string): ReactNode;
+
+    getQuestionLabel(labelValue: string, tipsValue: string): ReactNode;
+
+    getIcon(element: string): ReactNode;
+
+    getIconVal(element: string, val: string|number): ReactNode
 }
+
 export interface StepInformation {
     title: string;
     focusDescription: string;

@@ -12,3 +12,6 @@ html {
 .flex-shadow{
     box-shadow:#f2f2f2 3px 3px 4px  ;
 }
+.items-col-center-flex{
+    @apply flex flex-col justify-center
+}
