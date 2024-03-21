@@ -3,9 +3,9 @@ import RegisterPage from "../pages/account/register.tsx";
 import LoginPage from "../pages/account/login.tsx";
 import {UserWorkHooks} from "../../controller/Hooks/Atom/WorkHooks.ts";
 import {UserIdentityEnum} from "../../model/Enum/WorkEnum.ts";
-import ApplicantPage from "../pages/home/applicant.tsx";
-import RecruiterPage from "../pages/home/recruiter.tsx";
-import KeyKeeperPage from "../pages/home/keykeeper.tsx";
+import ApplicantPage from "../pages/home/applicant/page.tsx";
+import RecruiterPage from "../pages/home/recruiter/page.tsx";
+import KeyKeeperPage from "../pages/home/keykeeper/page.tsx";
 
 export function AppRoutes() {
     return <Routes>
@@ -21,30 +21,14 @@ function HomeRoutes() {
     const toRedirectUrl = userInfo.userInfo === null ? "/" : "/home/" + userInfo.userInfo.identity.toString();
     return <Routes>
         {userInfo.userInfo?.identity === UserIdentityEnum.Applicant &&
-            <Route path={"/Applicant/*"} element={<ApplicantRoutes/>}/>}
+            <Route path={"/Applicant/*"} element={<ApplicantPage/>}/>}
         {userInfo.userInfo?.identity === UserIdentityEnum.Recruiter &&
-            <Route path={"/Recruiter/*"} element={<RecruiterRoutes/>}/>}
+            <Route path={"/Recruiter/*"} element={<RecruiterPage/>}/>}
         {userInfo.userInfo?.identity === UserIdentityEnum.KeyKeeper &&
-            <Route path={"/KeyKeeper/*"} element={<KeyKeeperRoutes/>}/>}
+            <Route path={"/KeyKeeper/*"} element={<KeyKeeperPage/>}/>}
         <Route path={"/login/*"} element={<Navigate to={toRedirectUrl} replace={true}/>}/>
         <Route path={"/*"} element={<Navigate to={"/"} replace={true}/>}/>
     </Routes>;
 }
 
-function ApplicantRoutes() {
-    return <Routes>
-        <Route path={"/*"} element={<ApplicantPage/>}/>
-    </Routes>;
-}
 
-function RecruiterRoutes() {
-    return <Routes>
-        <Route path={"/*"} element={<RecruiterPage/>}/>
-    </Routes>;
-}
-
-function KeyKeeperRoutes() {
-    return <Routes>
-        <Route path={"/*"} element={<KeyKeeperPage/>}/>
-    </Routes>;
-}

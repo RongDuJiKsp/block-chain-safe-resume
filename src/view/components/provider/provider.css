@@ -16,6 +16,9 @@
 .item-shadow{
     box-shadow: #3c3c3c 1px 1px 3px;
 }
+.item-shadow-active{
+    box-shadow: #3c3c3c 1px 1px 3px inset;
+}
 .item-container{
     @apply my-1 py-0.5
 }

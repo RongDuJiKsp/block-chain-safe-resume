@@ -69,7 +69,11 @@ export default function HeaderBarProvider({children, items, operator, info}: Pro
             <div className={"flex justify-end  basis-2/3 gap-8"}>
                 {items.map((value, index) => {
                     return <NavLink to={value.routerPath} draggable={false}
-                                    className={"item-container item-shadow basis-1/6 flex justify-around hover:text-black "}
+                                    className={"item-container item-shadow active:item-shadow-active basis-1/6 flex justify-around hover:text-black "}
+                                    style={(v)=>{
+                                        console.log(v.isActive,"with",value.routerPath);
+                                        return{};
+                                    }}
                                     key={"item-map" + index}>
                         {value.logo}
                         <div className={"text-center my-auto font-mono font-bold text-lg"}>{value.text}</div>
