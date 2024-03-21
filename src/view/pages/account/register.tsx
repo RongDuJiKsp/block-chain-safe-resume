@@ -1,4 +1,4 @@
-import "./register.css"
+import "./register.css";
 import {App, Form, Input, Result, Steps} from "antd";
 import React, {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
 import {StepProps} from "antd/es/steps";
@@ -39,7 +39,7 @@ const userRegisterInfoDefaultValue: RegisterUserInfo = {
     privateKey: "",
     identity: UserIdentityEnum.None,
     nick: ""
-}
+};
 
 
 interface StateManager {
@@ -91,18 +91,18 @@ function RegisterPage() {
             title: val.title,
             description: getDescriptionWithStep(index, currentStep, val.focusDescription),
             icon: currentStep === index ? <LoadingOutlined/> : val.noFocusIcon,
-        }
-    })
+        };
+    });
     const setNextStep = () => {
         setCurrentStep(r => r + 1);
-    }
+    };
     const setLastStep = () => {
         setCurrentStep(r => r - 1);
-    }
+    };
     const reStart = () => {
         setCurrentStep(0);
         setUSerInfo(userRegisterInfoDefaultValue);
-    }
+    };
     return <div className={"overflow-hidden  register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
@@ -125,7 +125,7 @@ function RegisterPage() {
                 </RegisterInfoSetterContext.Provider>
             </div>
         </div>
-    </div>
+    </div>;
 }
 
 export default RegisterPage;
@@ -146,7 +146,7 @@ function SelectIdentityComponent() {
             identity: selectedIdentity
         }));
         registerInfo.nextStep?.call(null);
-    }
+    };
 
     return <div className={"h-full flex flex-col justify-around"}>
         <div className={"basis-3/5"}>
@@ -188,7 +188,7 @@ function SelectIdentityComponent() {
                         onClick={onNextClick}>Continue With {selectedIdentity}</button>
             </div>
         </div>
-    </div>
+    </div>;
 }
 
 interface RegisterFormType {
@@ -217,13 +217,13 @@ function FillInInformationComponent() {
                 inputInfo: infoVal,
                 hash: hashToTranslate.getHashOfUserInfo(infoVal),
                 nick: nickName
-            }
+            };
             console.log(userInfo);
             return userInfo;
         });
 
         registerInfo.nextStep?.call(null);
-    }
+    };
     const onFirstLoad = useCallback(() => {
         const {nick, inputInfo} = registerInfo.info;
         const {userName, userIDCard, userAnoKey} = inputInfo;
@@ -232,9 +232,9 @@ function FillInInformationComponent() {
             name: userName,
             IDCard: userIDCard,
             safeKey: userAnoKey,
-        }
+        };
         formRef.setFieldsValue(formVal);
-    }, [formRef, registerInfo.info])
+    }, [formRef, registerInfo.info]);
     useEffect(() => {
         onFirstLoad();
     }, [onFirstLoad]);
@@ -279,7 +279,7 @@ function FillInInformationComponent() {
                 </Form.Item>
             </Form>
         </div>
-    </div>
+    </div>;
 }
 
 function CheckInformationComponent() {
@@ -306,7 +306,7 @@ function CheckInformationComponent() {
             });
 
         }
-    }
+    };
 
     return <div className={"login-full-context-anima h-full flex flex-col justify-around"}>
         <div className={"basis-1/12 text-xl text-center "}>
@@ -347,7 +347,7 @@ function CheckInformationComponent() {
                 <button className={"button button-3d button-royal"} onClick={operateHooks.onLastStep}>上一步</button>
             </div>
         </div>
-    </div>
+    </div>;
 }
 
 function GetResultComponent() {
@@ -355,11 +355,11 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
-        FileSystemImpl.downloadToFile(new Blob(["PrivateKeyValue : " + res?.PrivateKeys]), `${res?.ETHAccounts} of ${res?.hashID}`, "key").then(() => message.success("下载成功！"))
-    }
+        FileSystemImpl.downloadToFile(new Blob(["PrivateKeyValue : " + res?.PrivateKeys]), `${res?.ETHAccounts} of ${res?.hashID}`, "key").then(() => message.success("下载成功！"));
+    };
     const onReturnPage = () => {
         navigate("/", {replace: true});
-    }
+    };
     return <div className={"h-full  flex flex-col justify-around "}>
         <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
             <Result status={res?.status ? "success" : "error"} title={res?.status ? "注册成功" : "注册失败，请重试"}
@@ -374,7 +374,7 @@ function GetResultComponent() {
                              </span>}
                     subTitle={res?.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.message}/>
         </div>
-    </div>
+    </div>;
 }
 
 

@@ -2,7 +2,6 @@ import {createFromIconfontCN, QuestionCircleTwoTone} from "@ant-design/icons";
 import {ComponentUtils} from "../../model/interface/util.ts";
 import React, {CSSProperties} from "react";
 import {Tooltip} from "antd";
-import {IconFontProps} from "@ant-design/icons/es/components/IconFont";
 
 // eslint-disable-next-line react-refresh/only-export-components
 const IconFont = createFromIconfontCN({

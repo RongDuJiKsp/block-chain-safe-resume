@@ -6,11 +6,11 @@ export const FileSystemImpl: UserFileSystem = {
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
-        link.download = prefix + "." + suffix
+        link.download = prefix + "." + suffix;
         document.body.appendChild(link);
         link.click();
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
     }
 
-}
+};

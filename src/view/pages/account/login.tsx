@@ -1,5 +1,5 @@
-import "./login.css"
-import {App, Form, Input, Select} from "antd"
+import "./login.css";
+import {App, Form, Input, Select} from "antd";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
@@ -40,7 +40,7 @@ function LoginPage() {
                 </Routes>
             </div>
         </div>
-    </div>
+    </div>;
 }
 
 export default LoginPage;
@@ -57,19 +57,19 @@ function LoginComponent() {
         workMethod.loginAsync(val.keyword, val.identity).then(r => {
             if (r.status) {
                 message.success("登录成功,正在跳转！").then();
-                nativate("/home/login")
+                nativate("/home/login");
             } else message.error("登录失败").then();
             loadingAction.setFalse();
         }).catch(e => {
             console.error(e);
             loadingAction.setFalse();
-        })
+        });
     };
     const cleanData = () => {
         workMethod.logout();
-    }
+    };
     useEffect(() => {
-        cleanData()
+        cleanData();
     }, []);
     return <div className={"flex flex-col justify-around h-full"}>
         <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
@@ -92,7 +92,7 @@ function LoginComponent() {
                 没有账号？<Link to={"/register"}>点我注册</Link>
             </div>
         </div>
-    </div>
+    </div>;
 }
 
 function AdminLoginComponent() {
@@ -106,5 +106,5 @@ function AdminLoginComponent() {
         <div className={"flex justify-center"}>
             <button className={"button button-raised button-pill button-action button-3d"}>进入管理系统</button>
         </div>
-    </div>
+    </div>;
 }

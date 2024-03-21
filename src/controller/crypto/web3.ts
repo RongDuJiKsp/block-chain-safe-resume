@@ -6,4 +6,4 @@ const Web3ServerImpl: Web3Server = {
     keyToAddress(privateKey: string): string {
         return web3Impl.eth.accounts.privateKeyToAccount(privateKey).address;
     }
-}
+};

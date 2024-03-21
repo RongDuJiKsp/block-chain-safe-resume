@@ -15,7 +15,7 @@ export const alovaClientImpl = createAlova({
         return response.json();
     },
     baseURL: serverConfig.backendUrl
-})
+});
 
 
 const userInfoAtom = atom<BasicUserInfo | null>(null);
@@ -37,7 +37,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
         const value = useAtomValue(userInfoAtom);
         return {
             userInfo: value
-        }
+        };
     },
     useMethod(): UserWorkMethod {
         const setInfo = useSetAtom(userInfoAtom);
@@ -50,25 +50,25 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 const reqBody: LoginReq = {
                     identity,
                     PrivateKeys: privateKey
-                }
+                };
                 console.log(reqBody);
                 const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
                 console.log(res);
                 const info: BasicUserInfo = {
                     hash: "", identity: identity, nick: "", privateKey: privateKey
-                }
-                setInfo(info)
+                };
+                setInfo(info);
                 return res;
             },
             async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
                     nickname, hashID, identity
-                }
+                };
                 return alovaClientImpl.Post<RegisterRes>("/register", reqBody);
             }
-        }
+        };
     }
-}
+};
 export const AdminWorkHooks: AtomHooks<Record<string, never>, Record<string, never>> = {
     useMethod(): Record<string, never> {
         return {};
@@ -76,4 +76,4 @@ export const AdminWorkHooks: AtomHooks<Record<string, never>, Record<string, nev
         return {};
     }
 
-}
+};

@@ -1,5 +1,4 @@
 import {CSSProperties, ReactElement, ReactNode} from "react";
-import {IconFontProps} from "@ant-design/icons/es/components/IconFont";
 
 export interface UserFileSystem {
     downloadToFile(file: BinFile, prefix: string, suffix: string): Promise<void>;
