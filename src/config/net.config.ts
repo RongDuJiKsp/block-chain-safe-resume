@@ -15,3 +15,6 @@ export const fileSuffixConfig=new Map([
     ["text/key","key"],
     ["text/plain","txt"]
 ]);
+export const keyConfig={
+    userInfo:"user-info",
+};

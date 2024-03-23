@@ -1,13 +1,14 @@
-import {atom, useAtomValue, useSetAtom} from "jotai";
+import {useAtomValue, useSetAtom} from "jotai";
 import {BasicUserInfo} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
-import {serverConfig} from "../../../config/net.config.ts";
+import {keyConfig, serverConfig} from "../../../config/net.config.ts";
 import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {FileSystemImpl} from "../../util/InteractiveSystem.ts";
+import {atomWithStorage} from "jotai/utils";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -19,7 +20,10 @@ export const alovaClientImpl = createAlova({
 });
 
 
-const userInfoAtom = atom<BasicUserInfo | null>(null);
+const userInfoAtom = atomWithStorage<BasicUserInfo | null>(keyConfig.userInfo, null, undefined, {
+    getOnInit: true
+});
+
 
 interface UserWorkValue {
     userInfo: BasicUserInfo | null;
@@ -51,11 +55,9 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 const reqBody: LoginReq = {
                     identity,
                     PrivateKeys: privateKey,
-                    username:new Date().toTimeString()
+                    username: new Date().toTimeString()
                 };
-                console.log(reqBody);
                 const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
-                console.log(res);
                 const info: BasicUserInfo = {
                     hash: "", identity: identity, nick: "", privateKey: privateKey
                 };
@@ -64,11 +66,11 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             },
             async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                    username:nickname, hashID, identity
+                    username: nickname, hashID, identity
                 };
-                const res= await alovaClientImpl.Post<RegisterRes>("/register", reqBody);
-                res.PrivateKeys=FileSystemImpl.base64ToAscii(res.PrivateKeys);
-                return  res;
+                const res = await alovaClientImpl.Post<RegisterRes>("/register", reqBody);
+                res.PrivateKeys = FileSystemImpl.base64ToAscii(res.PrivateKeys);
+                return res;
             }
         };
     }
