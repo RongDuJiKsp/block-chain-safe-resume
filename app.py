@@ -74,7 +74,17 @@ def loginRoute():
 
 @app.route('/upload', methods=["POST"])
 def uploadRoute():
-    return 1;
+    upload={
+        'status': 0,
+        'hash': '',
+    }
+    if 'file' not in request.files:
+        return json.dumps(upload)
+
+    file = request.files['file']
+    if file.filename == '':
+        return json.dumps(upload)
+    return uploadIpfs(file,upload)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

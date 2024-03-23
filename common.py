@@ -9,9 +9,11 @@ from settings import Configs
 from asmuth_bloom import *
 import pymysql
 import requests
+import ipfsapi
 
 global config
 config = Configs()
+api = ipfsapi.connect('127.0.0.1', 5001)
 def verifyIdentity(identity):
     list=["Applicant","Recruiter","KeyKeeper"]
     if identity in list:
@@ -104,3 +106,13 @@ def createRecruiter(data,user):
             return json.dumps(user)
         else:
             return json.dumps(user)
+def uploadIpfs(file,upload):
+    try:
+        # 添加文件到 IPFS
+        file_content = file.read()
+        res = api.add_bytes(file_content)
+    except Exception as e:
+        return upload
+    upload['status'] = 1
+    upload['hash'] = res['Hash']
+    return json.dumps(upload)
