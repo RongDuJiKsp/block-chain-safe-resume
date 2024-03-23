@@ -9,11 +9,12 @@ from settings import Configs
 from asmuth_bloom import *
 import pymysql
 import requests
+import pika
 import ipfsapi
 
 global config
 config = Configs()
-api = ipfsapi.connect('127.0.0.1', 5001)
+api = ipfsapi.connect('127.0.0.1', 6001)
 def verifyIdentity(identity):
     list=["Applicant","Recruiter","KeyKeeper"]
     if identity in list:
@@ -116,3 +117,23 @@ def uploadIpfs(file,upload):
     upload['status'] = 1
     upload['hash'] = res['Hash']
     return json.dumps(upload)
+
+def eventListener():
+    # 创建连接
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+
+    # 创建通道
+    channel = connection.channel()
+
+    # 声明队列
+    channel.queue_declare(queue='my_queue')
+
+    # 设置 'my_queue' 队列的回调函数
+    channel.basic_consume(queue='my_queue', on_message_callback=callback, auto_ack=True)
+
+    print('Waiting for messages. To exit press CTRL+C')
+
+    # 开始接收信息
+    channel.start_consuming()
+def callback(ch, method, properties, body):
+    print("Received %r" % body)
