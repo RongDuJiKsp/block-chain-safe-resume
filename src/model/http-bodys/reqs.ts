@@ -12,7 +12,7 @@ export interface RegisterReq {
     /**
      * 用户昵称
      */
-    nickname: string;
+    username: string;
 }
 
 export interface BaseRes {
@@ -28,5 +28,6 @@ export interface RegisterRes extends BaseRes {
 }
 export interface LoginReq{
     PrivateKeys:string;
-    identity:UserIdentityEnum
+    username:string;
+    identity:UserIdentityEnum;
 }

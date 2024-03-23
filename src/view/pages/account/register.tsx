@@ -297,8 +297,9 @@ function CheckInformationComponent() {
         onFinish() {
             if (isLoading) return;
             setLoading.setTrue();
-            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then(() => {
+            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then((info):void => {
                 setLoading.setFalse();
+                registerInfo.resSetter?.call(null, info);
                 registerInfo.nextStep?.call(null);
             }).catch(err => {
                 message.error("发生了错误:" + err).then();
@@ -355,6 +356,7 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
+        console.log( res,res?.PrivateKeys);
         FileSystemImpl.downloadToFile(new Blob(["PrivateKeyValue : " + res?.PrivateKeys]), `${res?.ETHAccounts} of ${res?.hashID}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {

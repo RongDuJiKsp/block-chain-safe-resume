@@ -11,6 +11,9 @@ export const FileSystemImpl: UserFileSystem = {
         link.click();
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
+    },
+    base64ToAscii(base64: string): string {
+        return new Buffer(base64,"base64").toString("utf-8");
     }
 
 };

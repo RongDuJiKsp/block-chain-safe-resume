@@ -7,6 +7,7 @@ import GlobalFetch from "alova/GlobalFetch";
 import {serverConfig} from "../../../config/net.config.ts";
 import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
+import {FileSystemImpl} from "../../util/InteractiveSystem.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -49,7 +50,8 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 
                 const reqBody: LoginReq = {
                     identity,
-                    PrivateKeys: privateKey
+                    PrivateKeys: privateKey,
+                    username:new Date().toTimeString()
                 };
                 console.log(reqBody);
                 const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
@@ -62,9 +64,11 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             },
             async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                    nickname, hashID, identity
+                    username:nickname, hashID, identity
                 };
-                return alovaClientImpl.Post<RegisterRes>("/register", reqBody);
+                const res= await alovaClientImpl.Post<RegisterRes>("/register", reqBody);
+                res.PrivateKeys=FileSystemImpl.base64ToAscii(res.PrivateKeys);
+                return  res;
             }
         };
     }

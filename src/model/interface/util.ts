@@ -2,6 +2,7 @@ import {CSSProperties, ReactElement, ReactNode} from "react";
 
 export interface UserFileSystem {
     downloadToFile(file: BinFile, prefix: string, suffix: string): Promise<void>;
+    base64ToAscii(base64:string):string
 
 }
 
