@@ -21,7 +21,7 @@ const headBarItems: ItemsAndPic[] = [
     },
     {
         logo: componentUtils.getIcon("icon-key1", {fontSize: 32}),
-        routerPath: APPLICANT_THIS_PATH + "/author",
+        routerPath: APPLICANT_THIS_PATH + "/auth",
         text: "简历授权"
     },
 ];
