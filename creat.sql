@@ -13,7 +13,6 @@ USE safe_resume;
 #     PrivateKeys VARCHAR(255) NOT NULL
 # );
 CREATE TABLE users (
-    username VARCHAR(255) NOT NULL,
     hashID VARCHAR(255) NOT NULL,
     ETHAccounts VARCHAR(255) NOT NULL,
     PublicKeys VARCHAR(255) NOT NULL,

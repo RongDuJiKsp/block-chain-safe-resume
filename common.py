@@ -18,9 +18,10 @@ def verifyIdentity(identity):
         return 1
     else:
         return 0
-
-def getKey(username):
-    url=f'http://47.97.255.9:5002/WeBASE-Front/privateKey?type=0&userName={username}'
+def randName():
+    return ''.join(random.sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8))
+def getKey(hashID):
+    url=f'http://47.97.255.9:5002/WeBASE-Front/privateKey?type=2&appId=2&returnPrivateKey=true&signUserId={hashID}'
     response = requests.get(url)
     key=response.json()
     return key
@@ -56,21 +57,20 @@ def createApplicant(data,user):
             user['message'] = "hashID已经存在"
             return json.dumps(user)
 
-        key=getKey(data['username'])
+        key=getKey(data['hashID'])
         need=getNeed()
         #插入用户信息
-        condition = f'insert into users(username,hashID,ETHAccounts,PublicKeys,identity,P) values(%s,%s,%s,%s,%s,%s);'
+        condition = f'insert into users(hashID,ETHAccounts,PublicKeys,identity,P) values(%s,%s,%s,%s,%s);'
         cur.execute(condition, (data['username'],data['hashID'], key["address"],key['publicKey'],data['identity'],need['P']))
 
         if cur.rowcount:
             #更新ETHAccounts状态
             user['status'] = 1
-            user['username'] = data['username']
+            user['username'] = randName()
             user['hashID'] = data['hashID']
             user['ETHAccounts'] = key["address"]
             user['PublicKeys'] = key['publicKey']
             user['PrivateKeys'] = key['privateKey']
-            user['identity'] = data['identity']
             user['identity'] = data['identity']
             user['S'] = need['S']
             user['P'] = need['P']
