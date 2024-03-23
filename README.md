@@ -117,7 +117,7 @@
 
 ###### 支持格式
 
-> application/json
+> multipart/form-data
 
 ###### HTTP请求方式
 
@@ -125,11 +125,60 @@
 
 ###### 请求参数
 
-> | 参数        | 必选 | 类型   | 说明     |
-> | ----------- | :--- | :----- | -------- |
-> | name        | ture | string | 用户名   |
-> | PrivateKeys | ture | string | 用户私钥 |
+> | 参数 | 必选 | 类型   | 说明   |
+> | ---- | :--- | :----- | ------ |
+> | name | ture | string | 文件名 |
+> |      |      |        |        |
 
 ###### 返回字段
+
+
+
+> | 返回字段 | 字段类型 | 说明                       |
+> | :------- | :------- | :------------------------- |
+> | status   | int      | 0表示上传失败1表示上传成功 |
+> | hash     | string   | ipfs上传返回的hash         |
+
+###### 接口示例:类似前端代码即可调用上传
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>File Upload</h2>
+
+<input type="file" id="fileToUpload">
+
+<button onclick="uploadFile()">Upload</button>
+
+<script>
+function uploadFile() {
+    var input = document.getElementById('fileToUpload');
+    var file = input.files[0];
+    var formData = new FormData();
+
+    formData.append('file', file);
+
+    fetch('http://localhost:5000/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+</script>
+
+</body>
+</html>
+
+```
+
+
 
 ### 接口4:简历查询接口
