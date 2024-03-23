@@ -22,3 +22,9 @@
 .item-container{
     @apply my-1 py-0.5
 }
+.basis-nav{
+    @apply item-container item-shadow  basis-1/6 flex justify-around hover:text-black
+}
+.active-nav{
+    @apply item-container item-shadow-active  basis-1/6 flex justify-around hover:text-black
+}
