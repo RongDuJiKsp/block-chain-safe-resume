@@ -1,10 +1,12 @@
 import "./provider.css";
 import logo from "../../../assets/logo-p.png";
+import title from "../../../assets/title.png";
 import {PropsWithChildren, ReactNode} from "react";
 import {Dropdown} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {NavLink} from "react-router-dom";
+import {UserGroup} from "../../../model/entity/user.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -19,10 +21,9 @@ export interface UserOperatorHook {
 }
 
 export interface UserShownInfo {
-    userHeader: ReactNode;
+    userGroup:UserGroup;
     userName: string;
     userToken: number;
-    userIdentity: string;
 }
 
 export interface HeaderBarProps {
@@ -40,7 +41,7 @@ export default function HeaderBarProvider({children, items, operator, info}: Pro
         },
         {
             key: "identity",
-            label: componentUtils.getIconVal("icon-identity", info.userIdentity)
+            label: componentUtils.getIconVal("icon-identity", info.userGroup.userIdentity)
         },
         {
             key: "token",
@@ -61,18 +62,15 @@ export default function HeaderBarProvider({children, items, operator, info}: Pro
         <div className={"h-16 header-bar-bg-color header-bar-shadow flex justify-between"}>
             <div className={"item-container ml-10 flex px-3 basis-[12.5%] justify-around"}>
                 <img draggable={false} src={logo} alt={"LOGO"} className={"h-full"}/>
-                <div className={"my-auto logo-text"}>
-                    <span className={"font-bold font-sans"}>SAFE </span>
-                    <span className={"font-bold font-mono text-2xl"}>CCV</span>
-                </div>
+                <img draggable={false} src={title} alt={"LOGO"} className={"h-2/3 my-auto"}/>
             </div>
             <div className={"flex justify-end  basis-2/3 gap-8"}>
                 {items.map((value, index) => {
                     return <NavLink to={value.routerPath} draggable={false}
                                     className={"item-container item-shadow active:item-shadow-active basis-1/6 flex justify-around hover:text-black "}
-                                    style={(v)=>{
-                                        console.log(v.isActive,"with",value.routerPath);
-                                        return{};
+                                    style={(v) => {
+                                        console.log(v.isActive, "with", value.routerPath);
+                                        return {};
                                     }}
                                     key={"item-map" + index}>
                         {value.logo}
@@ -83,7 +81,7 @@ export default function HeaderBarProvider({children, items, operator, info}: Pro
             <div className={"basis-[10.5%] item-container mr-11 items-col-center-flex"}>
                 <Dropdown menu={{items: dropDownItems}}>
                     <div className={"flex"}>
-                        <span>{info.userHeader}</span>
+                        <span>{info.userGroup.userHeader}</span>
                         <span className={"text-lg align-middle"}>&ensp;About Me</span>
                     </div>
                 </Dropdown>

@@ -5,6 +5,7 @@ import HeaderBarProvider, {
 } from "../../../components/provider/headerBarProvider.tsx";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {APPLICANT_THIS_PATH, ApplicantRoutes} from "../../../routes/home.tsx";
+import {UserGroup} from "../../../../model/entity/user.ts";
 
 
 const headBarItems: ItemsAndPic[] = [
@@ -24,20 +25,24 @@ const headBarItems: ItemsAndPic[] = [
         text: "简历授权"
     },
 ];
-
+const ThisUserGroup:UserGroup={
+    userIdentity: "Applicant",
+    userHeader: componentUtils.getIcon("icon-Owner-1", {fontSize: 28})
+};
 
 export default function ApplicantPage() {
     const userOpHook: UserOperatorHook = {
         onChangeNickName(): void {
-        }, onLogout(): void {
+
+        },
+        onLogout(): void {
 
         }
     };
     const info: UserShownInfo = {
-        userHeader: componentUtils.getIcon("icon-Owner-1", {fontSize: 28}),
         userName: "AUSERKING",
         userToken: 110,
-        userIdentity: "Applicant"
+        userGroup:ThisUserGroup
     };
     return <HeaderBarProvider items={headBarItems} operator={userOpHook} info={info}>
         <ApplicantRoutes/>
