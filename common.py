@@ -6,6 +6,7 @@
 # @介绍    :
 import json
 from settings import Configs
+from asmuth_bloom import *
 import pymysql
 import requests
 
@@ -56,9 +57,10 @@ def createApplicant(data,user):
             return json.dumps(user)
 
         key=getKey(data['username'])
+        need=getNeed()
         #插入用户信息
-        condition = f'insert into users(username,hashID,ETHAccounts,PublicKeys,identity) values(%s,%s,%s,%s,%s);'
-        cur.execute(condition, (data['username'],data['hashID'], key["address"],key['publicKey'],data['identity']))
+        condition = f'insert into users(username,hashID,ETHAccounts,PublicKeys,identity,P) values(%s,%s,%s,%s,%s,%s);'
+        cur.execute(condition, (data['username'],data['hashID'], key["address"],key['publicKey'],data['identity'],need['P']))
 
         if cur.rowcount:
             #更新ETHAccounts状态
@@ -69,6 +71,11 @@ def createApplicant(data,user):
             user['PublicKeys'] = key['publicKey']
             user['PrivateKeys'] = key['privateKey']
             user['identity'] = data['identity']
+            user['identity'] = data['identity']
+            user['S'] = need['S']
+            user['P'] = need['P']
+            user['M'] = need['M']
+            user['X'] = need['X']
             user['message'] = "注册成功"
             return json.dumps(user)
         else:
@@ -97,6 +104,3 @@ def createRecruiter(data,user):
             return json.dumps(user)
         else:
             return json.dumps(user)
-
-if __name__ == '__main__':
-    getKey("ltmthink")

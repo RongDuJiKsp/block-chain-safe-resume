@@ -22,6 +22,10 @@ def registerRoute():
         'ETHAccounts': '',
         'PublicKeys': '',
         'PrivateKeys': '',
+        'S': '',
+        'P': '',
+        'M': '',
+        'X': '',
         'message': '注册失败'
     }
     try:
@@ -73,4 +77,4 @@ def uploadRoute():
     return 1;
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

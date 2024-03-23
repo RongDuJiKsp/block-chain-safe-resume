@@ -17,9 +17,14 @@ CREATE TABLE users (
     hashID VARCHAR(255) NOT NULL,
     ETHAccounts VARCHAR(255) NOT NULL,
     PublicKeys VARCHAR(255) NOT NULL,
-    identity VARCHAR(50) NOT NULL
+    identity VARCHAR(50) NOT NULL,
+    P VARCHAR(255) NOT NULL
 );
 CREATE TABLE recruiter (
+    username VARCHAR(255) NOT NULL,
+    hashID VARCHAR(255) NOT NULL
+);
+CREATE TABLE KeyKeeper (
     username VARCHAR(255) NOT NULL,
     hashID VARCHAR(255) NOT NULL
 );
