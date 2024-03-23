@@ -1,4 +1,6 @@
 import {UserFileSystem} from "../../model/interface/util.ts";
+import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
+
 
 export const FileSystemImpl: UserFileSystem = {
 
@@ -13,7 +15,24 @@ export const FileSystemImpl: UserFileSystem = {
         document.body.removeChild(link);
     },
     base64ToAscii(base64: string): string {
-        return new Buffer(base64,"base64").toString("utf-8");
+        return new Buffer(base64, "base64").toString("utf-8");
     }
 
 };
+
+export class BasisSyncStorage<T> implements SyncStorage<T> {
+    getItem(key: string, initialValue: T): T {
+        const res = localStorage.getItem(key);
+        if (res) return JSON.parse(res);
+        return initialValue;
+    }
+
+    removeItem(key: string): void {
+        localStorage.removeItem(key);
+    }
+
+    setItem(key: string, newValue: T): void {
+        localStorage.setItem(key, JSON.stringify(newValue));
+    }
+
+}

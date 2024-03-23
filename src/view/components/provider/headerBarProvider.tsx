@@ -68,10 +68,6 @@ export default function HeaderBarProvider({children, items, operator, info}: Pro
                 {items.map((value, index) => {
                     return <NavLink to={value.routerPath} draggable={false}
                                     className={({isActive})=>isActive?"active-nav":"basis-nav"}
-                                    style={(v) => {
-                                        console.log(v.isActive, "with", value.routerPath);
-                                        return {};
-                                    }}
                                     key={"item-map" + index}>
                         {value.logo}
                         <div className={"text-center my-auto font-mono font-bold text-lg"}>{value.text}</div>

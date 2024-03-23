@@ -7,7 +7,7 @@ import GlobalFetch from "alova/GlobalFetch";
 import {keyConfig, serverConfig} from "../../../config/net.config.ts";
 import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
-import {FileSystemImpl} from "../../util/InteractiveSystem.ts";
+import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
 
 export const alovaClientImpl = createAlova({
@@ -20,7 +20,7 @@ export const alovaClientImpl = createAlova({
 });
 
 
-const userInfoAtom = atomWithStorage<BasicUserInfo | null>(keyConfig.userInfo, null, undefined, {
+const userInfoAtom = atomWithStorage<BasicUserInfo | null>(keyConfig.userInfo,null, new BasisSyncStorage<BasicUserInfo|null>() , {
     getOnInit: true
 });
 
