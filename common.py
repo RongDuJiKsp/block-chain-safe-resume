@@ -130,12 +130,13 @@ def createKeyKeeper(data,user):
             return json.dumps(user)
 def uploadIpfs(file,upload):
     files = {
-        'file': file
+        'file':(file.filename, file)
     }
-    response = requests.post(config.ipfs_url_upload, files=files)
+    response = requests.post(config.ipfs_url_upload, files=files ,proxies={'http': 'http://127.0.0.1:8080'})
     if response.status_code == 200:
         data = json.loads(response.text)
         hash_code = data['Hash']
+        name = data['Name']
         # with pymysql.connect(host=config.host, user=config.user, password=config.password,
         #                  database=config.database) as conn, conn.cursor() as cur:
         #     condition = f'insert into resumeForm(putTime,downloadtimes) values(NOW(),0);'
@@ -143,6 +144,7 @@ def uploadIpfs(file,upload):
     else:
         return json.dumps(upload)
     upload['status'] = 1
+    upload['name'] = name
     upload['hash'] = hash_code
     print(hash_code)
     return json.dumps(upload)
@@ -158,25 +160,3 @@ def getResumeMessage(hashID,message):
             return json.dumps(message)
         else:
             return json.dumps(message)
-
-
-def eventListener():
-    # 创建连接
-    # connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-    #
-    # # 创建通道
-    # channel = connection.channel()
-    #
-    # # 声明队列
-    # channel.queue_declare(queue='my_queue')
-    #
-    # # 设置 'my_queue' 队列的回调函数
-    # channel.basic_consume(queue='my_queue', on_message_callback=callback, auto_ack=True)
-    #
-    # print('Waiting for messages. To exit press CTRL+C')
-    #
-    # # 开始接收信息
-    # channel.start_consuming()
-    return 1
-def callback(ch, method, properties, body):
-    print("Received %r" % body)

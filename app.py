@@ -79,6 +79,7 @@ def uploadRoute():
     upload={
         'status': 0,
         'hash': '',
+        'name': ''
     }
     if 'file' not in request.files:
         return json.dumps(upload)
@@ -101,4 +102,3 @@ def getFileMessage():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-    print(eventListener())
