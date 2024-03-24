@@ -11,3 +11,12 @@ class Configs:
     password = "123456"
     host = "127.0.0.1"
     database= "safe_resume"
+
+    # ipfs设置
+    ipfs_host = "http://47.97.255.9:6001"
+    ipfs_url_upload = ipfs_host + "/api/v0/add"
+
+    # WeBASE接口设置
+    WeBASE_privateKey_api="http://47.97.255.9:5002/WeBASE-Front/privateKey"
+
+

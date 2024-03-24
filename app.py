@@ -7,9 +7,11 @@
 import json
 
 from common import *
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/register', methods=["POST"])
 def registerRoute():
@@ -82,10 +84,21 @@ def uploadRoute():
         return json.dumps(upload)
 
     file = request.files['file']
-    if file.filename == '':
+    if file.filename == '' :
         return json.dumps(upload)
     return uploadIpfs(file,upload)
+@app.route('/getFileMessage', methods=["POST"])
+def getFileMessage():
+    message={
+        'status': 0,
+        'putTime': '',
+        'downloadtimes': '',
+    }
+    hashID=request.form['hashID']
+    if hashID == '':
+        return json.dumps(message)
+    return getResumeMessage(hashID,message)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
-    eventListener()
+    print(eventListener())
