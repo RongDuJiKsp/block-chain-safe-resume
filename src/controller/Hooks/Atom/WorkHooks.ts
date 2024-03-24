@@ -4,7 +4,7 @@ import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
-import {keyConfig, serverConfig} from "../../../config/net.config.ts";
+import {STORAGE_KEY_CONFIG, SERVER_URLS} from "../../../config/net.config.ts";
 import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
@@ -16,11 +16,11 @@ export const alovaClientImpl = createAlova({
     responded: (response) => {
         return response.json();
     },
-    baseURL: serverConfig.backendUrl
+    baseURL: SERVER_URLS.backendUrl
 });
 
 
-const userInfoAtom = atomWithStorage<BasicUserInfo | null>(keyConfig.userInfo,null, new BasisSyncStorage<BasicUserInfo|null>() , {
+const userInfoAtom = atomWithStorage<BasicUserInfo | null>(STORAGE_KEY_CONFIG.userInfo, null, new BasisSyncStorage<BasicUserInfo | null>(), {
     getOnInit: true
 });
 
@@ -30,11 +30,13 @@ interface UserWorkValue {
 }
 
 interface UserWorkMethod {
-    registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
+    registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
 
     loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<BaseRes>;
 
     logout(): void;
+
+    changeUserNameAsync(newName: string): Promise<BaseRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -47,6 +49,12 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     useMethod(): UserWorkMethod {
         const setInfo = useSetAtom(userInfoAtom);
         return {
+            async changeUserNameAsync(newName: string): Promise<BaseRes> {
+                const name=newName;
+                return {
+                    status: 1
+                };
+            },
             logout(): void {
                 // setInfo(null);
             },
@@ -64,9 +72,9 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 setInfo(info);
                 return res;
             },
-            async registerAsync(nickname: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
+            async registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                    username: nickname, hashID, identity
+                    username, hashID, identity
                 };
                 const res = await alovaClientImpl.Post<RegisterRes>("/register", reqBody);
                 res.PrivateKeys = FileSystemImpl.base64ToAscii(res.PrivateKeys);

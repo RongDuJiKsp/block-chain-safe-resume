@@ -1,17 +1,8 @@
 import {UserIdentityEnum} from "../Enum/WorkEnum.ts";
 
 export interface RegisterReq {
-    /**
-     * 用户身份
-     */
     identity: UserIdentityEnum
-    /**
-     * 用户信息的hash
-     */
     hashID: string;
-    /**
-     * 用户昵称
-     */
     username: string;
 }
 
@@ -20,14 +11,21 @@ export interface BaseRes {
 }
 
 export interface RegisterRes extends BaseRes {
-    message:string;
-    "hashID": string,
-    "identity": string,
-    "ETHAccounts": string,
-    "PrivateKeys": string,
+    message: string
+    username: string;
+    hashID: string;
+    identity: UserIdentityEnum,
+    ETHAccounts: string,
+    PublicKeys: string,
+    PrivateKeys: string,
+    S: number,
+    P: number,
+    M: number[],
+    X: number[],
 }
-export interface LoginReq{
-    PrivateKeys:string;
-    username:string;
-    identity:UserIdentityEnum;
+
+export interface LoginReq {
+    PrivateKeys: string;
+    username: string;
+    identity: UserIdentityEnum;
 }

@@ -1,8 +1,4 @@
-import HeaderBarProvider, {
-    ItemsAndPic,
-    UserOperatorHook,
-    UserShownInfo
-} from "../../../components/provider/headerBarProvider.tsx";
+import HeaderBarProvider, {ItemsAndPic, UserShownInfo} from "../../../components/provider/headerBarProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {APPLICANT_THIS_PATH, RecruiterRoutes} from "../../../routes/home.tsx";
@@ -25,20 +21,13 @@ const headBarItems: ItemsAndPic[] = [
     }
 ];
 export default function RecruiterPage() {
-    const userOpHook: UserOperatorHook = {
-        onChangeNickName(): void {
 
-        },
-        onLogout(): void {
-
-        }
-    };
     const info: UserShownInfo = {
         userName: "AUSERKING",
         userToken: 110,
         userGroup: ThisUserGroup
     };
-    return <HeaderBarProvider items={headBarItems} operator={userOpHook} info={info}>
+    return <HeaderBarProvider items={headBarItems} info={info}>
         <RecruiterRoutes/>
     </HeaderBarProvider>;
 }

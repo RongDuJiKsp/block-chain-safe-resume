@@ -1,20 +1,7 @@
+export const SERVER_URLS = {
+    backendUrl: "http://47.97.255.9:5100"
+};
 
-export const ipfsConfig = {
-    protocol: "http",
-    host: "localhost",
-    port: "5001",
-};
-export const fileConfig={
-    supposedType:"application/json;charset=utf8"
-};
-export const serverConfig={
-    backendUrl:"http://localhost:5000"
-};
-export const fileSuffixConfig=new Map([
-    ["application/pdf","pdf"],
-    ["text/key","key"],
-    ["text/plain","txt"]
-]);
-export const keyConfig={
-    userInfo:"user-info",
+export const STORAGE_KEY_CONFIG = {
+    userInfo: "user-info",
 };

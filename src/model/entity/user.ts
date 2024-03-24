@@ -14,7 +14,12 @@ export interface HashedUserRegisterInformation {
     userIDCard: string;
     userAnoKey: string;
 }
-export interface UserGroup{
-    userHeader:ReactNode;
-    userIdentity:string;
+
+export interface UserGroup {
+    userHeader: ReactNode;
+    userIdentity: string;
+}
+
+export interface ApplicantStatusTuple {
+
 }

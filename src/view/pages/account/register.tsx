@@ -12,7 +12,7 @@ import {
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {hashToTranslate} from "../../../controller/crypto/hash.ts";
-import {ruleConfig} from "../../../config/backendrule.config.ts";
+import {FORM_RULE_PATTERNS} from "../../../config/backendrule.config.ts";
 import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entity/user.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
 import {RegisterRes} from "../../../model/http-bodys/reqs.ts";
@@ -260,7 +260,7 @@ function FillInInformationComponent() {
                 </Form.Item>
                 <Form.Item<RegisterFormType> name={"IDCard"}
                                              rules={[{required: true, message: "身份证或数字id不能为空"}, {
-                                                 pattern: ruleConfig.identityCardRegexp,
+                                                 pattern: FORM_RULE_PATTERNS.identityCardRegexp,
                                                  len: 18,
                                                  message: "身份证号不符合要求"
                                              }]}
@@ -297,7 +297,7 @@ function CheckInformationComponent() {
         onFinish() {
             if (isLoading) return;
             setLoading.setTrue();
-            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then((info):void => {
+            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then((info): void => {
                 setLoading.setFalse();
                 registerInfo.resSetter?.call(null, info);
                 registerInfo.nextStep?.call(null);
@@ -356,8 +356,15 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
-        console.log( res,res?.PrivateKeys);
-        FileSystemImpl.downloadToFile(new Blob(["PrivateKeyValue : " + res?.PrivateKeys]), `${res?.ETHAccounts} of ${res?.hashID}`, "key").then(() => message.success("下载成功！"));
+        console.log(res, res?.PrivateKeys);
+        const fileContext = `Please keep your  key, once lost, you can't get it back!
+        PrivateValue : ${res?.PrivateKeys}
+        SafeKey:${res?.S}
+        SubSafeKey:${res?.M}
+        You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
+        Please give the SubKey to the key holder who has been granted the right to pledge
+        `;
+        FileSystemImpl.downloadToFile(new Blob([fileContext]), `${res?.ETHAccounts?.substring(0, 7)}... of ${res?.hashID?.substring(0, 7)}...`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});
