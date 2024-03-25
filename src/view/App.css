@@ -19,3 +19,9 @@ html {
     min-height: 100vh;
     @apply good-for-eye-bg1
 }
+.h-full-screen{
+    height: calc(100vh - 4rem);
+}
+.header-bar-height{
+    height: 4rem;
+}

@@ -71,7 +71,7 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
             <p>sss</p>
         </Modal>
         <div>
-            <div className={"h-16 bg-gray-50 header-bar-shadow flex justify-between"}>
+            <div className={"header-bar-height bg-gray-50 header-bar-shadow flex justify-between"}>
                 <div className={"item-container ml-10 flex px-3 basis-[12.5%] justify-around"}>
                     <img draggable={false} src={logo} alt={"LOGO"} className={"h-full"}/>
                     <img draggable={false} src={title} alt={"LOGO"} className={"h-2/3 my-auto"}/>
