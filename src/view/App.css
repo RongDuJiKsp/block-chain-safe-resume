@@ -4,14 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    user-select: none;
-    background: linear-gradient(to bottom, #c3cfe2 0%, rgba(235, 252, 255, 0.29) 50%, #c3cfe2 100%) ;
-    min-height: 100vh;
-}
+
 .flex-shadow{
     box-shadow:#f2f2f2 3px 3px 4px  ;
 }
 .items-col-center-flex{
     @apply flex flex-col justify-center
+}
+.good-for-eye-bg1{
+    background:antiquewhite;
+}
+html {
+    user-select: none;
+    min-height: 100vh;
+    @apply good-for-eye-bg1
 }

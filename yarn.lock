@@ -2723,6 +2723,11 @@ possible-typed-array-names@^1.0.0:
   resolved "https://registry.yarnpkg.com/possible-typed-array-names/-/possible-typed-array-names-1.0.0.tgz#89bb63c6fada2c3e90adc4a647beeeb39cc7bf8f"
   integrity sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==
 
+postcss-antd-fixes@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/postcss-antd-fixes/-/postcss-antd-fixes-0.2.0.tgz#f0c6649539a4f506f16120ee99b735b50da43381"
+  integrity sha512-WuV4Ip5DnLg8q+wmNXUq13wZZcA5Lrj+em3Jznl4cxItZDgFp4wEh+5ba59TvFeHfwNuTEZ6YNDsYP9DG6NurQ==
+
 postcss-import@^15.1.0:
   version "15.1.0"
   resolved "https://registry.yarnpkg.com/postcss-import/-/postcss-import-15.1.0.tgz#41c64ed8cc0e23735a9698b3249ffdbf704adc70"
