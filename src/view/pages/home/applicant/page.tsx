@@ -14,12 +14,7 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon("icon-cloudupload-fill", {fontSize: 32}),
         routerPath: APPLICANT_THIS_PATH + "/upload",
         text: "简历上传"
-    },
-    {
-        logo: componentUtils.getIcon("icon-key1", {fontSize: 32}),
-        routerPath: APPLICANT_THIS_PATH + "/auth",
-        text: "简历授权"
-    },
+    }
 ];
 const ThisUserGroup: UserGroup = {
     userIdentity: "Applicant",

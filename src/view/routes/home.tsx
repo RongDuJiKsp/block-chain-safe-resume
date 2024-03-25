@@ -4,7 +4,6 @@ import RecruiterNotice from "../pages/home/recruiter/notice.tsx";
 import KeyKeeperNotice from "../pages/home/keykeeper/notice.tsx";
 import RecruiterRequire from "../pages/home/recruiter/require.tsx";
 import ApplicantUpload from "../pages/home/applicant/upload.tsx";
-import ApplicantAuth from "../pages/home/applicant/auth.tsx";
 
 export const APPLICANT_THIS_PATH: string = "/home/Applicant";
 
@@ -12,7 +11,6 @@ export function ApplicantRoutes() {
     return <Routes>
         <Route path={"/status"} element={<ApplicantStatus/>}/>
         <Route path={"/upload"} element={<ApplicantUpload/>}/>
-        <Route path={"/auth"} element={<ApplicantAuth/>}/>
         <Route path={"/*"} element={<Navigate to={APPLICANT_THIS_PATH + "/status"}/>}/>
     </Routes>;
 }
