@@ -8,13 +8,13 @@ import {componentUtils} from "../../../controller/util/component.tsx";
 import {NavLink} from "react-router-dom";
 import {UserGroup} from "../../../model/entity/user.ts";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {useBoolean} from "ahooks";
 
 export interface ItemsAndPic {
     logo: ReactNode;
     routerPath: string;
     text: string
 }
-
 
 
 export interface UserShownInfo {
@@ -31,6 +31,14 @@ export interface HeaderBarProps {
 
 export default function HeaderBarProvider({children, items, info}: PropsWithChildren<HeaderBarProps>) {
     const loginServer = UserWorkHooks.useMethod();
+    const [isChangeNickOpen, changeNickOpenAction] = useBoolean();
+    const [isLogoutOpen, logoutOpenAction] = useBoolean();
+    const onChangeNick = (): void => {
+
+    };
+    const onLogout = (): void => {
+
+    };
     const dropDownItems: ItemType[] = [
         {
             key: "nick",
@@ -47,16 +55,19 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
         {
             key: "nick-cng",
             label: componentUtils.getIconLabel("更改昵称", "icon-setting"),
-            onClick: ()=>{},
+            onClick: changeNickOpenAction.setTrue,
         },
         {
             key: "logout",
             label: componentUtils.getIconLabel("退出登录", "icon-out"),
-            onClick:  ()=>{},
+            onClick: logoutOpenAction.setTrue,
         }
     ];
-    return <>
-        <Modal open={false}>
+    return <div>
+        <Modal open={isChangeNickOpen}>
+            <p>sss</p>
+        </Modal>
+        <Modal open={isLogoutOpen}>
             <p>sss</p>
         </Modal>
         <div>
@@ -86,5 +97,5 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
             </div>
             {children}
         </div>
-    </>;
+    </div>;
 }
