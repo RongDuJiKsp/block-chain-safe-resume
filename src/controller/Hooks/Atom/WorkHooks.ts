@@ -56,7 +56,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 };
             },
             logout(): void {
-                // setInfo(null);
+                setInfo(null);
             },
             async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<BaseRes> {
 

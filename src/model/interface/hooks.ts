@@ -13,3 +13,9 @@ export interface AtomHooks<Values, Methods> {
      */
     useMethod(): Methods;
 }
+
+export interface CancelableOperateHooks {
+    onConform(): void;
+
+    onCancel(): void;
+}

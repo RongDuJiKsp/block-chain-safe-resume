@@ -9,6 +9,7 @@ import {NavLink} from "react-router-dom";
 import {UserGroup} from "../../../model/entity/user.ts";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useBoolean} from "ahooks";
+import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -33,11 +34,18 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
     const loginServer = UserWorkHooks.useMethod();
     const [isChangeNickOpen, changeNickOpenAction] = useBoolean();
     const [isLogoutOpen, logoutOpenAction] = useBoolean();
-    const onChangeNick = (): void => {
+    const onChangeNick: CancelableOperateHooks = {
+        onCancel: changeNickOpenAction.setFalse,
+        onConform(): void {
+
+        }
 
     };
-    const onLogout = (): void => {
-
+    const onLogout: CancelableOperateHooks = {
+        onCancel: logoutOpenAction.setFalse,
+        onConform(): void {
+            loginServer.logout();
+        }
     };
     const dropDownItems: ItemType[] = [
         {
@@ -64,11 +72,11 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
         }
     ];
     return <div>
-        <Modal open={isChangeNickOpen}>
+        <Modal open={isChangeNickOpen} onCancel={onChangeNick.onCancel} onOk={onChangeNick.onConform} title={"更改用户昵称"}>
             <p>sss</p>
         </Modal>
-        <Modal open={isLogoutOpen}>
-            <p>sss</p>
+        <Modal open={isLogoutOpen} onCancel={onLogout.onCancel} onOk={onLogout.onConform} title={"确认退出登录"}>
+            <p className={"py-3"}>请确认你要退出登录？</p>
         </Modal>
         <div>
             <div className={"header-bar-height bg-gray-50 header-bar-shadow flex justify-between"}>
