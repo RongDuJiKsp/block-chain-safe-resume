@@ -3,5 +3,5 @@ export const SERVER_URLS = {
 };
 
 export const STORAGE_KEY_CONFIG = {
-    userInfo: "user-info",
+    userState: "user-state",
 };

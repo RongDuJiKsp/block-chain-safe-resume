@@ -20,6 +20,16 @@ export interface UserGroup {
     userIdentity: string;
 }
 
-export interface ApplicantStatusTuple {
+export interface ApplicantResumeRequestStatusTuple {
 
+}
+export interface ApplicantResumeVisitStatusTuple{
+
+}
+
+export interface BasicUserState {
+    nick: string;
+    hash: string;
+    identity: UserIdentityEnum;
+    address: string;
 }

@@ -20,8 +20,8 @@ html {
     @apply good-for-eye-bg1
 }
 .h-full-screen{
-    height: calc(100vh - 4rem);
+    height: calc(100vh - 4.8rem);
 }
 .header-bar-height{
-    height: 4rem;
+    height: 4.8rem;
 }

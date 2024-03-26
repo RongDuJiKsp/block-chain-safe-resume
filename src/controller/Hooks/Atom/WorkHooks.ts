@@ -1,10 +1,10 @@
 import {useAtomValue, useSetAtom} from "jotai";
-import {BasicUserInfo} from "../../../model/entity/user.ts";
+import {BasicUserInfo, BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
-import {STORAGE_KEY_CONFIG, SERVER_URLS} from "../../../config/net.config.ts";
+import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
 import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
@@ -20,13 +20,13 @@ export const alovaClientImpl = createAlova({
 });
 
 
-const userInfoAtom = atomWithStorage<BasicUserInfo | null>(STORAGE_KEY_CONFIG.userInfo, null, new BasisSyncStorage<BasicUserInfo | null>(), {
+const userInfoAtom = atomWithStorage<BasicUserState | null>(STORAGE_KEY_CONFIG.userState, null, new BasisSyncStorage<BasicUserState | null>(), {
     getOnInit: true
 });
 
 
 interface UserWorkValue {
-    userInfo: BasicUserInfo | null;
+    userInfo: BasicUserState | null;
 }
 
 interface UserWorkMethod {
@@ -50,7 +50,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
         const setInfo = useSetAtom(userInfoAtom);
         return {
             async changeUserNameAsync(newName: string): Promise<BaseRes> {
-                const name=newName;
+                const name = newName;
                 return {
                     status: 1
                 };
@@ -66,8 +66,8 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                     username: new Date().toTimeString()
                 };
                 const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
-                const info: BasicUserInfo = {
-                    hash: "", identity: identity, nick: "", privateKey: privateKey
+                const info: BasicUserState = {
+                    hash: "", identity: identity, nick: "", address: ''
                 };
                 setInfo(info);
                 return res;
