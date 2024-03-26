@@ -5,6 +5,7 @@
 # @Date    : 2024/3/16 22:40
 # @介绍    :
 import json
+import mimetypes
 
 from common import *
 from flask import Flask, request
@@ -51,13 +52,15 @@ def loginRoute():
     login = {
         'status': 0,
         'username': '',
+        'ETHAccounts':''
     }
     if data['identity']=='Applicant':
         try:
-            username=verifyPrivateKeys(data['PrivateKeys'], data['username'])
-            if not (username is None):
+            key=verifyPrivateKeys(data['PrivateKeys'], data['username'])
+            if not (key["userName"] is None):
                 login['status'] = 1
-                login['username'] = username
+                login['username'] = key["userName"]
+                login['ETHAccounts'] = key["address"]
                 return json.dumps(login)
             else:
                 return json.dumps(login)
@@ -73,21 +76,33 @@ def loginRoute():
                 return json.dumps(login)
         except Exception as e:
             return json.dumps(login)
+    elif data['identity']=='KeyKeeper':
+        try:
+            login['status']=verifyKeyKeeper(data['username'])
+            if login['status']==1:
+                login['username'] = data['username']
+                return json.dumps(login)
+            else:
+                return json.dumps(login)
+        except Exception as e:
+            return json.dumps(login)
 
 @app.route('/upload', methods=["POST"])
 def uploadRoute():
     upload={
         'status': 0,
         'hash': '',
+        'type': '',
         'name': ''
     }
     if 'file' not in request.files:
         return json.dumps(upload)
 
     file = request.files['file']
-    if file.filename == '' :
+    hashID = request.args.get('hashID')
+    if file.filename == '' or hashID is None:
         return json.dumps(upload)
-    return uploadIpfs(file,upload)
+    return uploadIpfs(file,hashID,upload)
 @app.route('/getFileMessage', methods=["POST"])
 def getFileMessage():
     message={
@@ -99,6 +114,19 @@ def getFileMessage():
     if hashID == '':
         return json.dumps(message)
     return getResumeMessage(hashID,message)
+
+@app.route('/download', methods=['GET'])
+def download_file():
+    download={
+        'status': 0,
+    }
+    # IPFS gateway URL
+    file_hash=request.args.get('fileHash')
+    file_name=request.args.get('fileName')
+    if file_hash is None or file_name is None:
+        return json.dumps(download)
+    return downloadByipfs(file_hash,file_name,download)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

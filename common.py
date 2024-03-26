@@ -5,6 +5,9 @@
 # @Date    : 2024/3/17 8:40
 # @介绍    :
 import json
+
+from flask import send_file
+
 from settings import Configs
 from asmuth_bloom import *
 import pymysql
@@ -29,12 +32,21 @@ def verifyPrivateKeys(privateKey,userName):
     url = config.WeBASE_privateKey_api+f'/import?privateKey={privateKey}&userName={userName}'
     response = requests.get(url)
     key = response.json()
-    return key["userName"]
+    return key
 
 def verifyRecruiter(username):
     with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
         #判断用户名是否已经存在
         condition = f'select * from recruiter where username=%s'
+        cur.execute(condition, (username))
+        if cur.fetchone():
+            return 1
+        else:
+            return 0
+def verifyKeyKeeper(username):
+    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
+        #判断用户名是否已经存在
+        condition = f'select * from KeyKeeper where username=%s'
         cur.execute(condition, (username))
         if cur.fetchone():
             return 1
@@ -128,7 +140,7 @@ def createKeyKeeper(data,user):
             return json.dumps(user)
         else:
             return json.dumps(user)
-def uploadIpfs(file,upload):
+def uploadIpfs(file,hashID,upload):
     files = {
         'file':(file.filename, file)
     }
@@ -137,14 +149,15 @@ def uploadIpfs(file,upload):
         data = json.loads(response.text)
         hash_code = data['Hash']
         name = data['Name']
-        # with pymysql.connect(host=config.host, user=config.user, password=config.password,
-        #                  database=config.database) as conn, conn.cursor() as cur:
-        #     condition = f'insert into resumeForm(putTime,downloadtimes) values(NOW(),0);'
-        #     cur.execute(condition)
+        with pymysql.connect(host=config.host, user=config.user, password=config.password,
+                         database=config.database) as conn, conn.cursor() as cur:
+            condition = f'insert into resumeForm(hashID,putTime,downloadtimes) values(%s,NOW(),0);'
+            cur.execute(condition,(hashID))
     else:
         return json.dumps(upload)
     upload['status'] = 1
     upload['name'] = name
+    upload['type'] =  file.content_type
     upload['hash'] = hash_code
     print(hash_code)
     return json.dumps(upload)
@@ -160,3 +173,21 @@ def getResumeMessage(hashID,message):
             return json.dumps(message)
         else:
             return json.dumps(message)
+
+def downloadByipfs(file_hash,file_name,download):
+    gateway_url = config.ipfs_url_download+f"{file_hash}?download=true&filename={file_name}"
+    # Combine the gateway URL and the file hash
+    url = gateway_url + file_hash
+    # Download the file
+    response = requests.get(url)
+    # Check if the download was successful
+    if response.status_code == 200:
+        # Save the file temporarily
+        with open(file_hash, "wb") as f:
+            f.write(response.content)
+        # Send the file to the client
+        response=send_file(file_hash, as_attachment=True)
+        response.headers["Content-Disposition"] = f"attachment; filename={file_name}"
+        return response
+    else:
+        return download
