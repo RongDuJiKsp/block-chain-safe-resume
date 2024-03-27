@@ -1,7 +1,10 @@
 import {CSSProperties, ReactElement, ReactNode} from "react";
 
 export interface UserFileSystem {
-    downloadToFile(file: BinFile, prefix: string, suffix: string): Promise<void>;
+    downloadToFileFromSuffix(file: BinFile, prefix: string, suffix: string): Promise<void>;
+    downloadToFileAsName(file: BinFile, name:string): Promise<void>;
+    readFileAsBase64(file:File):Promise<string>;
+    readBase64AsBlob(base64:string,type:string):BinFile;
     base64ToAscii(base64:string):string
 
 }

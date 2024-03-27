@@ -4,19 +4,44 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 export const FileSystemImpl: UserFileSystem = {
 
-    async downloadToFile(file: BinFile, prefix: string, suffix: string): Promise<void> {
+    async downloadToFileFromSuffix(file: BinFile, prefix: string, suffix: string): Promise<void> {
+        await this.downloadToFileAsName(file, prefix + "." + suffix);
+    },
+    async downloadToFileAsName(file: BinFile, name: string): Promise<void> {
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
-        link.download = prefix + "." + suffix;
+        link.download = name;
         document.body.appendChild(link);
         link.click();
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
     },
+    readFileAsBase64(file: File) {
+        return new Promise((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = (ev): void => {
+                resolve(String(ev.target?.result).split(",")[1]);
+            };
+            fileReader.onerror = (ev) => {
+                reject(ev.target?.error);
+            };
+            fileReader.readAsDataURL(file);
+        });
+    },
+    readBase64AsBlob(base64: string, type: string): BinFile {
+        const binStr = atob(base64);
+        let n = binStr.length;
+        const u8Arr = new Uint8Array(n);
+        while (n--) {
+            u8Arr[n] = binStr.charCodeAt(n);
+        }
+        return new Blob([u8Arr], {type: type});
+    },
     base64ToAscii(base64: string): string {
         return new Buffer(base64, "base64").toString("utf-8");
     }
+
 
 };
 

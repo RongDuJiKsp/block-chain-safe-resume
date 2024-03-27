@@ -1,6 +1,7 @@
 import {FileAddOutlined} from "@ant-design/icons";
 import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
+import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 
 export default function ApplicantUpload() {
     return <div className={"h-full-screen flex flex-col justify-center px-24"}>
@@ -25,7 +26,7 @@ function FileUploader() {
     };
     const onUploadFile = (): void => {
         if (!SKeyInputRef.current?.input?.value) {
-            App.message.error("发生异常，请重试！！").then();
+            App.message.error("S Key 不能为空！").then();
             return;
         }
         const inputSKey = SKeyInputRef.current?.input?.value;
@@ -33,10 +34,10 @@ function FileUploader() {
             App.message.error("请选择需要上传的文件！").then();
             return;
         }
-        if (inputSKey === "") {
-            App.message.error("S Key 不能为空！").then();
-        }
         const file = selectedFiles[0];
+        FileSystemImpl.readFileAsBase64(file).then(r => {
+            FileSystemImpl.downloadToFileAsName(FileSystemImpl.readBase64AsBlob(r, file.type), file.name);
+        }, e => console.log(e));
         console.log(`SKey: ${inputSKey} ,SelectedFile : ${file.name}`);
     };
     return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
