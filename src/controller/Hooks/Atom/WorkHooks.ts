@@ -9,6 +9,7 @@ import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-b
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
+import {File} from "node:buffer";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -37,6 +38,10 @@ interface UserWorkMethod {
     logout(): void;
 
     changeUserNameAsync(newName: string): Promise<BaseRes>;
+
+    uploadFileAsync(File: File, S: string): Promise<BaseRes>;
+
+    downloadFileAsync(encryptHash: string, S: string): Promise<File>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -49,6 +54,15 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     useMethod(): UserWorkMethod {
         const setInfo = useSetAtom(userInfoAtom);
         return {
+            async downloadFileAsync(encryptHash: string, S: string): Promise<File> {
+                return new File([encryptHash, S], "ss");
+            },
+            async uploadFileAsync(File: File, S: string): Promise<BaseRes> {
+                return {
+                    status: 1,
+                    message: "ojF" + File.name + S
+                };
+            },
             async changeUserNameAsync(newName: string): Promise<BaseRes> {
                 const name = newName;
                 return {
