@@ -278,7 +278,7 @@ function FillInInformationComponent() {
                     <Input.TextArea autoSize={{minRows: 5, maxRows: 5}}/>
                 </Form.Item>
                 <Form.Item className={"flex justify-center"}>
-                    <button className={"button button-3d button-pill button-primary-flat"}>
+                    <button className={"button button-3d button-pill button-primary"}>
                         Conform
                     </button>
                 </Form.Item>
@@ -368,7 +368,9 @@ function GetResultComponent() {
         const fileContext = `Please keep your  key, once lost, you can't get it back!
         PrivateValue : ${res?.res.PrivateKeys}
         SafeKey:${res?.res.S}
-        SubSafeKey:${res?.res.M}
+        SubSafeKeyPair[M,X] :${res?.res.M.map((val, index) => {
+            return `\n        [${val},${res?.res.X[index]}]`;
+        })}
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         Please give the SubKey to the key holder who has been granted the right to pledge
         `;
@@ -379,7 +381,8 @@ function GetResultComponent() {
     };
     return <div className={"h-full  flex flex-col justify-around "}>
         <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
-            <Result status={res?.res.status ? "success" : "error"} title={res?.res.status ? "注册成功" : "注册失败，请重试"}
+            <Result status={res?.res.status ? "success" : "error"}
+                    title={res?.res.status ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>
                              <button className={"button button-3d button-action"} onClick={onDownload}
                                      style={{display: res?.res.status ? "inline-block" : "none"}}>
