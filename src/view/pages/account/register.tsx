@@ -48,9 +48,14 @@ interface StateManager {
     reStart?: () => void;
     infoSetter?: Dispatch<SetStateAction<RegisterUserInfo>>
     info: RegisterUserInfo,
-    resSetter?: Dispatch<SetStateAction<RegisterRes | undefined>>
-    res?: RegisterRes
+    resSetter?: Dispatch<SetStateAction<RegisterResult | undefined>>
+    res?: RegisterResult
 
+}
+
+interface RegisterResult {
+    res: RegisterRes;
+    info: string;
 }
 
 const RegisterInfoSetterContext = createContext<StateManager>({info: userRegisterInfoDefaultValue});
@@ -85,7 +90,7 @@ const StepElements: StepInformation[] = [
 function RegisterPage() {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [userInfo, setUSerInfo] = useState<RegisterUserInfo>(userRegisterInfoDefaultValue);
-    const [registerRes, setRegisterRes] = useState<RegisterRes>();
+    const [registerRes, setRegisterRes] = useState<RegisterResult>();
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
             title: val.title,
@@ -299,7 +304,10 @@ function CheckInformationComponent() {
             setLoading.setTrue();
             userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then((info): void => {
                 setLoading.setFalse();
-                registerInfo.resSetter?.call(null, info);
+                registerInfo.resSetter?.call(null, {
+                    res: info,
+                    info: registerInfo.info.nick
+                });
                 registerInfo.nextStep?.call(null);
             }).catch(err => {
                 message.error("发生了错误:" + err).then();
@@ -356,32 +364,32 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
-        console.log(res, res?.PrivateKeys);
+        console.log(res, res?.res.PrivateKeys);
         const fileContext = `Please keep your  key, once lost, you can't get it back!
-        PrivateValue : ${res?.PrivateKeys}
-        SafeKey:${res?.S}
-        SubSafeKey:${res?.M}
+        PrivateValue : ${res?.res.PrivateKeys}
+        SafeKey:${res?.res.S}
+        SubSafeKey:${res?.res.M}
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         Please give the SubKey to the key holder who has been granted the right to pledge
         `;
-        FileSystemImpl.downloadToFile(new Blob([fileContext]), `${res?.ETHAccounts?.substring(0, 7)}... of ${res?.hashID?.substring(0, 7)}...`, "key").then(() => message.success("下载成功！"));
+        FileSystemImpl.downloadToFile(new Blob([fileContext]), `${res?.res.ETHAccounts?.substring(0, 7)}... of ${res?.info}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});
     };
     return <div className={"h-full  flex flex-col justify-around "}>
         <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
-            <Result status={res?.status ? "success" : "error"} title={res?.status ? "注册成功" : "注册失败，请重试"}
+            <Result status={res?.res.status ? "success" : "error"} title={res?.res.status ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>
                              <button className={"button button-3d button-action"} onClick={onDownload}
-                                     style={{display: res?.status ? "inline-block" : "none"}}>
+                                     style={{display: res?.res.status ? "inline-block" : "none"}}>
                                  保存key
                              </button>
                              <button className={"button button-3d button-primary"} onClick={onReturnPage}>
                               返回登录
                             </button>
                              </span>}
-                    subTitle={res?.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.message}/>
+                    subTitle={res?.res.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.res.message}/>
         </div>
     </div>;
 }

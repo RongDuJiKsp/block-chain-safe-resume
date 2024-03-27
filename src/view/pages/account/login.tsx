@@ -46,7 +46,7 @@ function LoginPage() {
 export default LoginPage;
 
 function LoginComponent() {
-    const nativate = useNavigate();
+    const navigate = useNavigate();
     const workMethod = UserWorkHooks.useMethod();
     const [isLoading, loadingAction] = useBoolean();
     const {message} = App.useApp();
@@ -57,7 +57,7 @@ function LoginComponent() {
         workMethod.loginAsync(val.keyword, val.identity).then(r => {
             if (r.status) {
                 message.success("登录成功,正在跳转！").then();
-                nativate("/home/login");
+                navigate("/home/login");
             } else message.error("登录失败").then();
             loadingAction.setFalse();
         }).catch(e => {

@@ -1,5 +1,5 @@
 import {useAtomValue, useSetAtom} from "jotai";
-import {BasicUserInfo, BasicUserState} from "../../../model/entity/user.ts";
+import {BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
@@ -52,7 +52,8 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             async changeUserNameAsync(newName: string): Promise<BaseRes> {
                 const name = newName;
                 return {
-                    status: 1
+                    status: 1,
+                    message: "oj"
                 };
             },
             logout(): void {

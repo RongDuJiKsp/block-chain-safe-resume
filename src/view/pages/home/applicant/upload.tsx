@@ -24,7 +24,11 @@ function FileUploader() {
         event.target.value = "";
     };
     const onUploadFile = (): void => {
-        const inputSKey = `${SKeyInputRef.current?.input?.value}`;
+        if (!SKeyInputRef.current?.input?.value) {
+            App.message.error("发生异常，请重试！！").then();
+            return;
+        }
+        const inputSKey = SKeyInputRef.current?.input?.value;
         if (!selectedFiles.length) {
             App.message.error("请选择需要上传的文件！").then();
             return;
@@ -33,7 +37,7 @@ function FileUploader() {
             App.message.error("S Key 不能为空！").then();
         }
         const file = selectedFiles[0];
-        console.log(`SKey: ${SKeyInputRef.current?.input?.value} ,SelectedFile : ${file.name}`);
+        console.log(`SKey: ${inputSKey} ,SelectedFile : ${file.name}`);
     };
     return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
         <div className={"basis-1/3 h-5/6 my-auto border-[3px] border-dotted bg-gray-50"}>
@@ -53,7 +57,7 @@ function FileUploader() {
                        value={(selectedFiles.length && selectedFiles[0].type !== "") ? selectedFiles[0].name : "未选择文件"}/>
             </Form.Item>
             <div>
-                <Popconfirm title={"请检查上传的文件是否选择正确！以避免额外的token消耗"} onConfirm={onUploadFile} >
+                <Popconfirm title={"请检查上传的文件是否选择正确！以避免额外的token消耗"} onConfirm={onUploadFile}>
                     <button className={"button button-primary"}>Upload</button>
                 </Popconfirm>
             </div>
