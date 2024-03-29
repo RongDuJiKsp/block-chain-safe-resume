@@ -5,10 +5,24 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {BaseRes, LoginReq, RegisterReq, RegisterRes, ResumeInfoRes} from "../../../model/http-bodys/reqs.ts";
+import {LoginReq, RegisterReq} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
+import {
+    BaseRes,
+    ChangeNickRes,
+    GiveResumeLicensingRes,
+    KeyKeeperRequestRequestListRes,
+    LoginRes,
+    RecruiterResumeStatusRes,
+    RegisterRes,
+    RequestResumeLicensingRes,
+    ResumeInfoRes,
+    ResumeQuestListRes,
+    ResumeRequestHistoryListRes,
+    UploadSubKeyRes
+} from "../../../model/http-bodys/ress.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -32,13 +46,11 @@ interface UserWorkValue {
 interface UserWorkMethod {
     registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
 
-    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<BaseRes>;
+    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<LoginRes>;
 
     logout(): void;
 
-    changeUserNameAsync(newName: string): Promise<BaseRes>;
-
-
+    changeUserNameAsync(newName: string): Promise<ChangeNickRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -51,26 +63,27 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     useMethod(): UserWorkMethod {
         const setInfo = useSetAtom(userInfoAtom);
         return {
-            async changeUserNameAsync(newName: string): Promise<BaseRes> {
+            async changeUserNameAsync(newName: string): Promise<ChangeNickRes> {
                 const name = newName;
                 return {
                     status: 1,
-                    message: "oj"
+                    message: "oj",
+                    newName: ""
                 };
             },
             logout(): void {
                 setInfo(null);
             },
-            async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<BaseRes> {
+            async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<LoginRes> {
 
                 const reqBody: LoginReq = {
                     identity,
                     privateKeys: privateKey,
                 };
-                const res = await alovaClientImpl.Post<BaseRes>("/LoginReq", reqBody);
+                const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
                 console.log(res);
                 const info: BasicUserState = {
-                    hash: "", identity: identity, nick: "", address: ''
+                    identity: identity, nick: res.username, address: res.address
                 };
                 setInfo(info);
                 return res;
@@ -88,9 +101,15 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    uploadFileAsync(File: File, S: string): Promise<BaseRes>;
+    updateResumeAsync(File: File, S: string): Promise<BaseRes>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
+
+    getResumeRequestListAsync(): Promise<ResumeQuestListRes>;
+
+    giveResumeLicensingAsync(): Promise<GiveResumeLicensingRes>;
+
+    getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
@@ -104,7 +123,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     downloadtimes: "222"
                 };
             },
-            async uploadFileAsync(File: File, S: string): Promise<BaseRes> {
+            async updateResumeAsync(File: File, S: string): Promise<BaseRes> {
                 return {
                     status: 1,
                     message: "ojF" + File.name + S
@@ -119,18 +138,41 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 };
 
 interface RecruiterWorkMethod {
-    downloadFileAsync(encryptHash: string, S: string): Promise<File>;
+    downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
+
+    getResumeStatusListAsync(): Promise<RecruiterResumeStatusRes>;
+
+    requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes>;
 }
 
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
         return {
-            async downloadFileAsync(encryptHash: string, S: string): Promise<File> {
+            async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
                 return new File([encryptHash, S], "ss");
             },
+            async getResumeStatusListAsync() {
+                return {
+                    status: 1,
+                    message: ""
+                };
+            },
+            async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {
+                return {
+                    status: 1,
+                    message: ""
+                };
+            }
         };
-    }, useValue(): null {
+    },
+    useValue(): null {
         return null;
     }
 
 };
+
+interface KeyKeeperWorkMethod {
+    uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
+
+    requestRequestListAsync(): Promise<KeyKeeperRequestRequestListRes>;
+}

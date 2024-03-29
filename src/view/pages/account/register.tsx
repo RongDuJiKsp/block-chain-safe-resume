@@ -15,7 +15,7 @@ import {hashToTranslate} from "../../../controller/crypto/hash.ts";
 import {FORM_RULE_PATTERNS} from "../../../config/backendrule.config.ts";
 import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entity/user.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {RegisterRes} from "../../../model/http-bodys/reqs.ts";
+import {RegisterRes} from "../../../model/http-bodys/ress.ts";
 import {useBoolean} from "ahooks";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";

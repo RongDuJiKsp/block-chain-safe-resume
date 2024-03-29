@@ -4,14 +4,14 @@ import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
 import {useEffect, useState} from "react";
-import {ResumeInfoRes} from "../../../../model/http-bodys/reqs.ts";
-import {UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
+import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 const tableColumn: ColumnsType<ApplicantResumeRequestStatusTuple> = [{}];
 export default function ApplicantStatus() {
-    const userServerMethod = UserWorkHooks.useMethod();
+    const userServerMethod = ApplicantWorkHooks.useMethod();
     const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
     useEffect(() => {
         userServerMethod.getResumeInfoAsync().then(r => setResumeInfo(r));

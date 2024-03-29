@@ -29,7 +29,6 @@ export interface ApplicantResumeVisitStatusTuple{
 
 export interface BasicUserState {
     nick: string;
-    hash: string;
     identity: UserIdentityEnum;
     address: string;
 }

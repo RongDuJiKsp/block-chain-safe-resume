@@ -1,7 +1,7 @@
 import {FileAddOutlined} from "@ant-design/icons";
 import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
-import {UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApplicantWorkHooks, UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 export default function ApplicantUpload() {
     return <div className={"h-full-screen flex flex-col justify-center px-24"}>
@@ -11,7 +11,7 @@ export default function ApplicantUpload() {
 
 
 function FileUploader() {
-    const userServerMethod = UserWorkHooks.useMethod();
+    const userServerMethod = ApplicantWorkHooks.useMethod();
     const App = APP.useApp();
     const [selectedFiles, setSelectFiles] = useState<File[]>([]);
     const SKeyInputRef = useRef<InputRef>(null);
@@ -36,7 +36,7 @@ function FileUploader() {
             return;
         }
         const file = selectedFiles[0];
-        userServerMethod.uploadFileAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
+        userServerMethod.updateResumeAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
 
     };
     return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
