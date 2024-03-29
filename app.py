@@ -109,19 +109,12 @@ def DownloadFileReq():
 @app.route('/GetFileMesReq', methods=["POST"])
 def GetFileMesReq():
     data = request.get_json()
-    message={
-        'status': 0,
-        'message': '',
-        'putTime': 0,
-        'downloadtimes': 0,
-    }
+    message={}
     try:
         if data['hashID'] is None :
-            message['message'] = "参数不完整"
             return json.dumps(message)
         return getResumeMessage(data['hashID'],message)
     except Exception as e:
-        message['message'] = "下载失败 原因 {}".format(str(e))
         return json.dumps(message)
 
 

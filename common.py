@@ -105,12 +105,8 @@ def getResumeMessage(hashID,message):
         condition = f'select * from resumeForm where hashID=%s'
         cur.execute(condition, (hashID))
         if cur.rowcount:
-            result=cur.fetchone()
-            message['status'] = 1
-            message['message'] = "获取成功"
-            message['putTime'] = result[1]
-            message['downloadtimes'] = result[2]
-            return json.dumps(message)
+            result=cur.fetchall()
+            return json.dumps(result)
         else:
             return json.dumps(message)
 

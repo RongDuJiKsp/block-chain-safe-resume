@@ -198,13 +198,13 @@ interface DownloadRes extends BaseRes {
 
  /**
  * @interface GetFileMesRes
- * @extends BaseRes
+ * @property allMessahe 所有上传简历信息
+ * @property hashID 用户hashID
  * @property putTime 简历上传时间(从1970年1月1日00:00:00 UTC到现在的秒数)
  * @property downloadtimes 简历下载次数
  */
-interface GetFileMesRes extends BaseRes {
-    putTime: int;
-    downloadtimes: int;
+interface GetFileMesRes{
+    [[hashID,putTime,downloadtimes]]
  }
 ```
 
