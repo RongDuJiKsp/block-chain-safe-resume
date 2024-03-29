@@ -10,7 +10,6 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
-
 @app.route('/RegisterReq', methods=["POST"])
 def RegisterReq():
     data = request.get_json()
@@ -25,8 +24,8 @@ def RegisterReq():
         'X': '',
     }
     try:
-        if data['hashID'] is None or data['identity'] is None or data['userName'] is None:
-            user['message'] = "用户名或身份信息不能为空"
+        if data['identity'] is None :
+            user['message'] = "身份信息不能为空"
             return json.dumps(user)
         else:
             if verifyIdentity(data['identity']):
@@ -49,10 +48,10 @@ def LoginReq():
         'address':''
     }
     try:
-        if data['privateKeys'] is None or data['hashID'] is None or data['identity'] is None:
+        if data['privateKeys'] is None or data['identity'] is None:
             login['message'] = "参数不完整"
             return json.dumps(login)
-        return verifyprivateKeys(data['privateKeys'], data['hashID'],data['identity'],login)
+        return verifyprivateKeys(data['privateKeys'],data['identity'],login)
     except Exception as e:
         login['message'] = "登录失败 原因 {}".format(str(e))
         return json.dumps(login)
@@ -85,10 +84,10 @@ def UploadReq():
         return json.dumps(upload)
     # 前端上传文件,后端处理给webase
     file = request.files['file']
-    hashID = request.args.get('hashID')
-    if file.filename == '' or hashID is None:
+    address = request.args.get('address')
+    if file.filename == '' or address is None:
         return json.dumps(upload)
-    return uploadIpfs(file,hashID,upload)
+    return uploadIpfs(file,address,upload)
 @app.route('/DownloadFileReq', methods=['POST'])
 def DownloadFileReq():
     data = request.get_json()
@@ -111,9 +110,9 @@ def GetFileMesReq():
     data = request.get_json()
     message={}
     try:
-        if data['hashID'] is None :
+        if data['address'] is None :
             return json.dumps(message)
-        return getResumeMessage(data['hashID'],message)
+        return getResumeMessage(data['address'],message)
     except Exception as e:
         return json.dumps(message)
 

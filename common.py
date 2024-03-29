@@ -23,53 +23,61 @@ def verifyIdentity(identity):
         return 0
 def randName():
     return ''.join(random.sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 8))
-def getKey(hashID):
-    url=config.WeBASE_privateKey_api+f'?type=2&appId=2&returnPrivateKey=true&signUserId={hashID}'
+def getKey(userName):
+    url=config.WeBASE_privateKey_api+f'?type=2&appId=2&returnPrivateKey=true&signUserId={userName}'
     response = requests.get(url)
     key=response.json()
     privateKey= base64.b64decode(key['privateKey']).decode('utf-8')
-    url2 = config.WeBASE_privateKey_api + f"/import?privateKey={privateKey}&userName={hashID}"
+    url2 = config.WeBASE_privateKey_api + f"/import?privateKey={privateKey}&userName="
     response2 = requests.get(url2)
     return key
-def verifyprivateKeys(privateKey,hashID,identity,login):
-    url = config.WeBASE_privateKey_api+f'/import?privateKey={privateKey}&userName={hashID}'
+def getTableName(identity):
+    if identity == 'Applicant':
+        return 'Applicant'
+    elif identity == 'Recruiter':
+        return 'Recruiter'
+    elif identity == 'KeyKeeper':
+        return 'KeyKeeper'
+    else:
+        return 'error'
+def verifyprivateKeys(privateKey,identity,login):
+    name=randName()
+    url = config.WeBASE_privateKey_api+f'/import?privateKey={privateKey}&userName={name}'
     response = requests.get(url)
     key = response.json()
-    if key['code']==201038:
-        with pymysql.connect(host=config.host, user=config.user, password=config.password,
-                             database=config.database) as conn, conn.cursor() as cur:
-            # 判断用户是否已经存在
-            condition = f'select * from {identity} where hashID=%s'
-            cur.execute(condition, (hashID))
-            result = cur.fetchone()
-            if result:
-                login['status'] = 1
-                login['message'] = "登录成功"
-                login['userName'] = result[0]
-                login['address'] = result[2]
-                return json.dumps(login)
-            else:
-                return 0
+    if response.status_code == 200:
+        table_name = getTableName(identity)
+        if table_name == 'error':
+            login['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+            return json.dumps(login)
+        condition = f'select * from {table_name} where address=%s'
+        cur.execute(condition,(key['address']))
+        result = cur.fetchone()
+        if result:
+            login['status'] = 1
+            login['message'] = "登录成功"
+            login['userName'] = result[0]
+            login['address'] = result[1]
+            return json.dumps(login)
+        else:
+            return json.dumps(login)
 def register(data,user):
-        # 判断用户名是否已经存在
-        condition = f"select * from {data['identity']} where hashID=%s or userName=%s"
-        cur.execute(condition, (data["hashID"], data["userName"]))
-        if cur.fetchone():
-            user['message'] = "hashID已经存在"
-            return json.dumps(user)
-
-        key = getKey(data['hashID'])
+        userName = randName()
+        key = getKey(userName)
         need = getNeed()
+        table_name = getTableName(data['identity'])
+        if table_name == 'error':
+            user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+            return json.dumps(user)
         # 插入用户信息
-        condition = f"insert into {data['identity']}(userName,hashID,address,publicKeys,P) values(%s,%s,%s,%s,%s);"
-        cur.execute(condition, (data['userName'], data['hashID'], key["address"], key['publicKey'], need['P']))
+        condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
+        cur.execute(condition, (userName, key["address"], key['publicKey'], need['P']))
 
         if cur.rowcount:
             # 更新address状态
             user['status'] = 1
             user['message'] = "注册成功"
-            # user['userName'] = randName()
-            user['address'] = key["address"]
+            user['userName'] = userName
             # user['publicKeys'] = key['publicKey']
             user['privateKeys'] = key['privateKey']
             # user['identity'] = data['identity']
@@ -81,7 +89,7 @@ def register(data,user):
         else:
             return json.dumps(user)
 
-def uploadIpfs(file,hashID,upload):
+def uploadIpfs(file,address,upload):
     files = {
         'file':(file.filename, file)
     }
@@ -90,8 +98,8 @@ def uploadIpfs(file,hashID,upload):
     if response.status_code == 200:
         data = json.loads(response.text)
         hash_code = data['Hash']
-        condition = f'insert into resumeForm(hashID,putTime,downloadtimes) values(%s,UNIX_TIMESTAMP(),0);'
-        cur.execute(condition,(hashID))
+        condition = f'insert into resumeForm(address,putTime,downloadtimes) values(%s,UNIX_TIMESTAMP(),0);'
+        cur.execute(condition,(address))
     else:
         return json.dumps(upload)
     upload['status'] = 1
@@ -99,11 +107,11 @@ def uploadIpfs(file,hashID,upload):
     upload['hash'] = hash_code
     return json.dumps(upload)
 
-def getResumeMessage(hashID,message):
+def getResumeMessage(address,message):
         # 在hr表中
         # 查询resumeForm表所有内容
-        condition = f'select * from resumeForm where hashID=%s'
-        cur.execute(condition, (hashID))
+        condition = f'select * from resumeForm where address=%s'
+        cur.execute(condition, (address))
         if cur.rowcount:
             result=cur.fetchall()
             return json.dumps(result)
@@ -129,11 +137,15 @@ def downloadByipfs(file_hash,download):
         return download
 
 def ChangeName(data,change):
+        table_name = getTableName(data['identity'])
+        if table_name == 'error':
+            change['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+            return json.dumps(change)
         # 判断用户名是否已经存在
-        condition = f"select * from {data['identity']} where userName=%s"
+        condition = f"select * from {table_name} where userName=%s"
         cur.execute(condition, (data["oldName"]))
         if cur.fetchone():
-            condition = f"update {data['identity']} set userName=%s where userName=%s"
+            condition = f"update {table_name} set userName=%s where userName=%s"
             cur.execute(condition, (data['newName'], data['oldName']))
             if cur.rowcount:
                 change['status'] = 1

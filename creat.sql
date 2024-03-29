@@ -10,27 +10,24 @@ CREATE DATABASE IF NOT EXISTS safe_resume;
 USE safe_resume;
 CREATE TABLE Applicant (
     userName VARCHAR(255) NOT NULL,
-    hashID VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 CREATE TABLE Recruiter (
     userName VARCHAR(255) NOT NULL,
-    hashID VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 CREATE TABLE KeyKeeper (
     userName VARCHAR(255) NOT NULL,
-    hashID VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 CREATE TABLE resumeForm(
-    hashID VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
     putTime  int NOT NULL,
     downloadtimes int NOT NULL
 );

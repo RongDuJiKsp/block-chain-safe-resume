@@ -19,13 +19,10 @@
 ```
  /**
  * @interface RegisterReq 注册的请求体
- * @property hashID 用户hash
  * @property userName 用户名
  * @property identity 用户身份(Applicant、Recruiter、KeyKeeper)
  */
   interface RegisterReq {
-    hashID: string,
-    userName: string,
     identity: string
  }
 
@@ -60,7 +57,6 @@
 */
 interface LoginReq {
     privateKeys: string;
-    hashID: string;
     identity: UserIdentityEnum;
 }
 
@@ -114,6 +110,7 @@ interface LoginReq {
 ```
 /**
 *上传这块请求我是这么想的前端直接把文件传给后端不需要做什么操作，后端和合约交互把文件内容加密后上传到ipfs并返回hash
+*请求的时候需要get传参address
 */
 
 
@@ -142,8 +139,8 @@ function uploadFile() {
     var file = input.files[0];
     var formData = new FormData();
     formData.append('file', file);
-    var hashID = '123';  //hashID示例
-    fetch('http://127.0.0.1:5000/UploadReq?hashID=' + hashID, {
+    var address = '0x3a46aad900e8ff302b7198496131b7a84de217cf';  //address示例
+    fetch('http://127.0.0.1:5000/UploadReq?address=' + address, {
         method: 'POST',
         body: formData
     })
@@ -189,10 +186,10 @@ interface DownloadRes extends BaseRes {
  /**
  * 这是一个提供给Recruiter用户查看所有ap简历的接口
  * @interface GetFileMesReq
- * @property hashID Recruiter用户身份标识
+ * @property address Recruiter用户地址(登陆时已经返回)
  */
   interface GetFileMesReq {
-    hashID: string;
+    address: string;
  }
 
 
