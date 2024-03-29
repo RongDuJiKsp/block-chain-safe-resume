@@ -4,9 +4,6 @@
 # @Author  : LtmThink
 # @Date    : 2024/3/16 22:40
 # @介绍    :
-import json
-import mimetypes
-
 from common import *
 from flask import Flask, request
 from flask_cors import CORS
@@ -14,25 +11,21 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/register', methods=["POST"])
-def registerRoute():
+@app.route('/RegisterReq', methods=["POST"])
+def RegisterReq():
     data = request.get_json()
     user = {
         'status': 0,
-        'username': '',
-        'hashID': '',
-        'identity': '',
-        'ETHAccounts': '',
-        'PublicKeys': '',
-        'PrivateKeys': '',
+        'message': '',
+        'address': '',
+        'privateKeys': '',
         'S': '',
         'P': '',
         'M': '',
         'X': '',
-        'message': '注册失败'
     }
     try:
-        if data['hashID'] is None or data['identity'] is None or data['username'] is None:
+        if data['hashID'] is None or data['identity'] is None or data['userName'] is None:
             user['message'] = "用户名或身份信息不能为空"
             return json.dumps(user)
         else:
@@ -46,86 +39,90 @@ def registerRoute():
         return json.dumps(user)
 
 
-@app.route('/login', methods=["POST"])
-def loginRoute():
+@app.route('/LoginReq', methods=["POST"])
+def LoginReq():
     data = request.get_json()
     login = {
         'status': 0,
-        'username': '',
-        'ETHAccounts':''
+        'message':'',
+        'userName': '',
+        'address':''
     }
-    if data['identity']=='Applicant':
-        try:
-            key=verifyPrivateKeys(data['PrivateKeys'], data['username'])
-            if not (key["userName"] is None):
-                login['status'] = 1
-                login['username'] = key["userName"]
-                login['ETHAccounts'] = key["address"]
-                return json.dumps(login)
-            else:
-                return json.dumps(login)
-        except Exception as e:
+    try:
+        if data['privateKeys'] is None or data['hashID'] is None or data['identity'] is None:
+            login['message'] = "参数不完整"
             return json.dumps(login)
-    elif data['identity']=='Recruiter':
-        try:
-            login['status']=verifyRecruiter(data['username'])
-            if login['status']==1:
-                login['username'] = data['username']
-                return json.dumps(login)
-            else:
-                return json.dumps(login)
-        except Exception as e:
-            return json.dumps(login)
-    elif data['identity']=='KeyKeeper':
-        try:
-            login['status']=verifyKeyKeeper(data['username'])
-            if login['status']==1:
-                login['username'] = data['username']
-                return json.dumps(login)
-            else:
-                return json.dumps(login)
-        except Exception as e:
-            return json.dumps(login)
+        return verifyprivateKeys(data['privateKeys'], data['hashID'],data['identity'],login)
+    except Exception as e:
+        login['message'] = "登录失败 原因 {}".format(str(e))
+        return json.dumps(login)
 
-@app.route('/upload', methods=["POST"])
-def uploadRoute():
+@app.route('/ChangeNameReq', methods=["POST"])
+def ChangeNameReq():
+    data = request.get_json()
+    change={
+        'status': 0,
+        'message': '',
+        'newName': '',
+    }
+    try:
+        if data['oldName'] is None or data['privateKey'] is None or data['newName'] is None or data['identity'] is None:
+            change['message'] = "参数不完整"
+            return json.dumps(change)
+        return ChangeName(data,change)
+    except Exception as e:
+        change['message'] = "下载失败 原因 {}".format(str(e))
+        return json.dumps(change)
+
+@app.route('/UploadReq', methods=["POST"])
+def UploadReq():
     upload={
         'status': 0,
-        'hash': '',
-        'type': '',
-        'name': ''
+        'message': '',
+        'hash': ''
     }
     if 'file' not in request.files:
         return json.dumps(upload)
-
+    # 前端上传文件,后端处理给webase
     file = request.files['file']
     hashID = request.args.get('hashID')
     if file.filename == '' or hashID is None:
         return json.dumps(upload)
     return uploadIpfs(file,hashID,upload)
-@app.route('/getFileMessage', methods=["POST"])
-def getFileMessage():
-    message={
-        'status': 0,
-        'putTime': '',
-        'downloadtimes': '',
-    }
-    hashID=request.form['hashID']
-    if hashID == '':
-        return json.dumps(message)
-    return getResumeMessage(hashID,message)
-
-@app.route('/download', methods=['GET'])
-def download_file():
+@app.route('/DownloadFileReq', methods=['POST'])
+def DownloadFileReq():
+    data = request.get_json()
     download={
         'status': 0,
+        'fileName': '',
+        'base64': '',
     }
-    # IPFS gateway URL
-    file_hash=request.args.get('fileHash')
-    file_name=request.args.get('fileName')
-    if file_hash is None or file_name is None:
+    try:
+        if data['fileHash'] is None :
+            download['message'] = "参数不完整"
+            return json.dumps(download)
+        return downloadByipfs(data['fileHash'],download)
+    except Exception as e:
+        download['message'] = "下载失败 原因 {}".format(str(e))
         return json.dumps(download)
-    return downloadByipfs(file_hash,file_name,download)
+
+@app.route('/GetFileMesReq', methods=["POST"])
+def GetFileMesReq():
+    data = request.get_json()
+    message={
+        'status': 0,
+        'message': '',
+        'putTime': 0,
+        'downloadtimes': 0,
+    }
+    try:
+        if data['hashID'] is None :
+            message['message'] = "参数不完整"
+            return json.dumps(message)
+        return getResumeMessage(data['hashID'],message)
+    except Exception as e:
+        message['message'] = "下载失败 原因 {}".format(str(e))
+        return json.dumps(message)
 
 
 if __name__ == '__main__':

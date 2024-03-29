@@ -8,24 +8,29 @@
 DROP DATABASE IF EXISTS safe_resume;
 CREATE DATABASE IF NOT EXISTS safe_resume;
 USE safe_resume;
-CREATE TABLE users (
-    username VARCHAR(255) NOT NULL,
+CREATE TABLE Applicant (
+    userName VARCHAR(255) NOT NULL,
     hashID VARCHAR(255) NOT NULL,
-    ETHAccounts VARCHAR(255) NOT NULL,
-    PublicKeys VARCHAR(255) NOT NULL,
-    identity VARCHAR(50) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
-CREATE TABLE recruiter (
+CREATE TABLE Recruiter (
+    userName VARCHAR(255) NOT NULL,
     hashID VARCHAR(255) NOT NULL,
-    username VARCHAR(255) NOT NULL
+    address VARCHAR(255) NOT NULL,
+    publicKeys VARCHAR(255) NOT NULL,
+    P VARCHAR(255) NOT NULL
 );
 CREATE TABLE KeyKeeper (
+    userName VARCHAR(255) NOT NULL,
     hashID VARCHAR(255) NOT NULL,
-    username VARCHAR(255) NOT NULL
+    address VARCHAR(255) NOT NULL,
+    publicKeys VARCHAR(255) NOT NULL,
+    P VARCHAR(255) NOT NULL
 );
 CREATE TABLE resumeForm(
     hashID VARCHAR(255) NOT NULL,
-    putTime  DATETIME,
+    putTime  int NOT NULL,
     downloadtimes int NOT NULL
 );

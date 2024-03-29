@@ -4,10 +4,8 @@
 # @Author  : LtmThink
 # @Date    : 2024/3/17 8:40
 # @介绍    :
+import base64
 import json
-
-from flask import send_file
-
 from settings import Configs
 from asmuth_bloom import *
 import pymysql
@@ -15,6 +13,8 @@ import requests
 
 global config
 config = Configs()
+conn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database)
+cur = conn.cursor()
 def verifyIdentity(identity):
     list=["Applicant","Recruiter","KeyKeeper"]
     if identity in list:
@@ -27,167 +27,125 @@ def getKey(hashID):
     url=config.WeBASE_privateKey_api+f'?type=2&appId=2&returnPrivateKey=true&signUserId={hashID}'
     response = requests.get(url)
     key=response.json()
+    privateKey= base64.b64decode(key['privateKey']).decode('utf-8')
+    url2 = config.WeBASE_privateKey_api + f"/import?privateKey={privateKey}&userName={hashID}"
+    response2 = requests.get(url2)
     return key
-def verifyPrivateKeys(privateKey,userName):
-    url = config.WeBASE_privateKey_api+f'/import?privateKey={privateKey}&userName={userName}'
+def verifyprivateKeys(privateKey,hashID,identity,login):
+    url = config.WeBASE_privateKey_api+f'/import?privateKey={privateKey}&userName={hashID}'
     response = requests.get(url)
     key = response.json()
-    return key
-
-def verifyRecruiter(username):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
-        condition = f'select * from recruiter where username=%s'
-        cur.execute(condition, (username))
-        if cur.fetchone():
-            return 1
-        else:
-            return 0
-def verifyKeyKeeper(username):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
-        condition = f'select * from KeyKeeper where username=%s'
-        cur.execute(condition, (username))
-        if cur.fetchone():
-            return 1
-        else:
-            return 0
+    if key['code']==201038:
+        with pymysql.connect(host=config.host, user=config.user, password=config.password,
+                             database=config.database) as conn, conn.cursor() as cur:
+            # 判断用户是否已经存在
+            condition = f'select * from {identity} where hashID=%s'
+            cur.execute(condition, (hashID))
+            result = cur.fetchone()
+            if result:
+                login['status'] = 1
+                login['message'] = "登录成功"
+                login['userName'] = result[0]
+                login['address'] = result[2]
+                return json.dumps(login)
+            else:
+                return 0
 def register(data,user):
-    if data['identity'] == "Applicant":
-        return createApplicant(data,user)
-    elif data['identity'] == "Recruiter":
-        return createRecruiter(data,user)
-    elif data['identity'] == "KeyKeeper":
-        return createKeyKeeper(data,user)
-
-def createApplicant(data,user):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
-        condition = f'select * from recruiter where hashID=%s or username=%s'
-        cur.execute(condition, (data["hashID"], data["username"]))
+        # 判断用户名是否已经存在
+        condition = f"select * from {data['identity']} where hashID=%s or userName=%s"
+        cur.execute(condition, (data["hashID"], data["userName"]))
         if cur.fetchone():
             user['message'] = "hashID已经存在"
             return json.dumps(user)
 
-        key=getKey(data['hashID'])
-        need=getNeed()
-        #插入用户信息
-        condition = f'insert into users(username,hashID,ETHAccounts,PublicKeys,identity,P) values(%s,%s,%s,%s,%s,%s);'
-        cur.execute(condition, (data['username'],data['hashID'], key["address"],key['publicKey'],data['identity'],need['P']))
+        key = getKey(data['hashID'])
+        need = getNeed()
+        # 插入用户信息
+        condition = f"insert into {data['identity']}(userName,hashID,address,publicKeys,P) values(%s,%s,%s,%s,%s);"
+        cur.execute(condition, (data['userName'], data['hashID'], key["address"], key['publicKey'], need['P']))
 
         if cur.rowcount:
-            #更新ETHAccounts状态
+            # 更新address状态
             user['status'] = 1
-            #user['username'] = randName()
-            user['username'] = data['username']
-            user['hashID'] = data['hashID']
-            user['ETHAccounts'] = key["address"]
-            user['PublicKeys'] = key['publicKey']
-            user['PrivateKeys'] = key['privateKey']
-            user['identity'] = data['identity']
+            user['message'] = "注册成功"
+            # user['userName'] = randName()
+            user['address'] = key["address"]
+            # user['publicKeys'] = key['publicKey']
+            user['privateKeys'] = key['privateKey']
+            # user['identity'] = data['identity']
             user['S'] = need['S']
             user['P'] = need['P']
             user['M'] = need['M']
             user['X'] = need['X']
-            user['message'] = "注册成功"
             return json.dumps(user)
         else:
             return json.dumps(user)
 
-def createRecruiter(data,user):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
-        condition = f'select * from recruiter where hashID=%s or username=%s'
-        cur.execute(condition, (data["hashID"],data["username"]))
-        if cur.fetchone():
-            user['message'] = "hashID已经存在"
-            return json.dumps(user)
-
-        #插入用户信息
-        condition = f'insert into recruiter(username,hashID) values(%s,%s);'
-        cur.execute(condition, (data["username"], data["hashID"]))
-
-        if cur.rowcount:
-            #更新ETHAccounts状态
-            user['status'] = 1
-            user['username']=data["username"]
-            user['message'] = "注册成功"
-            user['hashID'] = data["hashID"]
-            user['identity'] =data['identity']
-            return json.dumps(user)
-        else:
-            return json.dumps(user)
-def createKeyKeeper(data,user):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
-        #判断用户名是否已经存在
-        condition = f'select * from recruiter where hashID=%s or username=%s'
-        cur.execute(condition, (data["hashID"],data["username"]))
-        if cur.fetchone():
-            user['message'] = "hashID已经存在"
-            return json.dumps(user)
-
-        #插入用户信息
-        condition = f'insert into KeyKeeper(username,hashID) values(%s,%s);'
-        cur.execute(condition, (data["username"], data["hashID"]))
-
-        if cur.rowcount:
-            #更新ETHAccounts状态
-            user['status'] = 1
-            user['username']=data["username"]
-            user['message'] = "注册成功"
-            user['hashID'] = data["hashID"]
-            user['identity'] =data['identity']
-            return json.dumps(user)
-        else:
-            return json.dumps(user)
 def uploadIpfs(file,hashID,upload):
     files = {
         'file':(file.filename, file)
     }
-    response = requests.post(config.ipfs_url_upload, files=files ,proxies={'http': 'http://127.0.0.1:8080'})
+    # 简历加密,简历上链
+    response = requests.post(config.ipfs_url_upload, files=files)
     if response.status_code == 200:
         data = json.loads(response.text)
         hash_code = data['Hash']
-        name = data['Name']
-        with pymysql.connect(host=config.host, user=config.user, password=config.password,
-                         database=config.database) as conn, conn.cursor() as cur:
-            condition = f'insert into resumeForm(hashID,putTime,downloadtimes) values(%s,NOW(),0);'
-            cur.execute(condition,(hashID))
+        condition = f'insert into resumeForm(hashID,putTime,downloadtimes) values(%s,UNIX_TIMESTAMP(),0);'
+        cur.execute(condition,(hashID))
     else:
         return json.dumps(upload)
     upload['status'] = 1
-    upload['name'] = name
-    upload['type'] =  file.content_type
+    upload['message'] = '上传成功'
     upload['hash'] = hash_code
-    print(hash_code)
     return json.dumps(upload)
 
 def getResumeMessage(hashID,message):
-    with pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database) as conn, conn.cursor() as cur:
+        # 在hr表中
+        # 查询resumeForm表所有内容
         condition = f'select * from resumeForm where hashID=%s'
         cur.execute(condition, (hashID))
         if cur.rowcount:
+            result=cur.fetchone()
             message['status'] = 1
-            message['putTime'] = cur.fetchone()[1]
-            message['downloadtimes'] = cur.fetchone()[2]
+            message['message'] = "获取成功"
+            message['putTime'] = result[1]
+            message['downloadtimes'] = result[2]
             return json.dumps(message)
         else:
             return json.dumps(message)
 
-def downloadByipfs(file_hash,file_name,download):
+def downloadByipfs(file_hash,download):
+    # 和合约交互获取文件哈希和文件名等
+    file_name = "test"
+    # 从ipfs处下载文件
     gateway_url = config.ipfs_url_download+f"{file_hash}?download=true&filename={file_name}"
-    # Combine the gateway URL and the file hash
     url = gateway_url + file_hash
-    # Download the file
     response = requests.get(url)
-    # Check if the download was successful
+    # 和合约交互解密文件
+
+    # 返回
     if response.status_code == 200:
-        # Save the file temporarily
-        with open(file_hash, "wb") as f:
-            f.write(response.content)
-        # Send the file to the client
-        response=send_file(file_hash, as_attachment=True)
-        response.headers["Content-Disposition"] = f"attachment; filename={file_name}"
-        return response
+        download['status'] = 1
+        download['fileName'] = file_name
+        download['body'] = base64.b64encode(response.content).decode('utf-8')
+        return download
     else:
         return download
+
+def ChangeName(data,change):
+        # 判断用户名是否已经存在
+        condition = f"select * from {data['identity']} where userName=%s"
+        cur.execute(condition, (data["oldName"]))
+        if cur.fetchone():
+            condition = f"update {data['identity']} set userName=%s where userName=%s"
+            cur.execute(condition, (data['newName'], data['oldName']))
+            if cur.rowcount:
+                change['status'] = 1
+                change['message'] = "修改成功"
+                change['newName'] = data['newName']
+                return json.dumps(change)
+            else:
+                return json.dumps(change)
+        else:
+            change['message'] = "用户名不存在"
+            return json.dumps(change)

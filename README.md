@@ -22,7 +22,7 @@
 
 > | 参数     | 必选 | 类型   | 说明         |
 > | :------- | :--- | :----- | ------------ |
-> | username | ture | string | 注册用户名   |
+> | userName | ture | string | 注册用户名   |
 > | hashID   | ture | string | 注册的hashID |
 > | identity | true | string | 三种身份     |
 
@@ -33,12 +33,12 @@
 > | 返回字段    | 字段类型 | 说明                                         |
 > | :---------- | :------- | :------------------------------------------- |
 > | status      | int      | 0表示注册失败1表示注册成功                   |
-> | username    | string   | 注册用户名                                   |
+> | userName    | string   | 注册用户名                                   |
 > | hashID      | string   | 注册成功返回hashID(返不返回应该都没什么问题) |
 > | identity    | string   | 身份信息(三种)                               |
-> | ETHAccounts | string   | ETH账户名(无需显示)                          |
-> | PublicKeys  | string   | 公钥，将保存在数据库中                       |
-> | PrivateKeys | string   | 私钥，将不保存在数据库中需要用户自己保管     |
+> | address | string   | ETH账户名(无需显示)                          |
+> | publicKeys  | string   | 公钥，将保存在数据库中                       |
+> | privateKeys | string   | 私钥，将不保存在数据库中需要用户自己保管     |
 > | S           | int      | S                                            |
 > | P           | int      | P                                            |
 > | M           | array    | M                                            |
@@ -49,10 +49,10 @@
 
 > 地址： http://47.97.255.9:5100/register
 >
-> post传参：{"username":"whoami","hashID":"C4CA4238A0B923820DCC509A6F75849BQ","identity":"Applicant"}
+> post传参：{"userName":"whoami","hashID":"C4CA4238A0B923820DCC509A6F75849BQ","identity":"Applicant"}
 
 ``` json
-{"status": 1, "username": "whoami", "hashID": "C4CA4238A0B923820DCC509A6F75849Ba", "identity": "Applicant", "ETHAccounts": "0xf80c771de9a9c2d9df5153acdc70048e944fa644", "PublicKeys": "6b5d2b0b1a408131af3a6bae0a0cc8653a8767b617bdf6088df9a497438d22d7014b7994dc72821da5d62f3a6db9f257b8b801782f8f19aa18b6d4a9513e6a81", "PrivateKeys": "YjZhMTU3NzVjMWE0MzU1NjFmYjFmZGMzYjU3MDQ4YWM2NTZlNjNkMzY2MGJjMjBmZTczODI1YTcxYWM1YmE4ZQ==", "S": 9488793770, "P": 15866148707, "M": [13406072982287, 21967254832489, 51569067649471, 79385932834037, 148803683241373], "X": [10697115756588, 16576427298182, 7688175423398, 22853390775325, 106399001934740], "message": "\u6ce8\u518c\u6210\u529f"}
+{"status": 1, "userName": "whoami", "hashID": "C4CA4238A0B923820DCC509A6F75849Ba", "identity": "Applicant", "address": "0xf80c771de9a9c2d9df5153acdc70048e944fa644", "publicKeys": "6b5d2b0b1a408131af3a6bae0a0cc8653a8767b617bdf6088df9a497438d22d7014b7994dc72821da5d62f3a6db9f257b8b801782f8f19aa18b6d4a9513e6a81", "privateKeys": "YjZhMTU3NzVjMWE0MzU1NjFmYjFmZGMzYjU3MDQ4YWM2NTZlNjNkMzY2MGJjMjBmZTczODI1YTcxYWM1YmE4ZQ==", "S": 9488793770, "P": 15866148707, "M": [13406072982287, 21967254832489, 51569067649471, 79385932834037, 148803683241373], "X": [10697115756588, 16576427298182, 7688175423398, 22853390775325, 106399001934740], "message": "\u6ce8\u518c\u6210\u529f"}
 ```
 
 ### 接口2:登录接口
@@ -78,7 +78,7 @@
 > | 参数        | 必选 | 类型   | 说明         |
 > | ----------- | :--- | :----- | ------------ |
 > | name        | ture | string | 用户名       |
-> | PrivateKeys | ture | string | 用户私钥     |
+> | privateKeys | ture | string | 用户私钥     |
 > | identity    | true | string | 用户身份信息 |
 
 ###### 返回字段
@@ -88,20 +88,20 @@
 > | 返回字段    | 字段类型 | 说明                       |
 > | :---------- | :------- | :------------------------- |
 > | status      | int      | 0表示登录失败1表示登录成功 |
-> | username    | string   | 用户名                     |
-> | ETHAccounts | string   | 私钥对应地址               |
+> | userName    | string   | 用户名                     |
+> | address | string   | 私钥对应地址               |
 
 ###### 接口示例
 
 > 地址： http://47.97.255.9:5100/login
 >
-> post传参：{"PrivateKeys":"0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d","identity":"Applicant"}
+> post传参：{"privateKeys":"0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d","identity":"Applicant"}
 
 ``` json
 {
     "status": 1,
-    "username": "ltmthink",
-    "ETHAccounts": "xxxxxxxxxxxx"
+    "userName": "ltmthink",
+    "address": "xxxxxxxxxxxx"
 }
 ```
 
