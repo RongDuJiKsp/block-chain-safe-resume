@@ -116,7 +116,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
         return null;
     }
 
-}
+};
 
 interface RecruiterWorkMethod {
     downloadFileAsync(encryptHash: string, S: string): Promise<File>;
