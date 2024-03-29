@@ -3,18 +3,17 @@ import {UserIdentityEnum} from "../Enum/WorkEnum.ts";
 export interface RegisterReq {
     identity: UserIdentityEnum
     hashID: string;
-    username: string;
+    userName: string;
 }
 
 export interface LoginReq {
-    PrivateKeys: string;
+    privateKeys: string;
     /**
      * 登录用户不需要输入用户昵称，数据库将用户地址和用户昵称对应，
      * 用户登录时用用户私钥计算用户地址，将地址和昵称一并返回
      * webase计算私钥传入的用户昵称暂时使用时间戳 这个字段会被弃用
      * @description
      */
-    username: string;
     identity: UserIdentityEnum;
 }
 
@@ -56,15 +55,15 @@ export interface BaseRes {
 /**
  * @interface RegisterRes 注册的响应体
  * @extends BaseRes
- * @property {string} PrivateKeys 用户注册的私钥
+ * @property {string} privateKeys 用户注册的私钥
  * @property {number} S 用户注册得到的 S Key
  * @property {number} P 用户注册得到的 P Key
  * @property {number[]} M 用户注册得到的子密钥M
  * @property {number[]} X 用户注册得到的子密钥X
  */
 export interface RegisterRes extends BaseRes {
-    ETHAccounts: string,
-    PrivateKeys: string,
+    address: string,
+    privateKeys: string,
     S: number,
     P: number,
     M: number[],
@@ -76,10 +75,12 @@ export interface RegisterRes extends BaseRes {
  * @extends BaseRes
  * @property address 用户私钥对应的地址
  * @property username 用户昵称
+ * @property session  用户的会话标识
  */
 export interface LoginRes extends BaseRes {
     address: string;
     username: string;
+    session:string;
 }
 
 /**
@@ -103,3 +104,7 @@ interface DownloadRes extends BaseRes {
 /**
  * 响应体设计的核心就是 传输的一定是可序列化对象 将对象序列化为json BaseRes为基类 剩下的字段随便搞 然后传输json
  */
+export interface ResumeInfoRes extends BaseRes{
+    putTime:string;
+    downloadtimes:string;
+}

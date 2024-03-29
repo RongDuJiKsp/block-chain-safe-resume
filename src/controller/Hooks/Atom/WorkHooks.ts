@@ -5,11 +5,10 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {BaseRes, LoginReq, RegisterReq, RegisterRes} from "../../../model/http-bodys/reqs.ts";
+import {BaseRes, LoginReq, RegisterReq, RegisterRes, ResumeInfoRes} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {File} from "node:buffer";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -42,6 +41,8 @@ interface UserWorkMethod {
     uploadFileAsync(File: File, S: string): Promise<BaseRes>;
 
     downloadFileAsync(encryptHash: string, S: string): Promise<File>;
+
+    getResumeInfoAsync(): Promise<ResumeInfoRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -63,6 +64,14 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                     message: "ojF" + File.name + S
                 };
             },
+            async getResumeInfoAsync(): Promise<ResumeInfoRes> {
+                return {
+                    status: 1,
+                    message: "ok",
+                    putTime: "1989-07-01 12:13:14",
+                    downloadtimes: "222"
+                };
+            },
             async changeUserNameAsync(newName: string): Promise<BaseRes> {
                 const name = newName;
                 return {
@@ -77,10 +86,10 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 
                 const reqBody: LoginReq = {
                     identity,
-                    PrivateKeys: privateKey,
-                    username: new Date().toTimeString()
+                    privateKeys: privateKey,
                 };
-                const res = await alovaClientImpl.Post<BaseRes>("/login", reqBody);
+                const res = await alovaClientImpl.Post<BaseRes>("/LoginReq", reqBody);
+                console.log(res);
                 const info: BasicUserState = {
                     hash: "", identity: identity, nick: "", address: ''
                 };
@@ -89,10 +98,10 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             },
             async registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                    username, hashID, identity
+                    userName: username, hashID, identity
                 };
-                const res = await alovaClientImpl.Post<RegisterRes>("/register", reqBody);
-                res.PrivateKeys = FileSystemImpl.base64ToAscii(res.PrivateKeys);
+                const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", reqBody);
+                if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);
                 return res;
             }
         };

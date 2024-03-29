@@ -29,3 +29,6 @@ export interface StepInformation {
     noFocusIcon: ReactElement;
     element: ReactElement
 }
+export interface ChainRpcInterface{
+    
+}

@@ -310,6 +310,7 @@ function CheckInformationComponent() {
                 });
                 registerInfo.nextStep?.call(null);
             }).catch(err => {
+                console.error(err);
                 message.error("发生了错误:" + err).then();
                 setLoading.setFalse();
             });
@@ -364,9 +365,10 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
-        console.log(res, res?.res.PrivateKeys);
+        console.log(res, res?.res.privateKeys);
         const fileContext = `Please keep your  key, once lost, you can't get it back!
-        PrivateValue : ${res?.res.PrivateKeys}
+        PrivateValue : ${res?.res.privateKeys}
+        address : ${res?.res.address}
         SafeKey:${res?.res.S}
         SubSafeKeyPair[M,X] :${res?.res.M.map((val, index) => {
             return `\n        [${val},${res?.res.X[index]}]`;
@@ -374,7 +376,7 @@ function GetResultComponent() {
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         Please give the SubKey to the key holder who has been granted the right to pledge
         `;
-        FileSystemImpl.downloadToFile(new Blob([fileContext]), `${res?.res.ETHAccounts?.substring(0, 7)}... of ${res?.info}`, "key").then(() => message.success("下载成功！"));
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([fileContext]), `${res?.res.address?.substring(0, 7)}... of ${res?.info}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});

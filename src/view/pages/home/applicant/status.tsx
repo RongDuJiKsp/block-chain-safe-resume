@@ -3,17 +3,25 @@ import {ApplicantResumeRequestStatusTuple} from "../../../../model/entity/user.t
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
+import {useEffect, useState} from "react";
+import {ResumeInfoRes} from "../../../../model/http-bodys/reqs.ts";
+import {UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 const tableColumn: ColumnsType<ApplicantResumeRequestStatusTuple> = [{}];
 export default function ApplicantStatus() {
+    const userServerMethod = UserWorkHooks.useMethod();
+    const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
+    useEffect(() => {
+        userServerMethod.getResumeInfoAsync().then(r => setResumeInfo(r));
+    }, []);
     return <div className={"flex flex-col justify-center h-full-screen px-24 gap-12"}>
         <div className={"flex justify-around bg-white py-8"}>
             <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
-                       value={113} suffix={"次"} formatter={numberCountUpFormatter}/>
+                       value={resumeInfo?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
             <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
-                       value={"2024-3-4 17:56"}/>
+                       value={resumeInfo?.putTime}/>
             <Statistic title={"待处理请求"} prefix={componentUtils.getIcon("icon-money-finance-buyer")}
                        value={0} suffix={"条"}/>
         </div>
