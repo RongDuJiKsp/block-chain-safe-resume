@@ -38,11 +38,7 @@ interface UserWorkMethod {
 
     changeUserNameAsync(newName: string): Promise<BaseRes>;
 
-    uploadFileAsync(File: File, S: string): Promise<BaseRes>;
 
-    downloadFileAsync(encryptHash: string, S: string): Promise<File>;
-
-    getResumeInfoAsync(): Promise<ResumeInfoRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -55,23 +51,6 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     useMethod(): UserWorkMethod {
         const setInfo = useSetAtom(userInfoAtom);
         return {
-            async downloadFileAsync(encryptHash: string, S: string): Promise<File> {
-                return new File([encryptHash, S], "ss");
-            },
-            async uploadFileAsync(File: File, S: string): Promise<BaseRes> {
-                return {
-                    status: 1,
-                    message: "ojF" + File.name + S
-                };
-            },
-            async getResumeInfoAsync(): Promise<ResumeInfoRes> {
-                return {
-                    status: 1,
-                    message: "ok",
-                    putTime: "1989-07-01 12:13:14",
-                    downloadtimes: "222"
-                };
-            },
             async changeUserNameAsync(newName: string): Promise<BaseRes> {
                 const name = newName;
                 return {
@@ -107,11 +86,51 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
         };
     }
 };
-export const AdminWorkHooks: AtomHooks<Record<string, never>, Record<string, never>> = {
-    useMethod(): Record<string, never> {
-        return {};
-    }, useValue(): Record<string, never> {
-        return {};
+
+interface ApplicantWorkMethod {
+    uploadFileAsync(File: File, S: string): Promise<BaseRes>;
+
+    getResumeInfoAsync(): Promise<ResumeInfoRes>;
+}
+
+export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
+    useMethod(): ApplicantWorkMethod {
+        return {
+            async getResumeInfoAsync(): Promise<ResumeInfoRes> {
+                return {
+                    status: 1,
+                    message: "ok",
+                    putTime: "1989-07-01 12:13:14",
+                    downloadtimes: "222"
+                };
+            },
+            async uploadFileAsync(File: File, S: string): Promise<BaseRes> {
+                return {
+                    status: 1,
+                    message: "ojF" + File.name + S
+                };
+            },
+        };
+    },
+    useValue(): null {
+        return null;
     }
 
-};
+}
+
+interface RecruiterWorkMethod {
+    downloadFileAsync(encryptHash: string, S: string): Promise<File>;
+}
+
+export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
+    useMethod(): RecruiterWorkMethod {
+        return {
+            async downloadFileAsync(encryptHash: string, S: string): Promise<File> {
+                return new File([encryptHash, S], "ss");
+            },
+        };
+    }, useValue(): null {
+        return null;
+    }
+
+}
