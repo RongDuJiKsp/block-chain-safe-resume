@@ -133,4 +133,4 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         return null;
     }
 
-}
+};
