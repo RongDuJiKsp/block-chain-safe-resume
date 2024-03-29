@@ -1,166 +1,149 @@
-### 接口1:注册接口
+所有响应体的基类
 
-
-
-###### 接口功能
-
-> 根据提供信息注册
-
-###### URL
-
->  http://47.97.255.9:5100/register
-
-###### 支持格式
-
-> application/json
-
-###### HTTP请求方式
-
-> POST
-
-###### 请求参数
-
-> | 参数     | 必选 | 类型   | 说明         |
-> | :------- | :--- | :----- | ------------ |
-> | userName | ture | string | 注册用户名   |
-> | hashID   | ture | string | 注册的hashID |
-> | identity | true | string | 三种身份     |
-
-###### 返回字段
-
-正常返回
-
-> | 返回字段    | 字段类型 | 说明                                         |
-> | :---------- | :------- | :------------------------------------------- |
-> | status      | int      | 0表示注册失败1表示注册成功                   |
-> | userName    | string   | 注册用户名                                   |
-> | hashID      | string   | 注册成功返回hashID(返不返回应该都没什么问题) |
-> | identity    | string   | 身份信息(三种)                               |
-> | address | string   | ETH账户名(无需显示)                          |
-> | publicKeys  | string   | 公钥，将保存在数据库中                       |
-> | privateKeys | string   | 私钥，将不保存在数据库中需要用户自己保管     |
-> | S           | int      | S                                            |
-> | P           | int      | P                                            |
-> | M           | array    | M                                            |
-> | X           | array    | X                                            |
-> | message     | string   | 更多信息                                     |
-
-###### 接口示例
-
-> 地址： http://47.97.255.9:5100/register
->
-> post传参：{"userName":"whoami","hashID":"C4CA4238A0B923820DCC509A6F75849BQ","identity":"Applicant"}
-
-``` json
-{"status": 1, "userName": "whoami", "hashID": "C4CA4238A0B923820DCC509A6F75849Ba", "identity": "Applicant", "address": "0xf80c771de9a9c2d9df5153acdc70048e944fa644", "publicKeys": "6b5d2b0b1a408131af3a6bae0a0cc8653a8767b617bdf6088df9a497438d22d7014b7994dc72821da5d62f3a6db9f257b8b801782f8f19aa18b6d4a9513e6a81", "privateKeys": "YjZhMTU3NzVjMWE0MzU1NjFmYjFmZGMzYjU3MDQ4YWM2NTZlNjNkMzY2MGJjMjBmZTczODI1YTcxYWM1YmE4ZQ==", "S": 9488793770, "P": 15866148707, "M": [13406072982287, 21967254832489, 51569067649471, 79385932834037, 148803683241373], "X": [10697115756588, 16576427298182, 7688175423398, 22853390775325, 106399001934740], "message": "\u6ce8\u518c\u6210\u529f"}
+```
+ /**
+ * @interface BaseRes 所有响应体的基类  也就是所有响应体都继承自该响应体
+ * @property {number} status 响应状态码 0为失败响应 1为正常响应
+ * @property {string} message 响应信息，当为正常响应时可以为空字符串
+ */
+  interface BaseRes {
+    status: number;
+    message: string;
+ }
 ```
 
-### 接口2:登录接口
 
-###### 接口功能
 
-> 检验登录用户
+#### 1.注册
 
-###### URL
+```
+ /**
+ * @interface RegisterReq 注册的请求体
+ * @property hashID 用户hash
+ * @property userName 用户名
+ * @property identity 用户身份(Applicant、Recruiter、KeyKeeper)
+ */
+  interface RegisterReq {
+    hashID: string,
+    userName: string,
+    identity: string
+ }
 
->  http://47.97.255.9:5100/login
 
-###### 支持格式
+ /**
+ * @interface RegisterRes 注册的响应体
+ * @extends BaseRes
+ * @property {string} address 用户对应address
+ * @property {string} privateKeys 用户注册的私钥
+ * @property {number} S 用户注册得到的 S Key
+ * @property {number} P 用户注册得到的 P Key
+ * @property {number[]} M 用户注册得到的子密钥M
+ * @property {number[]} X 用户注册得到的子密钥X
+ */
+  interface RegisterRes extends BaseRes {
+    address: string,
+    privateKeys: string,
+    S: number,
+    P: number,
+    M: number[],
+    X: number[],
+ }
+```
 
-> application/json
+#### 2.登录
 
-###### HTTP请求方式
-
-> POST
-
-###### 请求参数
-
-> | 参数        | 必选 | 类型   | 说明         |
-> | ----------- | :--- | :----- | ------------ |
-> | name        | ture | string | 用户名       |
-> | privateKeys | ture | string | 用户私钥     |
-> | identity    | true | string | 用户身份信息 |
-
-###### 返回字段
-
-正常返回
-
-> | 返回字段    | 字段类型 | 说明                       |
-> | :---------- | :------- | :------------------------- |
-> | status      | int      | 0表示登录失败1表示登录成功 |
-> | userName    | string   | 用户名                     |
-> | address | string   | 私钥对应地址               |
-
-###### 接口示例
-
-> 地址： http://47.97.255.9:5100/login
->
-> post传参：{"privateKeys":"0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d","identity":"Applicant"}
-
-``` json
-{
-    "status": 1,
-    "userName": "ltmthink",
-    "address": "xxxxxxxxxxxx"
+```
+/**
+* 登录用户不需要输入用户昵称，数据库将用户地址和用户昵称对应，
+* 用户登录时用用户私钥计算用户地址，将地址和昵称一并返回
+* webase计算私钥传入的用户昵称暂时使用时间戳 这个字段会被弃用
+*/
+interface LoginReq {
+    privateKeys: string;
+    hashID: string;
+    identity: UserIdentityEnum;
 }
+
+/**
+ * @interface LoginRes 登录接口
+ * @extends BaseRes
+ * @property address 用户私钥对应的地址
+ * @property username 用户昵称
+ */
+  interface LoginRes extends BaseRes {
+    address: string;
+    username: string;
+}
+
 ```
 
-### 接口3:简历上传接口
-
-###### 接口功能
-
-> 上传用户简历
-
-###### URL
-
->  http://47.97.255.9:5100/upload
-
-###### 支持格式
-
-> multipart/form-data
-
-###### HTTP请求方式
-
-> POST
-
-###### 请求参数
-
-> | 参数 | 必选 | 类型   | 说明   |
-> | ---- | :--- | :----- | ------ |
-> | name | ture | string | 文件名 |
-
-###### 返回字段
 
 
+#### 3.用户名更改
 
-> | 返回字段 | 字段类型 | 说明                       |
-> | :------- | :------- | :------------------------- |
-> | status   | int      | 0表示上传失败1表示上传成功 |
-> | hash     | string   | ipfs上传返回的hash         |
-> | name     | string   | 上传文件名                 |
+```
+ /**
+ * @interface ChangeNameReq 更改用户昵称的请求
+ * @property oldName 用户将要改的名字
+ * @property newName 用户的新名字
+ * @property identity 用户身份信息
+ * @property privateKey 用户的私钥 在后端计算为用户的地址然后读写数据库更改昵称
+ */
+ interface ChangeNickReq {
+    oldName: string;
+    newName: string;
+    identity: string;
+    privateKey: string;
+ }
 
-###### 接口示例:类似前端代码即可调用上传
+ /**
+ * @interface ChangeNameRes 更改用户昵称的响应体
+ * @extends BaseRes
+ * @property newName 用户新名字
+ * @property hash 上传文件时ipfs返回的hash
+ */
+ interface ChangeNickRes extends BaseRes{
+    newName: string;
+ }
+```
+
+
+
+#### 4.文件上传
+
+```
+/**
+*上传这块请求我是这么想的前端直接把文件传给后端不需要做什么操作，后端和合约交互把文件内容加密后上传到ipfs并返回hash
+*/
+
+
+ /**
+ * @interface UploadRes 上传文件的响应体
+ * @extends BaseRes
+ * @property hash 上传文件时ipfs返回的hash
+ */
+  interface UploadRes extends BaseRes {
+    hash: string;
+ }
+```
+
+上传html代码示例
 
 ```html
 <!DOCTYPE html>
 <html>
 <body>
-
 <h2>File Upload</h2>
-
 <input type="file" id="fileToUpload">
-
 <button onclick="uploadFile()">Upload</button>
-
 <script>
 function uploadFile() {
     var input = document.getElementById('fileToUpload');
     var file = input.files[0];
     var formData = new FormData();
-
     formData.append('file', file);
-
-    fetch('http://47.97.255.9:5100/upload', {
+    var hashID = '123';  //hashID示例
+    fetch('http://127.0.0.1:5000/UploadReq?hashID=' + hashID, {
         method: 'POST',
         body: formData
     })
@@ -173,77 +156,61 @@ function uploadFile() {
     });
 }
 </script>
-
 </body>
 </html>
-
 ```
 
 
 
-### 接口4:简历信息查询接口
+#### 5.文件下载
 
-###### 接口功能
+```
+ /**
+ * @interface DownloadFileReq
+ * @property fileHash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
+ */
+  interface DownloadFileReq {
+    fileHash: string;
+ }
 
-> 查询有关简历的简单信息
+ /**
+ * @interface DownloadRes
+ * @extends BaseRes
+ * @property base64 二进制文件的base64编码
+ */
+interface DownloadRes extends BaseRes {
+    base64: string;
+ }
+```
 
-###### URL
+#### 6.求职者简历展示
 
->  http://47.97.255.9:5100/getFileMessage
+```
+ /**
+ * 这是一个提供给Recruiter用户查看所有ap简历的接口
+ * @interface GetFileMesReq
+ * @property hashID Recruiter用户身份标识
+ */
+  interface GetFileMesReq {
+    hashID: string;
+ }
 
-###### 支持格式
 
-> application/json
+ /**
+ * @interface GetFileMesRes
+ * @extends BaseRes
+ * @property putTime 简历上传时间(从1970年1月1日00:00:00 UTC到现在的秒数)
+ * @property downloadtimes 简历下载次数
+ */
+interface GetFileMesRes extends BaseRes {
+    putTime: int;
+    downloadtimes: int;
+ }
+```
 
-###### HTTP请求方式
 
-> POST
 
-###### 请求参数
+#### 7.待授权请求查看
 
-> | 参数   | 必选 | 类型   | 说明         |
-> | ------ | :--- | :----- | ------------ |
-> | hashID | ture | string | 用户名hashID |
 
-###### 返回字段
 
-正常返回
-
-> | 返回字段      | 字段类型 | 说明                       |
-> | :------------ | :------- | :------------------------- |
-> | status        | int      | 0表示登录失败1表示登录成功 |
-> | putTime       | string   | 简历上传最新时间           |
-> | downloadtimes | string   | 简历被下载次数             |
-
-### 接口5:简历下载接口
-
-###### 接口功能
-
-> 下载简历
-
-###### URL
-
->  http://47.97.255.9:5100/download
-
-###### 支持格式
-
-> application/json
-
-###### HTTP请求方式
-
-> GET
-
-###### 请求参数
-
-> | 参数     | 必选 | 类型   | 说明     |
-> | -------- | :--- | :----- | -------- |
-> | fileHash | ture | string | 文件hash |
-> | fileName | true | string | 文件名   |
-
-###### 返回字段
-
-正常返回
-
-> | 返回字段 | 字段类型 | 说明                                 |
-> | :------- | :------- | :----------------------------------- |
-> | status   | int      | 0表示下载失败,否则将会下载相应的文件 |
