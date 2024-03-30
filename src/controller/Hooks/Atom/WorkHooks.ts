@@ -89,14 +89,14 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
                 console.log(res);
                 const info: BasicUserState = {
-                    identity: identity, nick: res.username, address: res.address
+                    identity: identity, nick: res.userName, address: res.address
                 };
                 setInfo(info);
                 return res;
             },
-            async registerAsync( identity: UserIdentityEnum): Promise<RegisterRes> {
+            async registerAsync(identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                     identity
+                    identity
                 };
                 const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", reqBody);
                 if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);

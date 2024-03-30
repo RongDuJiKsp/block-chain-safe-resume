@@ -6,11 +6,11 @@ import {App, Dropdown, Form, Input, Modal} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {NavLink} from "react-router-dom";
-import {UserGroup} from "../../../model/entity/user.ts";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 import {useForm} from "antd/es/form/Form";
+import {UserGroup} from "../../../model/entity/user.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -19,15 +19,9 @@ export interface ItemsAndPic {
 }
 
 
-export interface UserShownInfo {
-    userGroup: UserGroup;
-    userName: string;
-    userToken: number;
-}
-
 interface HeaderBarProps {
     items: ItemsAndPic[];
-    info: UserShownInfo;
+    group: UserGroup
 }
 
 interface ChangeNickFormProps {
@@ -35,7 +29,7 @@ interface ChangeNickFormProps {
     privateKey: string;
 }
 
-export default function HeaderBarProvider({children, items, info}: PropsWithChildren<HeaderBarProps>) {
+export default function HeaderBarProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
 
     return <div>
         <div className={"header-bar-height bg-gray-50 header-bar-shadow flex justify-between py-2"}>
@@ -47,7 +41,7 @@ export default function HeaderBarProvider({children, items, info}: PropsWithChil
                 <FunctionItems items={items}/>
             </div>
             <div className={"basis-[10.5%] item-container mr-11 items-col-center-flex"}>
-                <DropDownOperations info={info}/>
+                <DropDownOperations group={group}/>
             </div>
         </div>
         {children}
@@ -67,16 +61,21 @@ function FunctionItems({items}: { items: ItemsAndPic[] }) {
     </div>;
 }
 
-function DropDownOperations({info}: { info: UserShownInfo }) {
+function DropDownOperations({group}: { group: UserGroup }) {
     const {message} = App.useApp();
     const loginServer = UserWorkHooks.useMethod();
+    const {userInfo} = UserWorkHooks.useValue();
     const [isChangeNickOpen, changeNickOpenAction] = useBoolean();
     const [isLogoutOpen, logoutOpenAction] = useBoolean();
     const [form] = useForm<ChangeNickFormProps>();
+    if (userInfo === null) throw "在用户未登录时展示用户信息";
+    console.log(userInfo);
     const onSubmit = (val: ChangeNickFormProps) => {
         loginServer.changeUserNameAsync(val.nick, val.privateKey).then(r => {
-            if (r.status) message.success("修改昵称成功").then();
-            else message.error(r.message).then();
+            if (r.status) {
+                message.success("修改昵称成功").then();
+                changeNickOpenAction.setFalse();
+            } else message.error(r.message).then();
         }).catch(e => {
             message.error(e.message).then();
             console.log(e);
@@ -97,15 +96,15 @@ function DropDownOperations({info}: { info: UserShownInfo }) {
     const dropDownItems: ItemType[] = [
         {
             key: "nick",
-            label: componentUtils.getIconVal("icon-nick", info.userName)
+            label: componentUtils.getIconVal("icon-nick", userInfo.nick)
         },
         {
             key: "identity",
-            label: componentUtils.getIconVal("icon-identity", info.userGroup.userIdentity)
+            label: componentUtils.getIconVal("icon-identity", userInfo.identity)
         },
         {
             key: "token",
-            label: componentUtils.getIconVal("icon-token", info.userToken),
+            label: componentUtils.getIconVal("icon-token", 0),
         },
         {
             key: "nick-cng",
@@ -126,7 +125,7 @@ function DropDownOperations({info}: { info: UserShownInfo }) {
                     <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"}>
                         <Input allowClear/>
                     </Form.Item>
-                    <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}>
+                    <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"} rules={[{min: 4, max: 12}]}>
                         <Input allowClear/>
                     </Form.Item>
                 </Form>
@@ -137,7 +136,7 @@ function DropDownOperations({info}: { info: UserShownInfo }) {
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
             <div className={"flex"}>
-                <span>{info.userGroup.userHeader}</span>
+                <span>{group.userHeader}</span>
                 <span className={"text-lg align-middle"}>&ensp;About Me</span>
             </div>
         </Dropdown>

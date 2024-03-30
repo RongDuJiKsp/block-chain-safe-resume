@@ -1,4 +1,4 @@
-import HeaderBarProvider, {ItemsAndPic, UserShownInfo} from "../../../components/provider/headerBarProvider.tsx";
+import HeaderBarProvider, {ItemsAndPic} from "../../../components/provider/headerBarProvider.tsx";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {APPLICANT_THIS_PATH, ApplicantRoutes} from "../../../routes/home.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
@@ -27,12 +27,7 @@ const ThisUserGroup: UserGroup = {
 };
 
 export default function ApplicantPage() {
-    const info: UserShownInfo = {
-        userName: "AUSERKING",
-        userToken: 110,
-        userGroup: ThisUserGroup
-    };
-    return <HeaderBarProvider items={headBarItems} info={info}>
+    return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
         <ApplicantRoutes/>
     </HeaderBarProvider>;
 }

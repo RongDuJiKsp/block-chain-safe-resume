@@ -30,12 +30,12 @@ export interface RegisterRes extends BaseRes {
  * @interface LoginRes 登录接口
  * @extends BaseRes
  * @property address 用户私钥对应的地址
- * @property username 用户昵称
+ * @property userName 用户昵称
  * @property session  用户的会话标识
  */
 export interface LoginRes extends BaseRes {
     address: string;
-    username: string;
+    userName: string;
     session: string;
 }
 
