@@ -1,22 +1,11 @@
 import "./register.css";
-import {App, Form, Input, Result, Steps} from "antd";
-import React, {createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useState} from "react";
+import {App, Result, Steps} from "antd";
+import React, {createContext, Dispatch, SetStateAction, useContext, useState} from "react";
 import {StepProps} from "antd/es/steps";
-import {
-    CheckCircleOutlined,
-    ContainerOutlined,
-    FileSearchOutlined,
-    IdcardOutlined,
-    LoadingOutlined,
-} from "@ant-design/icons";
+import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
-import {componentUtils} from "../../../controller/util/component.tsx";
-import {hashToTranslate} from "../../../controller/crypto/hash.ts";
-import {FORM_RULE_PATTERNS} from "../../../config/backendrule.config.ts";
-import {BasicUserInfo, HashedUserRegisterInformation} from "../../../model/entity/user.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
 import {RegisterRes} from "../../../model/http-bodys/ress.ts";
-import {useBoolean} from "ahooks";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
@@ -29,36 +18,20 @@ function getDescriptionWithStep(targetStep: number, currentStep: number, descrip
 }
 
 
-interface RegisterUserInfo extends BasicUserInfo {
-    inputInfo: HashedUserRegisterInformation
-}
-
-const userRegisterInfoDefaultValue: RegisterUserInfo = {
-    inputInfo: {userAnoKey: "", userIDCard: "", userIdentity: UserIdentityEnum.None, userName: ""},
-    hash: "",
-    privateKey: "",
-    identity: UserIdentityEnum.None,
-    nick: ""
-};
-
-
 interface StateManager {
     nextStep?: () => void;
     lastStep?: () => void;
     reStart?: () => void;
-    infoSetter?: Dispatch<SetStateAction<RegisterUserInfo>>
-    info: RegisterUserInfo,
     resSetter?: Dispatch<SetStateAction<RegisterResult | undefined>>
     res?: RegisterResult
-
 }
 
 interface RegisterResult {
     res: RegisterRes;
-    info: string;
+    identity: UserIdentityEnum
 }
 
-const RegisterInfoSetterContext = createContext<StateManager>({info: userRegisterInfoDefaultValue});
+const RegisterInfoSetterContext = createContext<StateManager>({});
 
 
 const StepElements: StepInformation[] = [
@@ -69,17 +42,6 @@ const StepElements: StepInformation[] = [
         element: <SelectIdentityComponent/>
     },
     {
-        title: "Fill in information",
-        focusDescription: "填写您的个人信息",
-        noFocusIcon: <ContainerOutlined/>,
-        element: <FillInInformationComponent/>
-    },
-    {
-        title: "Check Your Information",
-        focusDescription: "核对您的个人信息",
-        noFocusIcon: <FileSearchOutlined/>,
-        element: <CheckInformationComponent/>
-    }, {
         title: "Check Result",
         focusDescription: "注册完成，请查看注册结果",
         noFocusIcon: <CheckCircleOutlined/>,
@@ -89,7 +51,6 @@ const StepElements: StepInformation[] = [
 
 function RegisterPage() {
     const [currentStep, setCurrentStep] = useState<number>(0);
-    const [userInfo, setUSerInfo] = useState<RegisterUserInfo>(userRegisterInfoDefaultValue);
     const [registerRes, setRegisterRes] = useState<RegisterResult>();
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
@@ -106,7 +67,6 @@ function RegisterPage() {
     };
     const reStart = () => {
         setCurrentStep(0);
-        setUSerInfo(userRegisterInfoDefaultValue);
     };
     return <div className={"overflow-hidden  register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
@@ -118,8 +78,6 @@ function RegisterPage() {
             <div className={"basis-2/3"}>
                 <RegisterInfoSetterContext.Provider value={{
                     nextStep: setNextStep,
-                    info: userInfo,
-                    infoSetter: setUSerInfo,
                     lastStep: setLastStep,
                     reStart: reStart,
                     res: registerRes,
@@ -136,7 +94,8 @@ function RegisterPage() {
 export default RegisterPage;
 
 function SelectIdentityComponent() {
-    const registerInfo = useContext(RegisterInfoSetterContext);
+    const registerInfoHandle = useContext(RegisterInfoSetterContext);
+    const registerServer = UserWorkHooks.useMethod();
     const {message} = App.useApp();
     const keys = Object.keys(UserIdentityEnum);
     const [selectedIdentity, setSelectedIdentity] = useState<UserIdentityEnum>(UserIdentityEnum.None);
@@ -145,12 +104,18 @@ function SelectIdentityComponent() {
             message.error("You can't continue with None").then();
             return;
         }
-        registerInfo.infoSetter?.call(null, (v): RegisterUserInfo => ({
-            ...v,
-            inputInfo: {...v.inputInfo, userIdentity: selectedIdentity},
-            identity: selectedIdentity
-        }));
-        registerInfo.nextStep?.call(null);
+        registerServer.registerAsync(selectedIdentity).then(r => {
+            if (r.status) {
+                registerInfoHandle.resSetter?.call(null, {identity: selectedIdentity, res: r});
+                message.success("注册成功").then();
+                registerInfoHandle.nextStep?.call(null);
+            } else {
+                message.error(r.message).then();
+            }
+        }).catch(e => {
+            console.log(e);
+            message.error(e.message).then();
+        });
     };
 
     return <div className={"h-full flex flex-col justify-around"}>
@@ -196,167 +161,6 @@ function SelectIdentityComponent() {
     </div>;
 }
 
-interface RegisterFormType {
-    name: string;
-    IDCard: string;
-    nickName: string;
-    safeKey: string;
-}
-
-function FillInInformationComponent() {
-    const registerInfo = useContext(RegisterInfoSetterContext);
-    const [formRef] = Form.useForm<RegisterFormType>();
-    const onConformAndNext = (val: RegisterFormType) => {
-        registerInfo.infoSetter?.call(null, (prevState): RegisterUserInfo => {
-            const {name, IDCard, safeKey, nickName} = val;
-            const {identity, privateKey} = prevState;
-            const infoVal: HashedUserRegisterInformation = {
-                userName: name,
-                userIDCard: IDCard,
-                userAnoKey: safeKey,
-                userIdentity: identity
-            };
-            return {
-                identity: identity,
-                privateKey: privateKey,
-                inputInfo: infoVal,
-                hash: hashToTranslate.getHashOfUserInfo(infoVal),
-                nick: nickName
-            };
-        });
-
-        registerInfo.nextStep?.call(null);
-    };
-    const onFirstLoad = useCallback(() => {
-        const {nick, inputInfo} = registerInfo.info;
-        const {userName, userIDCard, userAnoKey} = inputInfo;
-        const formVal: RegisterFormType = {
-            nickName: nick,
-            name: userName,
-            IDCard: userIDCard,
-            safeKey: userAnoKey,
-        };
-        formRef.setFieldsValue(formVal);
-    }, [formRef, registerInfo.info]);
-    useEffect(() => {
-        onFirstLoad();
-    }, [onFirstLoad]);
-    return <div className={"h-full login-full-context-anima flex flex-col justify-around"}>
-        <div className={"basis-1/12 text-center py-2 text-lg font-sans"}>
-            请在此填写用户信息
-        </div>
-        <div className={"basis-3/5 pl-12"}>
-            <Form<RegisterFormType> className={"flex flex-col gap-12 w-2/3 my-auto"} form={formRef} labelCol={{span: 8}}
-                                    wrapperCol={{span: 16}} onFinish={onConformAndNext}>
-                <Form.Item<RegisterFormType> name={"nickName"} rules={[{required: true, message: "昵称不能为空！"}]}
-                                             label={componentUtils.getQuestionLabel("用户昵称", "用户昵称用于便于记忆的唯一标识一个用户，请确保您的昵称便于记忆")}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item<RegisterFormType> name={"name"}
-                                             rules={[{required: true, message: "姓名不能为空"}, {
-                                                 min: 2,
-                                                 max: 30,
-                                                 message: "姓名不符合要求"
-                                             }]}
-                                             label={componentUtils.getQuestionLabel("姓名", "您的姓名用于计算您的身份hash，我们承诺您的姓名只在本地参与运算，不会上传到服务器。")}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item<RegisterFormType> name={"IDCard"}
-                                             rules={[{required: true, message: "身份证或数字id不能为空"}, {
-                                                 pattern: FORM_RULE_PATTERNS.identityCardRegexp,
-                                                 len: 18,
-                                                 message: "身份证号不符合要求"
-                                             }]}
-                                             label={componentUtils.getQuestionLabel("身份证号或数字id", "您的身份证号码仅和您的姓名用于计算您的身份hash，我们承诺您的身份证号码只在本地参与运算，不会上传到服务器。")}>
-                    <Input/>
-                </Form.Item>
-                <Form.Item<RegisterFormType> name={"safeKey"}
-                                             rules={[{required: true, message: "请填写安全语句"}]}
-                                             label={componentUtils.getQuestionLabel("安全语句", "您的安全语句用于混淆计算出来的hash，以防止恶意分子获取到您的信息后恶意注册影响您的正常使用，安全语句可以是任意内容，但请记住已便于找回hash")}>
-                    <Input.TextArea autoSize={{minRows: 5, maxRows: 5}}/>
-                </Form.Item>
-                <Form.Item className={"flex justify-center"}>
-                    <button className={"button button-3d button-pill button-primary"}>
-                        Conform
-                    </button>
-                </Form.Item>
-            </Form>
-        </div>
-    </div>;
-}
-
-function CheckInformationComponent() {
-    const userWork = UserWorkHooks.useMethod();
-    const {message} = App.useApp();
-    const [isLoading, setLoading] = useBoolean();
-    const registerInfo = useContext(RegisterInfoSetterContext);
-    const operateHooks = {
-        onRestart() {
-            registerInfo.reStart?.call(null);
-        },
-        onLastStep() {
-            registerInfo.lastStep?.call(null);
-        },
-        onFinish() {
-            if (isLoading) return;
-            setLoading.setTrue();
-            userWork.registerAsync(registerInfo.info.nick, registerInfo.info.hash, registerInfo.info.identity).then((info): void => {
-                setLoading.setFalse();
-                registerInfo.resSetter?.call(null, {
-                    res: info,
-                    info: registerInfo.info.nick
-                });
-                registerInfo.nextStep?.call(null);
-            }).catch(err => {
-                console.error(err);
-                message.error("发生了错误:" + err).then();
-                setLoading.setFalse();
-            });
-
-        }
-    };
-
-    return <div className={"login-full-context-anima h-full flex flex-col justify-around"}>
-        <div className={"basis-1/12 text-xl text-center "}>
-            <div className={"mt-5"}> 请核对您的个人信息是否正确，一经注册，无法修改！</div>
-        </div>
-        <div className={"basis-3/5 border-2 border-purple-300 bg-pale"}>
-            <div className={"px-[22%] flex flex-col justify-around h-full"}>
-                <p>
-                    您的姓名 : {registerInfo.info.inputInfo.userName}
-                </p>
-                <p>
-                    您的身份证号 : {registerInfo.info.inputInfo.userIDCard}
-                </p>
-                <p>
-                    您的注册身份 : {registerInfo.info.inputInfo.userIdentity}
-                </p>
-                <p>
-                    您的安全语句 : {registerInfo.info.inputInfo.userAnoKey}
-                </p>
-                <p>
-                    您的昵称 : {registerInfo.info.nick}
-                </p>
-                <p>
-                    系统计算的hash:<br/>
-                    {registerInfo.info.hash}
-                </p>
-
-            </div>
-        </div>
-        <div className={"basis-1/5"}>
-            <div className={"w-2/3 flex justify-around mx-auto"}>
-                <button className={"button button-3d button-caution"} onClick={operateHooks.onRestart}>重新填写</button>
-                <button className={"button button-3d button-primary"} onClick={operateHooks.onFinish}>
-                    <div className={"w-24"}>{isLoading ?
-                        <span><LoadingOutlined/> 正在提交</span> :
-                        <span>确认提交</span>}</div>
-                </button>
-                <button className={"button button-3d button-royal"} onClick={operateHooks.onLastStep}>上一步</button>
-            </div>
-        </div>
-    </div>;
-}
 
 function GetResultComponent() {
     const {res} = useContext(RegisterInfoSetterContext);
@@ -374,7 +178,7 @@ function GetResultComponent() {
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         Please give the SubKey to the key holder who has been granted the right to pledge
         `;
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([fileContext]), `${res?.res.address?.substring(0, 7)}... of ${res?.info}`, "key").then(() => message.success("下载成功！"));
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([fileContext]), `${res?.res.address?.substring(0, 7)}... of ${res?.identity}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});

@@ -44,7 +44,7 @@ interface UserWorkValue {
 }
 
 interface UserWorkMethod {
-    registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes>;
+    registerAsync(identity: UserIdentityEnum): Promise<RegisterRes>;
 
     loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<LoginRes>;
 
@@ -94,9 +94,9 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 setInfo(info);
                 return res;
             },
-            async registerAsync(username: string, hashID: string, identity: UserIdentityEnum): Promise<RegisterRes> {
+            async registerAsync( identity: UserIdentityEnum): Promise<RegisterRes> {
                 const reqBody: RegisterReq = {
-                    userName: username, hashID, identity
+                     identity
                 };
                 const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", reqBody);
                 if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);
