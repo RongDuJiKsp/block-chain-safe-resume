@@ -1,4 +1,4 @@
-import HeaderBarProvider, {ItemsAndPic, UserShownInfo} from "../../../components/provider/headerBarProvider.tsx";
+import HeaderBarProvider, {ItemsAndPic} from "../../../components/provider/headerBarProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {RECRUITER_THIS_PATH, RecruiterRoutes} from "../../../routes/home.tsx";
@@ -22,12 +22,8 @@ const headBarItems: ItemsAndPic[] = [
 ];
 export default function RecruiterPage() {
 
-    const info: UserShownInfo = {
-        userName: "AUSERKING",
-        userToken: 110,
-        userGroup: ThisUserGroup
-    };
-    return <HeaderBarProvider items={headBarItems} info={info}>
+
+    return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
         <RecruiterRoutes/>
     </HeaderBarProvider>;
 }

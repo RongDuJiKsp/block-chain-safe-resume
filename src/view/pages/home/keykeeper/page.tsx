@@ -1,4 +1,4 @@
-import HeaderBarProvider, {ItemsAndPic, UserShownInfo} from "../../../components/provider/headerBarProvider.tsx";
+import HeaderBarProvider, {ItemsAndPic} from "../../../components/provider/headerBarProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {KeyKeeperRoutes} from "../../../routes/home.tsx";
@@ -10,12 +10,7 @@ const ThisUserGroup: UserGroup = {
 
 const headBarItems: ItemsAndPic[] = [];
 export default function KeyKeeperPage() {
-    const info: UserShownInfo = {
-        userName: "AUSERKING",
-        userToken: 110,
-        userGroup: ThisUserGroup
-    };
-    return <HeaderBarProvider items={headBarItems} info={info}>
+    return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
         <KeyKeeperRoutes/>
     </HeaderBarProvider>;
 }

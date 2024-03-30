@@ -144,7 +144,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     status: 1,
                     message: "ok",
                     putTime: "1989-07-01 12:13:14",
-                    downloadtimes: "222"
+                    downloadtimes: "2232"
                 };
             },
             async updateResumeAsync(File: File, S: string): Promise<BaseRes> {

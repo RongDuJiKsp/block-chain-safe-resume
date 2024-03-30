@@ -4,7 +4,7 @@ import {ApplicantResumeVisitStatusTuple} from "../../../../model/entity/user.ts"
 
 const tableColumn: ColumnsType<ApplicantResumeVisitStatusTuple> = [{}];
 export default function ApplicantRecord() {
-    return <div className={"flex flex-col justify-center h-full-screen px-24 gap-12"}>
+    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4"}>
             <div className={"font-sans font-bold border-b-2 mb-2"}>累计下载记录</div>
             <Table columns={tableColumn}/>

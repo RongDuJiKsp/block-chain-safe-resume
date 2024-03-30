@@ -27,7 +27,7 @@ export function RecruiterRoutes() {
     </Routes>;
 }
 
-export const KEYKEEPER_THIS_PATH: string = "/home/Applicant";
+export const KEYKEEPER_THIS_PATH: string = "/home/KeyKeeper";
 
 export function KeyKeeperRoutes() {
     return <Routes>

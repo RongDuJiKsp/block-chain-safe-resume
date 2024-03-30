@@ -25,3 +25,6 @@ html {
 .header-bar-height{
     height: 4.8rem;
 }
+.basic-window{
+    @apply px-24
+}

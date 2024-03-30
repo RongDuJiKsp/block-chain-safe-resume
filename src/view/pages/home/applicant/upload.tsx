@@ -4,7 +4,7 @@ import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
 import {ApplicantWorkHooks, UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 export default function ApplicantUpload() {
-    return <div className={"h-full-screen flex flex-col justify-center px-24"}>
+    return <div className={"h-full-screen flex flex-col justify-center basic-window"}>
         <div className={"basis-3/5"}><FileUploader/></div>
     </div>;
 }

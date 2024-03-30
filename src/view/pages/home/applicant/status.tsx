@@ -16,7 +16,7 @@ export default function ApplicantStatus() {
     useEffect(() => {
         userServerMethod.getResumeInfoAsync().then(r => setResumeInfo(r));
     }, []);
-    return <div className={"flex flex-col justify-center h-full-screen px-24 gap-12"}>
+    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
         <div className={"flex justify-around bg-white py-8"}>
             <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                        value={resumeInfo?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
