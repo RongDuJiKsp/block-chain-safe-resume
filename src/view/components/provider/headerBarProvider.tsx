@@ -1,8 +1,8 @@
 import "./provider.css";
 import logo from "../../../assets/logo-p.png";
 import title from "../../../assets/title.png";
-import {PropsWithChildren, ReactNode, useRef} from "react";
-import {Dropdown, Form, Input, InputRef, Modal} from "antd";
+import {PropsWithChildren, ReactNode} from "react";
+import {App, Dropdown, Form, Input, Modal} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {NavLink} from "react-router-dom";
@@ -10,6 +10,7 @@ import {UserGroup} from "../../../model/entity/user.ts";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
+import {useForm} from "antd/es/form/Form";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -24,11 +25,15 @@ export interface UserShownInfo {
     userToken: number;
 }
 
-export interface HeaderBarProps {
+interface HeaderBarProps {
     items: ItemsAndPic[];
     info: UserShownInfo;
 }
 
+interface ChangeNickFormProps {
+    nick: string;
+    privateKey: string;
+}
 
 export default function HeaderBarProvider({children, items, info}: PropsWithChildren<HeaderBarProps>) {
 
@@ -63,20 +68,23 @@ function FunctionItems({items}: { items: ItemsAndPic[] }) {
 }
 
 function DropDownOperations({info}: { info: UserShownInfo }) {
+    const {message} = App.useApp();
     const loginServer = UserWorkHooks.useMethod();
     const [isChangeNickOpen, changeNickOpenAction] = useBoolean();
     const [isLogoutOpen, logoutOpenAction] = useBoolean();
-    const nickNameInputRef = useRef<InputRef>(null);
-    const onChangeName = async (): Promise<void> => {
-        if (!nickNameInputRef.current?.input?.value) return;
-        const toChangeNick = nickNameInputRef.current.input.value;
-        nickNameInputRef.current.input.value="";
-        
-        changeNickOpenAction.setFalse();
+    const [form] = useForm<ChangeNickFormProps>();
+    const onSubmit = (val: ChangeNickFormProps) => {
+        loginServer.changeUserNameAsync(val.nick, val.privateKey).then(r => {
+            if (r.status) message.success("修改昵称成功").then();
+            else message.error(r.message).then();
+        }).catch(e => {
+            message.error(e.message).then();
+            console.log(e);
+        });
     };
     const onChangeNick: CancelableOperateHooks = {
         onCancel: changeNickOpenAction.setFalse,
-        onConform: onChangeName
+        onConform: () => form.submit()
     };
     const onLogout: CancelableOperateHooks = {
         onCancel: logoutOpenAction.setFalse,
@@ -114,9 +122,14 @@ function DropDownOperations({info}: { info: UserShownInfo }) {
         <Modal open={isChangeNickOpen} onCancel={onChangeNick.onCancel} onOk={onChangeNick.onConform}
                title={"更改用户昵称"}>
             <div className={"m-8"}>
-                <Form.Item label={"目标昵称"}>
-                    <Input ref={nickNameInputRef} allowClear/>
-                </Form.Item>
+                <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
+                    <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"}>
+                        <Input allowClear/>
+                    </Form.Item>
+                    <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}>
+                        <Input allowClear/>
+                    </Form.Item>
+                </Form>
             </div>
         </Modal>
         <Modal open={isLogoutOpen} onCancel={onLogout.onCancel} onOk={onLogout.onConform} title={"确认退出登录"}>
