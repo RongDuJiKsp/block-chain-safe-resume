@@ -216,15 +216,13 @@ function FillInInformationComponent() {
                 userAnoKey: safeKey,
                 userIdentity: identity
             };
-            const userInfo: RegisterUserInfo = {
+            return {
                 identity: identity,
                 privateKey: privateKey,
                 inputInfo: infoVal,
                 hash: hashToTranslate.getHashOfUserInfo(infoVal),
                 nick: nickName
             };
-            console.log(userInfo);
-            return userInfo;
         });
 
         registerInfo.nextStep?.call(null);

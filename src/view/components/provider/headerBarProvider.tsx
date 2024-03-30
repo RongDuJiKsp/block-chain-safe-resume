@@ -71,7 +71,7 @@ function DropDownOperations({info}: { info: UserShownInfo }) {
         if (!nickNameInputRef.current?.input?.value) return;
         const toChangeNick = nickNameInputRef.current.input.value;
         nickNameInputRef.current.input.value="";
-        console.log(toChangeNick);
+        
         changeNickOpenAction.setFalse();
     };
     const onChangeNick: CancelableOperateHooks = {

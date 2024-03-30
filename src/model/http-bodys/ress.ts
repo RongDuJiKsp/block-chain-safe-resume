@@ -84,7 +84,7 @@ export interface GiveResumeLicensingRes extends BaseRes {
 
 }
 
-export interface ChangeNickRes extends BaseRes {
+export interface ChangeNameRes extends BaseRes {
     newName: string;
 }
 

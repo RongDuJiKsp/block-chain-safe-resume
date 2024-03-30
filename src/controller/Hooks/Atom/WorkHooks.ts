@@ -1,17 +1,17 @@
-import {useAtomValue, useSetAtom} from "jotai";
+import {useAtom, useAtomValue} from "jotai";
 import {BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {LoginReq, RegisterReq} from "../../../model/http-bodys/reqs.ts";
+import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
 import {
     BaseRes,
-    ChangeNickRes,
+    ChangeNameRes,
     GiveResumeLicensingRes,
     KeyKeeperRequestRequestListRes,
     LoginRes,
@@ -50,7 +50,7 @@ interface UserWorkMethod {
 
     logout(): void;
 
-    changeUserNameAsync(newName: string): Promise<ChangeNickRes>;
+    changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -61,15 +61,21 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
         };
     },
     useMethod(): UserWorkMethod {
-        const setInfo = useSetAtom(userInfoAtom);
+        const [info, setInfo] = useAtom(userInfoAtom);
         return {
-            async changeUserNameAsync(newName: string): Promise<ChangeNickRes> {
-                const name = newName;
-                return {
-                    status: 1,
-                    message: "oj",
-                    newName: ""
+            async changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes> {
+                if (info === null) throw "在未登录的情况下尝试修改用户名";
+                const request: ChangeNameReq = {
+                    oldName: info.nick,
+                    newName: newName,
+                    identity: info.identity,
+                    privateKey: privateKey
                 };
+                const response = await alovaClientImpl.Post<ChangeNameRes>("/ChangeNameReq", request);
+                if (response.status) {
+                    setInfo({...info, nick: response.newName});
+                }
+                return response;
             },
             logout(): void {
                 setInfo(null);
@@ -115,6 +121,24 @@ interface ApplicantWorkMethod {
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
         return {
+            async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
+                return {
+                    status: 1,
+                    message: 'ok'
+                };
+            },
+            async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
+                return {
+                    status: 1,
+                    message: 'ok'
+                };
+            },
+            async giveResumeLicensingAsync(): Promise<GiveResumeLicensingRes> {
+                return {
+                    status: 1,
+                    message: 'ok'
+                };
+            },
             async getResumeInfoAsync(): Promise<ResumeInfoRes> {
                 return {
                     status: 1,
@@ -128,7 +152,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     status: 1,
                     message: "ojF" + File.name + S
                 };
-            },
+            }
         };
     },
     useValue(): null {
