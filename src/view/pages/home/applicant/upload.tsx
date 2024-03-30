@@ -1,7 +1,7 @@
 import {FileAddOutlined} from "@ant-design/icons";
 import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
-import {ApplicantWorkHooks, UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 export default function ApplicantUpload() {
     return <div className={"h-full-screen flex flex-col justify-center basic-window"}>
