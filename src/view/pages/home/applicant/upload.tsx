@@ -5,7 +5,9 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts
 
 export default function ApplicantUpload() {
     return <div className={"h-full-screen flex flex-col justify-center basic-window"}>
-        <div className={"basis-3/5"}><FileUploader/></div>
+        <div className={"basis-3/5"}>
+            <FileUploader/>
+        </div>
     </div>;
 }
 
