@@ -16,6 +16,8 @@ global config
 config = Configs()
 conn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database)
 cur = conn.cursor()
+cur.execute('SET GLOBAL wait_timeout = 288000')
+cur.execute('SET GLOBAL interactive_timeout = 288000')
 
 
 def verifyIdentity(identity):
