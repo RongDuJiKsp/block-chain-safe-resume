@@ -17,6 +17,9 @@ export interface ApplicantResumeVisitStatusTableTuple {
 export interface RecruiterHandledResumeStatusTableTuple{
 
 }
+export interface KeyKeeperReceivedRequestStatusTableTuple{
+
+}
 
 export interface BasicUserState {
     nick: string;
