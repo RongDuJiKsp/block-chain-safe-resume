@@ -32,7 +32,7 @@ interface ChangeNickFormProps {
 export default function HeaderBarProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
 
     return <div>
-        <div className={"header-bar-height bg-gray-50 header-bar-shadow flex justify-between py-2"}>
+        <div className={"header-bar-height bg-gray-50 flex justify-between py-2"}>
             <div className={"item-container ml-10 flex px-3 basis-[12.5%] justify-around"}>
                 <img draggable={false} src={logo} alt={"LOGO"} className={"h-full"}/>
                 <img draggable={false} src={title} alt={"LOGO"} className={"h-2/3 my-auto"}/>

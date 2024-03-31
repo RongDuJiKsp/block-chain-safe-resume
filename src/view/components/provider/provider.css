@@ -29,10 +29,10 @@
 }
 
 .basis-nav {
-    @apply item-container item-shadow  basis-1/6 flex justify-around hover:text-black
+    @apply item-container item-shadow  basis-1/6 flex justify-around hover:text-black rounded-lg
 }
 
 .active-nav {
     transition-duration: 1s;
-    @apply item-container item-shadow-active  basis-1/6 flex justify-around hover:text-black
+    @apply item-container item-shadow-active  basis-1/6 flex justify-around hover:text-black rounded-lg
 }

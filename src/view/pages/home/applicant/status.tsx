@@ -51,9 +51,10 @@ interface ApplicantResumeRequestStatusTableTuple {
 
 function ResumeRequestComponent() {
     const onAccept = (data: ApplicantResumeRequestStatusTableTuple) => {
-
+        console.log(data);
     };
     const onDelay = (data: ApplicantResumeRequestStatusTableTuple) => {
+        console.log(data);
 
     };
     const tableColumn: ColumnsType<ApplicantResumeRequestStatusTableTuple> = [
