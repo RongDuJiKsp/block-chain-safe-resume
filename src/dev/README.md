@@ -56,6 +56,7 @@ export const useInitial: () => InitialHookStatus = () => {
 
     useEffect(() => {
         setLoading(true);
+
         async function login() {
             const response = await loginRequest(DEV_LOGIN, DEV_PASSWORD);
             if (response?.status !== 200) {
@@ -63,8 +64,9 @@ export const useInitial: () => InitialHookStatus = () => {
             }
             setLoading(false);
         }
+
         login();
     }, []);
-    return { loading, error };
+    return {loading, error};
 };
 ```

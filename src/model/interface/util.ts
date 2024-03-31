@@ -2,10 +2,14 @@ import {CSSProperties, ReactElement, ReactNode} from "react";
 
 export interface UserFileSystem {
     downloadToFileFromSuffix(file: BinFile, prefix: string, suffix: string): Promise<void>;
-    downloadToFileAsName(file: BinFile, name:string): Promise<void>;
-    readFileAsBase64(file:File):Promise<string>;
-    readBase64AsBlob(base64:string,type:string):BinFile;
-    base64ToAscii(base64:string):string
+
+    downloadToFileAsName(file: BinFile, name: string): Promise<void>;
+
+    readFileAsBase64(file: File): Promise<string>;
+
+    readBase64AsBlob(base64: string, type: string): BinFile;
+
+    base64ToAscii(base64: string): string
 
 }
 
@@ -20,7 +24,7 @@ export interface ComponentUtils {
 
     getIcon(element: string, config?: CSSProperties): ReactNode;
 
-    getIconVal(element: string, val: string|number, config?: CSSProperties): ReactNode
+    getIconVal(element: string, val: string | number, config?: CSSProperties): ReactNode
 }
 
 export interface StepInformation {
@@ -29,6 +33,7 @@ export interface StepInformation {
     noFocusIcon: ReactElement;
     element: ReactElement
 }
-export interface ChainRpcInterface{
-    
+
+export interface ChainRpcInterface {
+
 }

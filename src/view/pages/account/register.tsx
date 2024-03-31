@@ -113,7 +113,7 @@ function SelectIdentityComponent() {
                 message.error(r.message).then();
             }
         }).catch(e => {
-            console.log(e);
+
             message.error(e.message).then();
         });
     };

@@ -87,7 +87,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                     privateKeys: privateKey,
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
-                console.log(res);
+
                 const info: BasicUserState = {
                     identity: identity, nick: res.userName, address: res.address
                 };

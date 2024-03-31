@@ -69,7 +69,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
     const [isLogoutOpen, logoutOpenAction] = useBoolean();
     const [form] = useForm<ChangeNickFormProps>();
     if (userInfo === null) throw "在用户未登录时展示用户信息";
-    console.log(userInfo);
+
     const onSubmit = (val: ChangeNickFormProps) => {
         loginServer.changeUserNameAsync(val.nick, val.privateKey).then(r => {
             if (r.status) {
@@ -78,7 +78,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
             } else message.error(r.message).then();
         }).catch(e => {
             message.error(e.message).then();
-            console.log(e);
+
         });
     };
     const onChangeNick: CancelableOperateHooks = {

@@ -1,10 +1,12 @@
-.header-bar-bg-color{
+.header-bar-bg-color {
     background-color: #9fa8a3;
 }
-.header-bar-shadow{
-    box-shadow: #3c3c3c 2px 2px 6px ;
+
+.header-bar-shadow {
+    box-shadow: #3c3c3c 2px 2px 6px;
 }
-.logo-text{
+
+.logo-text {
     color: #2929d9;
     @supports (-webkit-background-clip: text) or (background-clip: text) {
         -webkit-background-clip: text;
@@ -13,19 +15,24 @@
         background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 }
-.item-shadow{
+
+.item-shadow {
     box-shadow: #3c3c3c 1px 1px 3px;
 }
-.item-shadow-active{
+
+.item-shadow-active {
     box-shadow: #3c3c3c 1px 1px 3px inset;
 }
-.item-container{
+
+.item-container {
     @apply my-1 py-0.5
 }
-.basis-nav{
+
+.basis-nav {
     @apply item-container item-shadow  basis-1/6 flex justify-around hover:text-black
 }
-.active-nav{
+
+.active-nav {
     transition-duration: 1s;
     @apply item-container item-shadow-active  basis-1/6 flex justify-around hover:text-black
 }
