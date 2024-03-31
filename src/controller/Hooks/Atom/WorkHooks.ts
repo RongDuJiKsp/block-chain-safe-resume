@@ -15,7 +15,7 @@ import {
     GiveResumeLicensingRes,
     KeyKeeperRequestRequestListRes,
     LoginRes,
-    RecruiterResumeStatusRes,
+    RecruiterResumeStatusListRes,
     RegisterRes,
     RequestResumeLicensingRes,
     ResumeInfoRes,
@@ -189,7 +189,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 interface RecruiterWorkMethod {
     downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
 
-    getResumeStatusListAsync(): Promise<RecruiterResumeStatusRes>;
+    getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
 
     requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes>;
 }
@@ -203,7 +203,8 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
             async getResumeStatusListAsync() {
                 return {
                     status: 1,
-                    message: ""
+                    message: "",
+                    list: []
                 };
             },
             async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {

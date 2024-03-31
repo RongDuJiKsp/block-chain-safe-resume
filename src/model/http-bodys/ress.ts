@@ -1,4 +1,4 @@
-import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../entity/user.ts";
+import {ConnectingResumeInfo, ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../entity/user.ts";
 
 /**
  * @interface BaseRes 所有响应体的基类  也就是所有响应体都继承自该响应体
@@ -67,12 +67,13 @@ export interface ResumeInfoRes extends BaseRes {
     downloadtimes: string;
 }
 
-export interface RecruiterResumeStatusRes extends BaseRes {
-
-}
 
 export interface RequestResumeLicensingRes extends BaseRes {
 
+}
+
+export interface RecruiterResumeStatusListRes extends BaseRes {
+    list: ConnectingResumeInfo[];
 }
 
 export interface ResumeQuestListRes extends BaseRes {

@@ -22,3 +22,7 @@ export interface ResumeLicenseRequestInfo {
 export interface ResumeVisitHistoryInfo {
 
 }
+
+export interface ConnectingResumeInfo {
+
+}

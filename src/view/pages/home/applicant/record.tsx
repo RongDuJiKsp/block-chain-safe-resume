@@ -6,11 +6,8 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ResumeVisitHistoryInfo} from "../../../../model/entity/user.ts";
 
-interface ApplicantResumeVisitStatusTableTuple {
 
-}
-
-const tableColumn: ColumnsType<ApplicantResumeVisitStatusTableTuple> = [{}];
+const tableColumn: ColumnsType<ResumeVisitHistoryInfo> = [{}];
 export default function ApplicantRecord() {
     const userService = ApplicantWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
@@ -30,6 +27,7 @@ export default function ApplicantRecord() {
 function ResumeHistoryComponent({tableVal}: { tableVal: ResumeVisitHistoryInfo[] }) {
     return <div>
         <Table<ResumeVisitHistoryInfo> columns={tableColumn} dataSource={tableVal}
-                                       pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}/>
+                                       pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}
+        />
     </div>;
 }
