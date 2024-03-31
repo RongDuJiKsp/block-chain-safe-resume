@@ -1,8 +1,8 @@
 import {Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {ApplicantResumeVisitStatusTuple} from "../../../../model/entity/user.ts";
+import {ApplicantResumeVisitStatusTableTuple} from "../../../../model/entity/user.ts";
 
-const tableColumn: ColumnsType<ApplicantResumeVisitStatusTuple> = [{}];
+const tableColumn: ColumnsType<ApplicantResumeVisitStatusTableTuple> = [{}];
 export default function ApplicantRecord() {
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4"}>

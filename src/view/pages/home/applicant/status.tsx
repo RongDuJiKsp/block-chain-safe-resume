@@ -1,5 +1,5 @@
 import {Statistic, Table} from "antd";
-import {ApplicantResumeRequestStatusTuple} from "../../../../model/entity/user.ts";
+import {ApplicantResumeRequestStatusTableTuple} from "../../../../model/entity/user.ts";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
@@ -9,7 +9,7 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
-const tableColumn: ColumnsType<ApplicantResumeRequestStatusTuple> = [{}];
+const tableColumn: ColumnsType<ApplicantResumeRequestStatusTableTuple> = [{}];
 export default function ApplicantStatus() {
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
         <div className={" bg-white py-8"}>

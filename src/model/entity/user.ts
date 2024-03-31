@@ -8,10 +8,13 @@ export interface UserGroup {
     userIdentity: string;
 }
 
-export interface ApplicantResumeRequestStatusTuple {
+export interface ApplicantResumeRequestStatusTableTuple {
 
 }
-export interface ApplicantResumeVisitStatusTuple{
+export interface ApplicantResumeVisitStatusTableTuple {
+
+}
+export interface RecruiterHandledResumeStatusTableTuple{
 
 }
 
