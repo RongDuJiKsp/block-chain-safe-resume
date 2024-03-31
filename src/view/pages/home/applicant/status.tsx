@@ -7,6 +7,7 @@ import {useEffect, useState} from "react";
 import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
+import TableHeader from "../../../components/comp/tableHeader.tsx";
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
@@ -21,10 +22,7 @@ export default function ApplicantStatus() {
             <ResumeInfoComponent/>
         </div>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4"}>
-            <div className={"flex justify-between pb-4 border-b-2"}>
-                <div className={"font-sans font-bold my-auto"}>访问请求</div>
-                <button className={"button button-primary "} onClick={changeAction}>刷新</button>
-            </div>
+            <TableHeader title={"访问请求"} onFresh={changeAction}/>
             <ResumeRequestComponent/>
         </div>
     </div>;

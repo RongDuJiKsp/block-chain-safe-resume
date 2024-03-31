@@ -3,6 +3,7 @@ import {ColumnsType} from "antd/es/table";
 import {KeyKeeperReceivedRequestStatusTableTuple} from "../../../../model/entity/user.ts";
 import {useEffect, useState} from "react";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
+import TableHeader from "../../../components/comp/tableHeader.tsx";
 
 const tableColumn: ColumnsType<KeyKeeperReceivedRequestStatusTableTuple> = [{}];
 export default function KeyKeeperNotice() {
@@ -12,10 +13,7 @@ export default function KeyKeeperNotice() {
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
         <div className={"work-window-color basis-2/3 px-8 py-4"}>
-            <div className={"flex justify-between pb-4 border-b-2"}>
-                <div className={"font-sans font-bold my-auto"}>等待上传的请求</div>
-                <button className={"button button-primary "} onClick={changeAction}>刷新</button>
-            </div>
+            <TableHeader title={"待上传请求"} onFresh={changeAction}/>
             <RequestTableComponent/>
         </div>
     </div>;
