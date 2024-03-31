@@ -6,8 +6,9 @@ import {componentUtils} from "../../../controller/util/component.tsx";
 import {Link, NavLink, Route, Routes, useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useBoolean} from "ahooks";
-import {LoadingOutlined} from "@ant-design/icons";
+import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined} from "@ant-design/icons";
 import {useEffect} from "react";
+import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 
 
 type LoginFormType = {
@@ -27,7 +28,7 @@ function LoginPage() {
     return <div>
         <div
             className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around container-shadow"}>
-            <div className={"text-right pr-5 basis-1/6 pt-2"}>
+            <div className={"text-right pr-5 basis-1/6 pt-2 dark-mode-text"}>
                 切换
                 {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
                     <NavLink key={r[0]} to={r[1]}
@@ -71,20 +72,23 @@ function LoginComponent() {
     useEffect(() => {
         cleanData();
     }, []);
-    return <div className={"flex flex-col justify-around h-full"}>
+    return <div className={"flex flex-col justify-around h-full dark-mode-text"}>
         <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
-        <Form<LoginFormType> onFinish={onLogin}>
-            <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
-                <Input allowClear/>
+        <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
+            <Form.Item<LoginFormType> name={"keyword"} colon={false}
+                                      label={<KeyOutlined className={"text-white"} style={{fontSize: 26}}/>}>
+                <Input allowClear size={"large"} style={{borderRadius: 30}}/>
             </Form.Item>
-            <Form.Item<LoginFormType> name={"identity"} label={"身份"}>
-                <Select placeholder={"请选择你的身份"} options={identityOption}/>
+            <Form.Item<LoginFormType> name={"identity"} colon={false}
+                                      label={<IdcardOutlined className={"text-white"} style={{fontSize: 26}}/>}>
+                <Select placeholder={"请选择你的身份"} options={identityOption} size={"large"}/>
             </Form.Item>
             <div className={"flex justify-center"}>
-                <button className={"button button-raised button-primary button-3d"}>
-                    <div className={"w-24"}>{isLoading ? <span><LoadingOutlined/> 正在登录</span> :
-                        <span>点击登录</span>}</div>
-                </button>
+                <ArrayPointerInButton title={
+                    isLoading ?
+                        <span><LoadingOutlined/> 正在登录</span> :
+                        <span><SendOutlined/> 点击登录</span>
+                }/>
             </div>
         </Form>
         <div className={"text-center text-sm"}>
