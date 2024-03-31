@@ -1,10 +1,10 @@
-import {useState} from "react";
+import {useCallback, useState} from "react";
 
 type UseSwapBoolean = [boolean, () => void];
 
 export function useSwapBoolean(): UseSwapBoolean {
     const [bool, setBool] = useState<boolean>(false);
-    return [bool, () => {
+    return [bool, useCallback(() => {
         setBool(prevState => !prevState);
-    }];
+    }, [])];
 }
