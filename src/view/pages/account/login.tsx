@@ -75,7 +75,7 @@ function LoginComponent() {
         <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
         <Form<LoginFormType> onFinish={onLogin}>
             <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
-                <Input/>
+                <Input allowClear/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} label={"身份"}>
                 <Select placeholder={"请选择你的身份"} options={identityOption}/>
