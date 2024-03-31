@@ -13,3 +13,8 @@ export interface BasicUserState {
     identity: UserIdentityEnum;
     address: string;
 }
+
+export interface ResumeLicenseRequestInfo {
+    username: string;
+    address: string;
+}

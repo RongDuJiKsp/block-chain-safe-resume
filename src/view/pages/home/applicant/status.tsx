@@ -7,22 +7,25 @@ import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ResumeLicenseRequestInfo} from "../../../../model/entity/user.ts";
 
 
 export default function ApplicantStatus() {
     const userService = ApplicantWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
+    const [tableInfo, setTableInfo] = useState<ResumeLicenseRequestInfo[]>([]);
     useEffect(() => {
         userService.getResumeInfoAsync().then(r => setResumeInfo(r));
+        userService.getResumeRequestListAsync().then(r => setTableInfo(r.list));
         //TODO: flash render
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
-        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4"}>
+    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6"}>
+        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问请求"} onFresh={changeAction}/>
-            <ResumeRequestComponent/>
+            <ResumeRequestComponent tableVal={tableInfo}/>
         </div>
-        <div className={" bg-white py-8"}>
+        <div className={" bg-white py-8 "}>
             <ResumeInfoComponent info={resumeInfo}/>
         </div>
 
@@ -43,21 +46,15 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
 }
 
 
-interface ApplicantResumeRequestStatusTableTuple {
-    username: string;
-    address: string;
-}
-
-
-function ResumeRequestComponent() {
-    const onAccept = (data: ApplicantResumeRequestStatusTableTuple) => {
+function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo[] }) {
+    const onAccept = (data: ResumeLicenseRequestInfo) => {
         console.log(data);
     };
-    const onDelay = (data: ApplicantResumeRequestStatusTableTuple) => {
+    const onDelay = (data: ResumeLicenseRequestInfo) => {
         console.log(data);
 
     };
-    const tableColumn: ColumnsType<ApplicantResumeRequestStatusTableTuple> = [
+    const tableColumn: ColumnsType<ResumeLicenseRequestInfo> = [
         {
             title: "用户名",
             dataIndex: "username"
@@ -82,12 +79,10 @@ function ResumeRequestComponent() {
 
 
     ];
-    const tableVal: ApplicantResumeRequestStatusTableTuple[] = [
-        {address: "0x9bf591a009ecd917e234f94e22e671042cb58e55", username: "ssss"}
-    ];
     return <div>
         <div className={"mx-28 my-3"}>
-            <Table columns={tableColumn} dataSource={tableVal} bordered={true}/>
+            <Table columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
+                   pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}/>
         </div>
     </div>;
 }

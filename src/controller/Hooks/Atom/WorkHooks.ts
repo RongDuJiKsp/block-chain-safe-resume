@@ -130,7 +130,31 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
                 return {
                     status: 1,
-                    message: 'ok'
+                    message: 'ok',
+                    list: [
+                        {
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        }, {
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        },
+                        {
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        },
+                        {
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        },
+                        {
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        },{
+                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
+                            username: "alibaba"
+                        },
+                    ]
                 };
             },
             async giveResumeLicensingAsync(): Promise<GiveResumeLicensingRes> {

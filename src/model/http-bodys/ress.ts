@@ -1,3 +1,5 @@
+import {ResumeLicenseRequestInfo} from "../entity/user.ts";
+
 /**
  * @interface BaseRes 所有响应体的基类  也就是所有响应体都继承自该响应体
  * @property {number} status 响应状态码 0为失败响应 1为正常响应
@@ -74,6 +76,7 @@ export interface RequestResumeLicensingRes extends BaseRes {
 }
 
 export interface ResumeQuestListRes extends BaseRes {
+    list: ResumeLicenseRequestInfo[];
 }
 
 export interface ResumeRequestHistoryListRes extends BaseRes {
