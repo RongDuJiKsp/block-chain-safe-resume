@@ -1,20 +1,14 @@
-import {Modal, Statistic, Table} from "antd";
+import {Button, Popconfirm, Statistic, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
-import {useCallback, useEffect, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
-interface ApplicantResumeRequestStatusTableTuple {
 
-}
-
-const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
-
-const tableColumn: ColumnsType<ApplicantResumeRequestStatusTableTuple> = [{}];
 export default function ApplicantStatus() {
     const userService = ApplicantWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
@@ -34,6 +28,7 @@ export default function ApplicantStatus() {
 
     </div>;
 }
+const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
 
@@ -47,22 +42,52 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
     </div>;
 }
 
+
+interface ApplicantResumeRequestStatusTableTuple {
+    username: string;
+    address: string;
+}
+
+
 function ResumeRequestComponent() {
-    const [selected, setSelected] = useState<ApplicantResumeRequestStatusTableTuple | null>(null);
-    const cleanSelected = useCallback(() => {
-        setSelected(null);
-    }, []);
+    const onAccept = (data: ApplicantResumeRequestStatusTableTuple) => {
+
+    };
+    const onDelay = (data: ApplicantResumeRequestStatusTableTuple) => {
+
+    };
+    const tableColumn: ColumnsType<ApplicantResumeRequestStatusTableTuple> = [
+        {
+            title: "用户名",
+            dataIndex: "username"
+        },
+        {
+            title: "地址",
+            dataIndex: "address",
+        },
+        {
+            title: "操作",
+            render(_, rec): ReactNode {
+                return <div className={"justify-around flex"}>
+                    <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onAccept(rec)}>
+                        <Button type={"primary"}>授权</Button>
+                    </Popconfirm>
+                    <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onDelay(rec)}>
+                        <Button type={"primary"} danger={true}>拒绝</Button>
+                    </Popconfirm>
+                </div>;
+            }
+        },
+
+
+    ];
+    const tableVal: ApplicantResumeRequestStatusTableTuple[] = [
+        {address: "0x9bf591a009ecd917e234f94e22e671042cb58e55", username: "ssss"}
+    ];
     return <div>
-        <AcceptAndDelayRequestModel selected={selected} finish={cleanSelected}/>
-        <Table columns={tableColumn}/>
+        <div className={"mx-28 my-3"}>
+            <Table columns={tableColumn} dataSource={tableVal} bordered={true}/>
+        </div>
     </div>;
 }
 
-function AcceptAndDelayRequestModel({selected, finish}: {
-    selected: ApplicantResumeRequestStatusTableTuple | null,
-    finish: CallBackWithSideEffect
-}) {
-    return <Modal open={selected !== null} onOk={finish} onCancel={finish}>
-        {String(selected)}
-    </Modal>;
-}
