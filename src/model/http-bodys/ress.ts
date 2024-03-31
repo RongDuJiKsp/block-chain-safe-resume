@@ -1,4 +1,6 @@
-import {ConnectingResumeInfo, ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../entity/user.ts";
+import {ConnectingResumeInfo} from "../entity/recruiter.ts";
+import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../entity/applicant.ts";
+
 
 /**
  * @interface BaseRes 所有响应体的基类  也就是所有响应体都继承自该响应体
@@ -62,40 +64,51 @@ interface DownloadRes extends BaseRes {
 /**
  * 响应体设计的核心就是 传输的一定是可序列化对象 将对象序列化为json BaseRes为基类 剩下的字段随便搞 然后传输json
  */
+//ap获取的简历信息
 export interface ResumeInfoRes extends BaseRes {
     putTime: string;
     downloadtimes: string;
 }
 
-
+//rc请求许可的响应体
 export interface RequestResumeLicensingRes extends BaseRes {
 
 }
 
+//rc获取所有正在等待响应和还在有效期内的简历请求列表的响应体
 export interface RecruiterResumeStatusListRes extends BaseRes {
     list: ConnectingResumeInfo[];
 }
 
+//ap获取向ap请求响应的rc的列表
 export interface ResumeQuestListRes extends BaseRes {
     list: ResumeLicenseRequestInfo[];
 }
 
+//ap获取向ap请求简历的rc的历史
 export interface ResumeRequestHistoryListRes extends BaseRes {
     list: ResumeVisitHistoryInfo[];
 }
 
-export interface GiveResumeLicensingRes extends BaseRes {
+//ap同意或者拒绝rc发起的请求的响应体
+export interface GiveOrDelayResumeLicensingRes extends BaseRes {
 
 }
 
+//更改昵称的响应体
 export interface ChangeNameRes extends BaseRes {
     newName: string;
 }
 
+//kk上传子密钥的响应体
 export interface UploadSubKeyRes extends BaseRes {
 
 }
 
-export interface KeyKeeperRequestRequestListRes extends BaseRes {
+//kk获取所有等待kk上传子密钥请求的列表
+export interface RequestRequestListRes extends BaseRes {
+
+}
+export interface AccessibleSubKeyListRes extends BaseRes{
 
 }

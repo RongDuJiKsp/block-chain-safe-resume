@@ -10,13 +10,14 @@ import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
 import {
+    AccessibleSubKeyListRes,
     BaseRes,
     ChangeNameRes,
-    GiveResumeLicensingRes,
-    KeyKeeperRequestRequestListRes,
+    GiveOrDelayResumeLicensingRes,
     LoginRes,
     RecruiterResumeStatusListRes,
     RegisterRes,
+    RequestRequestListRes,
     RequestResumeLicensingRes,
     ResumeInfoRes,
     ResumeQuestListRes,
@@ -113,7 +114,7 @@ interface ApplicantWorkMethod {
 
     getResumeRequestListAsync(): Promise<ResumeQuestListRes>;
 
-    giveResumeLicensingAsync(): Promise<GiveResumeLicensingRes>;
+    giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes>;
 
     getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
 }
@@ -158,7 +159,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     ]
                 };
             },
-            async giveResumeLicensingAsync(): Promise<GiveResumeLicensingRes> {
+            async giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes> {
                 return {
                     status: 1,
                     message: 'ok'
@@ -224,5 +225,28 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
 
-    requestRequestListAsync(): Promise<KeyKeeperRequestRequestListRes>;
+    requestRequestListAsync(): Promise<RequestRequestListRes>;
+
+    getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 }
+
+export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
+    useMethod(): KeyKeeperWorkMethod {
+        return {
+            async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
+                return {status: 1, message: "22"};
+            },
+            async requestRequestListAsync(): Promise<RequestRequestListRes> {
+                return {status: 1, message: "22"};
+            },
+            async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
+                return {status: 1, message: "22"};
+            }
+
+        };
+    }
+    , useValue(): null {
+        return null;
+    }
+
+};
