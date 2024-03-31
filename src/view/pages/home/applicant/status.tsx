@@ -57,14 +57,19 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
     const tableColumn: ColumnsType<ResumeLicenseRequestInfo> = [
         {
             title: "用户名",
-            dataIndex: "username"
+            dataIndex: "username",
+            width: "16%",
+            align: "center",
         },
         {
             title: "地址",
             dataIndex: "address",
+            align: "center"
         },
         {
             title: "操作",
+            width: "17%",
+            align: "center",
             render(_, rec): ReactNode {
                 return <div className={"justify-around flex"}>
                     <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onAccept(rec)}>

@@ -14,8 +14,8 @@ export default function ApplicantRecord() {
     useEffect(() => {
         //TODO: flash render
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12"}>
-        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4"}>
+    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12 "}>
+        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问记录"} onFresh={changeAction}/>
             <ResumeHistoryComponent/>
         </div>
@@ -24,6 +24,6 @@ export default function ApplicantRecord() {
 
 function ResumeHistoryComponent() {
     return <div>
-        <Table columns={tableColumn}/>
+        <Table columns={tableColumn} pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}/>
     </div>;
 }
