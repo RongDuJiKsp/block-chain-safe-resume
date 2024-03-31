@@ -1,5 +1,4 @@
-import {Statistic, Table} from "antd";
-import {ApplicantResumeRequestStatusTableTuple} from "../../../../model/entity/user.ts";
+import {Modal, Statistic, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
@@ -8,6 +7,10 @@ import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
+
+interface ApplicantResumeRequestStatusTableTuple {
+
+}
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
@@ -45,7 +48,15 @@ function ResumeInfoComponent() {
 }
 
 function ResumeRequestComponent() {
+    const [selected, setSelected] = useState<ApplicantResumeRequestStatusTableTuple | null>(null);
     return <div>
+        <AcceptAndDelayRequestModel selected={selected}/>
         <Table columns={tableColumn}/>
     </div>;
+}
+
+function AcceptAndDelayRequestModel({selected}: { selected: ApplicantResumeRequestStatusTableTuple | null }) {
+    return <Modal open={selected !== null}>
+
+    </Modal>;
 }

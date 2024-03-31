@@ -1,9 +1,12 @@
 import {Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {ApplicantResumeVisitStatusTableTuple} from "../../../../model/entity/user.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {useEffect} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
+
+interface ApplicantResumeVisitStatusTableTuple {
+
+}
 
 const tableColumn: ColumnsType<ApplicantResumeVisitStatusTableTuple> = [{}];
 export default function ApplicantRecord() {

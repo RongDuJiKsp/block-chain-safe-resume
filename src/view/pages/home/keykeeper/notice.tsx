@@ -1,9 +1,13 @@
 import {Modal, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {KeyKeeperReceivedRequestStatusTableTuple} from "../../../../model/entity/user.ts";
 import {useEffect, useState} from "react";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
+
+
+interface KeyKeeperReceivedRequestStatusTableTuple {
+
+}
 
 const tableColumn: ColumnsType<KeyKeeperReceivedRequestStatusTableTuple> = [{}];
 export default function KeyKeeperNotice() {
@@ -22,12 +26,12 @@ export default function KeyKeeperNotice() {
 function RequestTableComponent() {
     const [selectedResume, setSelectResume] = useState<KeyKeeperReceivedRequestStatusTableTuple | null>(null);
     return <div>
-        <UploadSubKeyComponent resume={selectedResume}/>
+        <UploadSubKeyModel resume={selectedResume}/>
         <Table columns={tableColumn}/>
     </div>;
 }
 
-function UploadSubKeyComponent({resume}: { resume: KeyKeeperReceivedRequestStatusTableTuple | null }) {
+function UploadSubKeyModel({resume}: { resume: KeyKeeperReceivedRequestStatusTableTuple | null }) {
     return <Modal open={resume !== null}>
 
     </Modal>;

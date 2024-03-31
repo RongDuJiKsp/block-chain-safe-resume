@@ -8,18 +8,10 @@ export interface UserGroup {
     userIdentity: string;
 }
 
-export interface ApplicantResumeRequestStatusTableTuple {
 
-}
-export interface ApplicantResumeVisitStatusTableTuple {
 
-}
-export interface RecruiterHandledResumeStatusTableTuple{
 
-}
-export interface KeyKeeperReceivedRequestStatusTableTuple{
 
-}
 
 export interface BasicUserState {
     nick: string;
