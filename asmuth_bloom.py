@@ -131,7 +131,7 @@ def getm(t, n, bit_k, k):
 
 #Large 256-bit numbers as a test
 def getNeed():
-    k = generate_random_number(10)
+    k = generate_random_number(5)
     dict = {}
     print("S ", k)
     dict["S"] = k
@@ -180,3 +180,5 @@ def getNeed():
         timrc.append(sum(t2)/round)
     return dict
 
+if __name__ == '__main__':
+    getNeed()

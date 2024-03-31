@@ -10,6 +10,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+# 0.登录注册改用户名三个函数
 @app.route('/RegisterReq', methods=["POST"])
 def RegisterReq():
     data = request.get_json()
@@ -34,7 +35,7 @@ def RegisterReq():
                 user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
                 return json.dumps(user)
     except Exception as e:
-        user['message'] = "注册失败 原因 {}".format(str(e))
+        user['message'] = "{}".format(str(e))
         return json.dumps(user)
 
 
@@ -53,7 +54,7 @@ def LoginReq():
             return json.dumps(login)
         return verifyprivateKeys(data['privateKeys'],data['identity'],login)
     except Exception as e:
-        login['message'] = "登录失败 原因 {}".format(str(e))
+        login['message'] = "{}".format(str(e))
         return json.dumps(login)
 
 @app.route('/ChangeNameReq', methods=["POST"])
@@ -70,24 +71,102 @@ def ChangeNameReq():
             return json.dumps(change)
         return ChangeName(data,change)
     except Exception as e:
-        change['message'] = "下载失败 原因 {}".format(str(e))
+        change['message'] = "{}".format(str(e))
         return json.dumps(change)
 
-@app.route('/UploadReq', methods=["POST"])
-def UploadReq():
-    upload={
+# @app.route('/GetFileMesReq', methods=["POST"])
+# def GetFileMesReq():
+#     data = request.get_json()
+#     message={}
+#     try:
+#         if data['address'] is None :
+#             return json.dumps(message)
+#         return getResumeMessage(data['address'],message)
+#     except Exception as e:
+#         return json.dumps(message)
+
+#1.申请秘密份额三个函数
+# 得到所以待保管秘密份额的ap用户
+@app.route('/GetNeedSaveReq', methods=["POST"])
+def GetNeedSaveReq():
+    data = request.get_json()
+    try:
+        KKAddress = data['KKAddress']
+        return getNeedSave(KKAddress)
+    except Exception as e:
+        return json.dumps([])
+
+# 保管秘密份额
+@app.route('/SavePartReq', methods=["POST"])
+def SavePartReq():
+    data = request.get_json()
+    part ={
         'status': 0,
         'message': '',
-        'hash': ''
     }
-    if 'file' not in request.files:
-        return json.dumps(upload)
-    # 前端上传文件,后端处理给webase
-    file = request.files['file']
-    address = request.args.get('address')
-    if file.filename == '' or address is None:
-        return json.dumps(upload)
-    return uploadIpfs(file,address,upload)
+    try:
+        ApUserName = data['userName']
+        ApAddress = data['address']
+        KKAddress = data['KKAddress']
+        return SavePart(ApUserName,ApAddress,KKAddress,part)
+    except Exception as e:
+        part['message'] = "{}".format(str(e))
+        return json.dumps(part)
+# 查看已经保管的秘密份额
+@app.route('/GetSaveReq', methods=["POST"])
+def GetSaveReq():
+    data = request.get_json()
+    try:
+        return getSave(data["KKAddress"])
+    except Exception as e:
+        return json.dumps([])
+
+#2.Recruiter 四个函数
+# 返回所以可申请查看简历的ap用户
+@app.route('/GetResumeReq', methods=["POST"])
+def GetResumeReq():
+    data = request.get_json()
+    try:
+        ReAddress = data['ReAddress']
+        return getResume(ReAddress)
+    except Exception as e:
+        return json.dumps([])
+
+# 请求授权查看简历
+@app.route('/RecAuthorizeReq', methods=["POST"])
+def RecAuthorizeReq():
+    data = request.get_json()
+    authorize = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApUserName = data['ApUserName']
+        ApAddress = data['ApAddress']
+        ReAddress = data['ReAddress']
+        if recAuthorize(ApUserName,ApAddress,ReAddress) == False:
+            authorize['status'] = 0
+            authorize['message'] = "授权请求失败"
+            return json.dumps(authorize)
+        else:
+            authorize['status'] = 1
+            authorize['message'] = "授权请求成功"
+            return json.dumps(authorize)
+    except Exception as e:
+        authorize['message'] = "{}".format(str(e))
+        return json.dumps(authorize)
+
+# 已申请简历授权查看
+@app.route('/RecAlreadyAuthorizeReq', methods=["POST"])
+def RecAlreadyAuthorizeReq():
+    data = request.get_json()
+    try:
+        ReAddress = data['ReAddress']
+        return recAlreadyAuthorizeReq(ReAddress)
+    except Exception as e:
+        return json.dumps([])
+
+# 授权成功后可以下载文件
 @app.route('/DownloadFileReq', methods=['POST'])
 def DownloadFileReq():
     data = request.get_json()
@@ -102,20 +181,55 @@ def DownloadFileReq():
             return json.dumps(download)
         return downloadByipfs(data['fileHash'],download)
     except Exception as e:
-        download['message'] = "下载失败 原因 {}".format(str(e))
+        download['message'] = "{}".format(str(e))
         return json.dumps(download)
 
-@app.route('/GetFileMesReq', methods=["POST"])
-def GetFileMesReq():
+#3. ap 三个函数
+# 查看简历查看请求
+@app.route('/GetRequestReq', methods=["POST"])
+def GetRequestReq():
     data = request.get_json()
-    message={}
     try:
-        if data['address'] is None :
-            return json.dumps(message)
-        return getResumeMessage(data['address'],message)
+        ApAddress = data['ApAddress']
+        return getRequest(ApAddress)
     except Exception as e:
-        return json.dumps(message)
+        return json.dumps([])
 
+# 授权查看简历,不同意更新数据库,同意和合约函数交互+更新数据库
+@app.route('/ApAuthorizeReq', methods=["POST"])
+def ApAuthorizeReq():
+    data = request.get_json()
+    try:
+        # 不同意传0，同意传1
+        status = data['status']
+        ApAddress = data['ApAddress']
+        ReAddress = data['ReAddress']
+        if status == 0:
+            return rejectAuthorize(ApAddress,ReAddress)
+        return apAuthorize(ApAddress,ReAddress)
+    except Exception as e:
+        return json.dumps({'status': 0, 'message': '{}'.format(str(e))})
+# 简历上传函数
+@app.route('/UploadReq', methods=["POST"])
+def UploadReq():
+    upload={
+        'status': 0,
+        'message': '',
+        'hash': ''
+    }
+    try:
+        if 'file' not in request.files:
+            return json.dumps(upload)
+        # 前端上传文件,后端处理给webase
+        file = request.files['file']
+        userName = request.args.get('userName')
+        address = request.args.get('address')
+        if file.filename == '' or address is None:
+            return json.dumps(upload)
+        return uploadIpfs(file,userName,address,upload)
+    except Exception as e:
+        upload['message'] = "{}".format(str(e))
+        return json.dumps(upload)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

@@ -26,8 +26,35 @@ CREATE TABLE KeyKeeper (
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
+
+# 1.kk和ap
+# 可供选择的秘密份额
+CREATE TABLE NeedSave (
+    userName VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    remainingAmount int NOT NULL
+);
+
+# kk已经保管的秘密份额
+CREATE TABLE KKAlreadySave (
+    ApUserName VARCHAR(255) NOT NULL,
+    ApAddress VARCHAR(255) NOT NULL,
+    KKAddress VARCHAR(255) NOT NULL
+);
+
+# 2.hr和ap
+# 简历表
 CREATE TABLE resumeForm(
+    userName VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     putTime  int NOT NULL,
-    downloadtimes int NOT NULL
+    downloadtimes BIGINT NOT NULL
+);
+
+# 申请中和已经录取的表,等待0,接受1
+CREATE TABLE AlreadyResumeForm(
+    ApUserName VARCHAR(255) NOT NULL,
+    ApAddress VARCHAR(255) NOT NULL,
+    ReAddress VARCHAR(255) NOT NULL,
+    ststus int NOT NULL
 );

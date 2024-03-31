@@ -47,6 +47,8 @@
  }
 ```
 
+示例:`{"identity":"Applicant"}`
+
 #### 2.登录
 
 ```
@@ -105,12 +107,232 @@ interface LoginReq {
 
 
 
-#### 4.文件上传
+#### 4.kk得到所以待保管秘密份额的ap用户
+
+```
+ /**
+ * @interface GetNeedSaveReq
+ * @property KKAddress kk用户地址(登陆时已经返回)
+ */
+  interface GetNeedSaveReq {
+    KKAddress: string;
+ }
+
+
+ /**
+ * @interface GetNeedSaveRes
+ * @property userName 用户名
+ * @property address 用户地址
+ * @property remainingAmount 剩余秘密份额数量(每个kk最多保管同一个用户的秘密份额1分、份)
+ */
+interface GetNeedSaveRes{
+    [[userName,address,remainingAmount],[...,...,...]]
+}
+```
+
+示例:`{"KKAddress":"0xdd5d634fd9737fbad195ec5216eecde4b7f943ca"}`
+
+#### 5.kk秘密份额保管申请
+
+```
+ /**
+ * @interface SavePartReq
+ * @property userName 待保管人的名称(接口6查询时已经返回)
+ * @property address  待保管人的地址(接口6查询时已经返回)
+ * @property KKAddress kk的地址(接口2登录时已经返回)
+ */
+  interface SavePartReq {
+    userName: string;
+    address: string;
+    KKAddress: string;
+ }
+
+ /**
+ * @interface SavePartRes
+ * @extends BaseRes
+ * @property i kk保管该用户的第几份秘密份额
+ * @property x 秘密份额x
+ * @property m 秘密份额m
+ * @property p p
+ */
+interface SavePartRes extends BaseRes {
+    i: int;
+    x: int;
+    m: int;
+    p: int;
+}
+```
+
+#### 6.kk查看已经保管的秘密份额
+
+```
+ /**
+ * @interface GetSaveReq
+ * @property KKAddress kk用户地址(登陆时已经返回)
+ */
+  interface GetSaveReq {
+    KKAddress: string;
+ }
+
+
+ /**
+ * @interface GetNeedSaveRes
+ * @property userName 用户名
+ * @property address 用户地址
+ * @property KKAddress kk地址(无所谓的有没有的)
+ */
+interface GetNeedSaveRes{
+    [[userName,address,KKAddress],[...,...,...]]
+}
+```
+
+示例:`{"KKAddress":"0xa522fe242f4cc2b31ae035e6b433a3cbf48d5afc"}`
+
+#### 7.re查看所有可申请查看简历的ap用户
+
+```
+ /**
+ * @interface GetResumeReq
+ * @property ReAddress re用户地址(登陆时已经返回)
+ */
+  interface GetResumeReq {
+    ReAddress: string;
+ }
+
+
+ /**
+ * @interface GetResumeRes
+ * @property userName 用户名
+ * @property address 用户地址
+ * @property putTime 简历上传时间(从1970年1月1日00:00:00 UTC到现在的秒数)
+ * @property downloadtimes 简历下载次数
+ */
+interface GetResumeReq{
+    [[userName,address,putTime,downloadtimes],[...,...,...]]
+}
+```
+
+#### 8.re请求授权查看简历
+
+```
+ /**
+ * @interface RecAuthorizeReq
+ * @property ApUserName ap用户名
+ * @property ApAddress  ap用户地址
+ * @property ReAddress re用户地址
+ */
+  interface RecAuthorizeReq {
+    ApUserName: string;
+    ApAddress: string;
+    ReAddress: string;
+ }
+
+ /**
+ * @interface RecAuthorizeRes
+ * @extends BaseRes
+ */
+interface RecAuthorizeRes extends BaseRes {
+}
+```
+
+#### 9.re查看自己申请查看的简历状态
+
+```
+ /**
+ * @interface RecAlreadyAuthorizeReq
+ * @property ReAddress re用户地址(登陆时已经返回)
+ */
+  interface GetResumeReq {
+    ReAddress: string;
+ }
+
+
+ /**
+ * @interface RecAlreadyAuthorizeRes
+ * @property ApUserName ap用户名
+ * @property ApAddress ap用户地址
+ * @property ReAddress re用户自己的地址(忽略就好)
+ * @property ReAddress 申请状态(int型,0表示在申请中,1表示申请成功)
+ */
+interface RecAlreadyAuthorizeRes{
+    [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+}
+```
+
+#### 10.re下载简历
+
+```
+ /**
+ * @interface DownloadFileReq
+ * @property fileHash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
+ */
+  interface DownloadFileReq {
+    fileHash: string;
+ }
+
+ /**
+ * @interface DownloadRes
+ * @extends BaseRes
+ * @property base64 二进制文件的base64编码
+ */
+interface DownloadRes extends BaseRes {
+    base64: string;
+}
+```
+
+#### 11.ap查看所有的简历申请请求
+
+```
+ /**
+ * @interface GetRequestReq
+ * @property ApAddress ap用户地址(登陆时已经返回)
+ */
+  interface GetRequestReq {
+    ApAddress: string;
+ }
+
+
+ /**
+ * @interface GetRequestRes
+ * @property ApUserName ap用户名(忽略就好)
+ * @property ApAddress ap用户自己的地址(忽略就好)
+ * @property ReAddress re用户的地址
+ * @property ReAddress 申请状态(int型,0表示在申请中,1表示ap已同意申请)
+ */
+interface GetRequestRes{
+    [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+}
+```
+
+#### 12.ap用户授权相应re查看自己的简历(分同意或不同意两种情况)
+
+```
+ /**
+ * @interface ApAuthorizeReq
+ * @property status int型,0表示不同意申请,1表示同意申请
+ * @property ApAddress  ap用户地址
+ * @property ReAddress re用户地址
+ */
+  interface ApAuthorizeReq {
+    status: int;
+    ApAddress: string;
+    ReAddress: string;
+ }
+
+ /**
+ * @interface ApAuthorizeRes
+ * @extends BaseRes
+ */
+interface ApAuthorizeRes extends BaseRes {
+}
+```
+
+#### 13.ap用户上传简历
 
 ```
 /**
 *上传这块请求我是这么想的前端直接把文件传给后端不需要做什么操作，后端和合约交互把文件内容加密后上传到ipfs并返回hash
-*请求的时候需要get传参address
+*请求的时候需要get传参userName和address
 */
 
 
@@ -139,8 +361,9 @@ function uploadFile() {
     var file = input.files[0];
     var formData = new FormData();
     formData.append('file', file);
-    var address = '0x3a46aad900e8ff302b7198496131b7a84de217cf';  //address示例
-    fetch('http://127.0.0.1:5000/UploadReq?address=' + address, {
+    var userName = 'dIvPOeE6RW2r'
+    var address = '0xa5b2718b5111c89d6d464ca3d1aef041a1334905';  //address示例
+    fetch('http://127.0.0.1:5000/UploadReq?address=' + address+'&userName='+userName, {
         method: 'POST',
         body: formData
     })
@@ -156,58 +379,3 @@ function uploadFile() {
 </body>
 </html>
 ```
-
-
-
-#### 5.文件下载
-
-```
- /**
- * @interface DownloadFileReq
- * @property fileHash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
- */
-  interface DownloadFileReq {
-    fileHash: string;
- }
-
- /**
- * @interface DownloadRes
- * @extends BaseRes
- * @property base64 二进制文件的base64编码
- */
-interface DownloadRes extends BaseRes {
-    base64: string;
- }
-```
-
-#### 6.求职者简历展示
-
-```
- /**
- * 这是一个提供给Recruiter用户查看所有ap简历的接口
- * @interface GetFileMesReq
- * @property address Recruiter用户地址(登陆时已经返回)
- */
-  interface GetFileMesReq {
-    address: string;
- }
-
-
- /**
- * @interface GetFileMesRes
- * @property allMessahe 所有上传简历信息
- * @property hashID 用户hashID
- * @property putTime 简历上传时间(从1970年1月1日00:00:00 UTC到现在的秒数)
- * @property downloadtimes 简历下载次数
- */
-interface GetFileMesRes{
-    [[hashID,putTime,downloadtimes]]
- }
-```
-
-
-
-#### 7.待授权请求查看
-
-
-
