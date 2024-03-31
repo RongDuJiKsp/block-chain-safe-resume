@@ -4,7 +4,7 @@ import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts
 import {useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
-import {ResumeVisitHistoryInfo} from "../../../../model/entity/user.ts";
+import {ResumeVisitHistoryInfo} from "../../../../model/entity/applicant.ts";
 
 
 const tableColumn: ColumnsType<ResumeVisitHistoryInfo> = [{}];

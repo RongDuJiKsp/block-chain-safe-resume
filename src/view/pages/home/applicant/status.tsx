@@ -7,7 +7,7 @@ import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
-import {ResumeLicenseRequestInfo} from "../../../../model/entity/user.ts";
+import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
 
 
 export default function ApplicantStatus() {

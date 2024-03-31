@@ -5,6 +5,7 @@ import KeyKeeperNotice from "../pages/home/keykeeper/notice.tsx";
 import RecruiterRequire from "../pages/home/recruiter/require.tsx";
 import ApplicantUpload from "../pages/home/applicant/upload.tsx";
 import ApplicantRecord from "../pages/home/applicant/record.tsx";
+import KeyKeeperGetSubKey from "../pages/home/keykeeper/get.tsx";
 
 export const APPLICANT_THIS_PATH: string = "/home/Applicant";
 
@@ -32,6 +33,7 @@ export const KEYKEEPER_THIS_PATH: string = "/home/KeyKeeper";
 export function KeyKeeperRoutes() {
     return <Routes>
         <Route path={"/notice"} element={<KeyKeeperNotice/>}/>
+        <Route path={"/get"} element={<KeyKeeperGetSubKey/>}/>
         <Route path={"/*"} element={<Navigate to={KEYKEEPER_THIS_PATH + "/notice"}/>}/>
     </Routes>;
 }

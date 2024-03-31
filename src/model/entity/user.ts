@@ -14,15 +14,4 @@ export interface BasicUserState {
     address: string;
 }
 
-export interface ResumeLicenseRequestInfo {
-    username: string;
-    address: string;
-}
 
-export interface ResumeVisitHistoryInfo {
-
-}
-
-export interface ConnectingResumeInfo {
-
-}

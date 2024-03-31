@@ -13,6 +13,11 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon("icon-money-finance-buyer", {fontSize: 32}),
         routerPath: KEYKEEPER_THIS_PATH + "/notice",
         text: "上传请求"
+    },
+    {
+        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 32}),
+        routerPath: KEYKEEPER_THIS_PATH + "/get",
+        text: "获取子密钥"
     }
 ];
 export default function KeyKeeperPage() {

@@ -3,7 +3,7 @@ import {ColumnsType} from "antd/es/table";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
-import {ConnectingResumeInfo} from "../../../../model/entity/user.ts";
+import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 
