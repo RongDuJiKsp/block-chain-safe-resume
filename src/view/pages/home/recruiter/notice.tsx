@@ -26,7 +26,7 @@ export default function RecruiterNotice() {
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
     return <div>
-        <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal}
+        <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}
         />
     </div>;

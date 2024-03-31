@@ -21,11 +21,13 @@ export default function KeyKeeperNotice() {
     </div>;
 }
 
-function RequestTableComponent({tableVal}:{tableVal:UploadSubKeyRequestInfo[]}) {
+function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[] }) {
     const [selectedResume, setSelectResume] = useState<UploadSubKeyRequestInfo | null>(null);
     return <div>
         <UploadSubKeyModel resume={selectedResume}/>
-        <Table columns={tableColumn} dataSource={tableVal}/>
+        <Table<UploadSubKeyRequestInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
+                                        pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}
+        />
     </div>;
 }
 
