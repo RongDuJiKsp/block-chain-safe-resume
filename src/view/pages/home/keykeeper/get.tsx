@@ -92,7 +92,7 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<Accessibl
             message.error("登录状态异常，请退出后重试！").then();
             return;
         }
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getKeyKeeperSubKey(keyPair.x, keyPair.m, keyPair.p, keyPair.i, data.userName, data.address, userInfo.address)]), `${data.userName} hand by ${userInfo.address.substring(0, 6)}...`, "key").then(() => {
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getKeyKeeperSubKey(keyPair.x, keyPair.m, keyPair.p, keyPair.i, data.userName, userInfo.nick,)]), `${data.userName} hand by ${userInfo.address.substring(0, 6)}...`, "key").then(() => {
             message.success("下载成功！").then();
             canBeCloseAction.setTrue();
         });
