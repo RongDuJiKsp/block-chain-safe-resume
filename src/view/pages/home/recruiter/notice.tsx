@@ -7,7 +7,6 @@ import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 
-
 export default function RecruiterNotice() {
     const userService = RecruiterWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
@@ -26,8 +25,8 @@ export default function RecruiterNotice() {
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
     const tableColumn: ColumnsType<ConnectingResumeInfo> = [{}];
     return <div>
-        <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
-                                     pagination={{pageSize: 5, showQuickJumper: true,hideOnSinglePage:true}}
+        <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
+                                     pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
     </div>;
 }

@@ -26,8 +26,8 @@ export default function ApplicantRecord() {
 
 function ResumeHistoryComponent({tableVal}: { tableVal: ResumeVisitHistoryInfo[] }) {
     return <div>
-        <Table<ResumeVisitHistoryInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
-                                       pagination={{pageSize: 5, showQuickJumper: true ,hideOnSinglePage:true}}
+        <Table<ResumeVisitHistoryInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
+                                       pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
     </div>;
 }

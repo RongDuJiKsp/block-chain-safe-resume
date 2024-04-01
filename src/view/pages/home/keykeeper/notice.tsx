@@ -25,8 +25,8 @@ function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[]
     const [selectedResume, setSelectResume] = useState<UploadSubKeyRequestInfo | null>(null);
     return <div>
         <UploadSubKeyModel resume={selectedResume}/>
-        <Table<UploadSubKeyRequestInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
-                                        pagination={{pageSize: 5, showQuickJumper: true ,hideOnSinglePage:true}}
+        <Table<UploadSubKeyRequestInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
+                                        pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
     </div>;
 }

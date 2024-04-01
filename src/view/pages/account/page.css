@@ -59,7 +59,8 @@
     animation-name: bigger-contain-context;
     animation-duration: 1.7s;
 }
-.showing-in{
+
+.showing-in {
     animation-name: bigger-contain-context;
     animation-duration: 1.2s;
 }
