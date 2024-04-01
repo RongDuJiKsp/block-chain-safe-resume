@@ -72,7 +72,7 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
     return <div>
         <GetAccessibleSubKey data={selectedInfo} clear={onClearSelected}/>
         <Table<AccessibleSubKeyInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
-                                     pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}
+                                     pagination={{pageSize: 5, showQuickJumper: true ,hideOnSinglePage:true}}
         />
     </div>;
 }

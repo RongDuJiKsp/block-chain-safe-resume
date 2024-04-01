@@ -25,6 +25,8 @@ import {
 import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
 import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
+import {GetResumeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -191,9 +193,10 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 interface RecruiterWorkMethod {
     downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
 
-    getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
 
     requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes>;
+
+    getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
 }
 
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
@@ -201,15 +204,24 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         const userInfo = useAtomValue(userInfoAtom);
         return {
             async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
-                if (userInfo === null) throw "未登录时尝试上传";
+                if (userInfo === null) throw "未登录时尝试下载";
                 return new File([encryptHash, S], "ss");
             },
             async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
-                if (userInfo === null) throw "未登录";
+                if (userInfo === null) throw "未登录时尝试获取简历列表";
+                const req: GetResumeReq = {
+                    ReAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetResumeReq", req);
                 return {
-                    status: 1,
-                    message: "",
-                    list: []
+                    status: res.status,
+                    message: res.message,
+                    list: res.list.map((val): ConnectingResumeInfo => ({
+                        ApUserName: val[0],
+                        ApAddress: val[1],
+                        ReAddress: val[2],
+                        status: Number(val[3])
+                    }))
                 };
             },
             async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {

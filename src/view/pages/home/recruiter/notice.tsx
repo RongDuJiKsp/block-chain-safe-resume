@@ -7,14 +7,13 @@ import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 
-const tableColumn: ColumnsType<ConnectingResumeInfo> = [{}];
+
 export default function RecruiterNotice() {
     const userService = RecruiterWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [tableVal, setTableVal] = useState<ConnectingResumeInfo[]>([]);
     useEffect(() => {
         userService.getResumeStatusListAsync().then(r => setTableVal(r.list));
-        //TODO: flash render
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window"}>
         <div className={"basis-3/4  mx-11  pt-6 px-6 work-window-color"}>
@@ -25,9 +24,10 @@ export default function RecruiterNotice() {
 }
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
+    const tableColumn: ColumnsType<ConnectingResumeInfo> = [{}];
     return <div>
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal}  bordered={true} size={"small"}
-                                     pagination={{pageSize: 5, showQuickJumper: true, position: ["topRight"]}}
+                                     pagination={{pageSize: 5, showQuickJumper: true,hideOnSinglePage:true}}
         />
     </div>;
 }
