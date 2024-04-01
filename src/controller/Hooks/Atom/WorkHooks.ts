@@ -225,7 +225,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 };
             },
             async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {
-                if (userInfo === null) throw "未登录时尝试上传";
+                if (userInfo === null) throw "未登录时尝试";
                 return {
                     status: 1,
                     message: ""
