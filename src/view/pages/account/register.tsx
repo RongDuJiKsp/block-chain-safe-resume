@@ -5,7 +5,7 @@ import {StepProps} from "antd/es/steps";
 import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {RegisterRes} from "../../../model/http-bodys/ress.ts";
+import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";

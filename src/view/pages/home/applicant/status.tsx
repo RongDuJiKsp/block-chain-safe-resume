@@ -3,11 +3,11 @@ import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
 import {ReactNode, useEffect, useState} from "react";
-import {ResumeInfoRes} from "../../../../model/http-bodys/ress.ts";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
+import {ResumeInfoRes} from "../../../../model/http-bodys/user/applicant/res.ts";
 
 
 export default function ApplicantStatus() {

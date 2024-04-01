@@ -5,25 +5,23 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/reqs.ts";
+import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
+import {BaseRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
-    AccessibleSubKeyListRes,
-    BaseRes,
-    ChangeNameRes,
     GiveOrDelayResumeLicensingRes,
-    LoginRes,
-    RecruiterResumeStatusListRes,
-    RegisterRes,
-    RequestRequestListRes,
-    RequestResumeLicensingRes,
     ResumeInfoRes,
     ResumeQuestListRes,
-    ResumeRequestHistoryListRes,
+    ResumeRequestHistoryListRes
+} from "../../../model/http-bodys/user/applicant/res.ts";
+import {
+    AccessibleSubKeyListRes,
+    RequestRequestListRes,
     UploadSubKeyRes
-} from "../../../model/http-bodys/ress.ts";
+} from "../../../model/http-bodys/user/keykeeper/res.ts";
+import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
