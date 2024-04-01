@@ -34,6 +34,9 @@ export interface StepInformation {
     element: ReactElement
 }
 
-export interface ChainRpcInterface {
+export interface GetFileTemplate {
+    getRegisterKey(privateKey: string): string;
+
+    getKeyKeeperSubKey(X: number, M: number, P: number, NO: number, apName: string, apAddress: string, kkAddress: string): string;
 
 }

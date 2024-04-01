@@ -4,8 +4,13 @@ import {AccessibleSubKeyInfo} from "../../../../model/entity/keykeeper.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {App, Button, Modal, Popconfirm, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {KeyKeeperWorkHook} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {KeyKeeperWorkHook, UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
+import {DownloadSubKeysRes} from "../../../../model/http-bodys/user/keykeeper/res.ts";
+import {LoadingOutlined} from "@ant-design/icons";
+import {useBoolean} from "ahooks";
+import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
+import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 
 
 export default function KeyKeeperGetSubKey() {
@@ -56,7 +61,8 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
             align: "center",
             render(_, item): ReactNode {
                 return <div className={"justify-around flex"}>
-                    <Popconfirm title={"确认获取该用户子密钥？"} onConfirm={() => onAccept(item)}>
+                    <Popconfirm title={`确认获取保管该用户(${item.userName.substring(0, 8) + ".."})的子密钥？`}
+                                onConfirm={() => onAccept(item)}>
                         <Button type={"primary"}>获取</Button>
                     </Popconfirm>
                 </div>;
@@ -72,13 +78,55 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
 }
 
 function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<AccessibleSubKeyInfo>) {
+    const {message} = App.useApp();
+    const kkUserServer = KeyKeeperWorkHook.useMethod();
+    const {userInfo} = UserWorkHooks.useValue();
+    const [keyPair, setKeyPair] = useState<DownloadSubKeysRes | null>(null);
+    const [canBeClose, canBeCloseAction] = useBoolean();
+    const onDownloadSubKey: CallBackWithSideEffect = () => {
+        if (!keyPair || !data) {
+            message.error("未获取到子密钥，请关闭浮窗后重试").then();
+            return;
+        }
+        if (!userInfo) {
+            message.error("登录状态异常，请退出后重试！").then();
+            return;
+        }
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getKeyKeeperSubKey(keyPair.x, keyPair.m, keyPair.p, keyPair.i, data.userName, data.address, userInfo.address)]), `${data.userName} hand by ${userInfo.address.substring(0, 6)}...`, "key").then(() => {
+            message.success("下载成功！").then();
+            canBeCloseAction.setTrue();
+        });
 
+    };
     useEffect(() => {
+        if (data === null) return;
+        canBeCloseAction.setFalse();
+        kkUserServer.downloadSubKeyAsync(data.userName, data.address).then(r => {
+            console.log(r);
+            if (r.status) {
+                message.success("获取子密钥成功，请下载子密钥").then();
+                setKeyPair(r);
+            } else {
+                message.error("获取子密钥失败，原因为" + r.message).then();
+                setKeyPair(null);
+                clear();
+            }
+        });
 
     }, [data]);
-    return <Modal open={data !== null} onCancel={clear} footer={null}>
+    return <Modal open={data !== null} onCancel={canBeClose ? clear : undefined} footer={null}>
         <div className={"my-5"}>
-
+            {keyPair === null ?
+                <div>
+                    <LoadingOutlined/> 正在下载子密钥，请稍后，请不要关闭该页面.....
+                </div> :
+                <div className={"py-8"}>
+                    <p>请下载子密钥并且妥善保管，在需要上传子密钥时及时上传子密钥可以获得奖励，未妥善保管或上传错误将会获得处罚！</p>
+                    <div className={"flex justify-center my-3"}>
+                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载子密钥
+                        </button>
+                    </div>
+                </div>}
         </div>
     </Modal>;
 }

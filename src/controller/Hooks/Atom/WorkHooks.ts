@@ -18,11 +18,12 @@ import {
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
+    DownloadSubKeysRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
 import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
-import {GetNeedSaveReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 
 export const alovaClientImpl = createAlova({
@@ -229,6 +230,8 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
 
+    downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
+
     getRequestListAsync(): Promise<RequestListRes>;
 
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
@@ -239,6 +242,11 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
     useMethod(): KeyKeeperWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
+                if (userInfo === null) throw "未登录时尝试获取子密钥";
+                const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};
+                return alovaClientImpl.Post<DownloadSubKeysRes>("/SavePartReq", req);
+            },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";
                 const req: GetNeedSaveReq = {
@@ -260,6 +268,8 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return {status: 1, message: "22"};
             },
             async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
+                if (userInfo === null) throw "未登录时尝试上传子密钥";
+
                 return {status: 1, message: "22"};
             }
 

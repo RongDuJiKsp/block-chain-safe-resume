@@ -6,6 +6,14 @@ export interface UploadSubKeyRes extends BaseRes {
 
 }
 
+//kk下载子子密钥的响应
+export interface DownloadSubKeysRes extends BaseRes {
+    i: number;
+    x: number;
+    m: number;
+    p: number;
+}
+
 //kk获取所有等待kk上传子密钥请求的列表
 export interface RequestListRes extends BaseRes {
 

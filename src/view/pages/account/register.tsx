@@ -9,6 +9,7 @@ import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -167,18 +168,11 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const navigate = useNavigate();
     const onDownload = () => {
-        console.log(res, res?.res.privateKeys);
-        const fileContext = `Please keep your  key, once lost, you can't get it back!
-        PrivateValue : ${res?.res.privateKeys}
-        address : ${res?.res.address}
-        SafeKey:${res?.res.S}
-        SubSafeKeyPair[M,X] :${res?.res.M.map((val, index) => {
-            return `\n        [${val},${res?.res.X[index]}]`;
-        })}
-        You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
-        Please give the SubKey to the key holder who has been granted the right to pledge
-        `;
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([fileContext]), `${res?.res.address?.substring(0, 7)}... of ${res?.identity}`, "key").then(() => message.success("下载成功！"));
+        if (!res?.res) {
+            message.error("注册时发生异常，请检查网络后重试！").then();
+            return;
+        }
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys)]), `${res?.res.address?.substring(0, 7)}... of ${res?.identity}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});
