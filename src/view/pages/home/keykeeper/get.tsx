@@ -53,6 +53,7 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
         {
             title: "剩余份额",
             dataIndex: "amount",
+            width: "17%",
             align: "center"
         },
         {
