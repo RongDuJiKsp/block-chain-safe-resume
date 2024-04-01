@@ -68,10 +68,10 @@ function RegisterPage() {
     const reStart = () => {
         setCurrentStep(0);
     };
-    return <div className={"overflow-hidden  register-page-bg-color login-full-anima"}>
+    return <div className={"overflow-hidden register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
-                <div className={"mt-[35%]"}>
+                <div className={"mt-[35%] bg-better-write py-8 px-6"}>
                     <Steps direction="vertical" items={stepItems} current={currentStep}/>
                 </div>
             </div>
@@ -118,9 +118,9 @@ function SelectIdentityComponent() {
         });
     };
 
-    return <div className={"h-full flex flex-col justify-around"}>
+    return <div className={"h-full flex flex-col justify-around  dark-mode-text"}>
         <div className={"basis-3/5"}>
-            <div className={"pt-8 flex flex-col gap-12"}>
+            <div className={"pt-8 flex flex-col gap-12 "}>
                 <p className={"text-center text-2xl font-sans"}>系统身份介绍</p>
                 <p className={"text-lg"}>
                     Applicant: <br/>
@@ -148,7 +148,7 @@ function SelectIdentityComponent() {
         <div className={"basis-1/12"}>
             <div className={"h-full flex justify-center gap-14"}>
                 {keys.map((val, index) => val !== UserIdentityEnum.None &&
-                    <button key={"select-id-button" + index} className={"button button-3d button-pill"}
+                    <button key={"select-id-button" + index} className={"button button-3d button-pill button-royal"}
                             onClick={() => setSelectedIdentity(val as UserIdentityEnum)}>{val}</button>)}
             </div>
         </div>
@@ -183,8 +183,8 @@ function GetResultComponent() {
     const onReturnPage = () => {
         navigate("/", {replace: true});
     };
-    return <div className={"h-full  flex flex-col justify-around "}>
-        <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
+    return <div className={"h-full  flex flex-col justify-around showing-in"}>
+        <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
             <Result status={res?.res.status ? "success" : "error"}
                     title={res?.res.status ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>
