@@ -25,15 +25,11 @@ def RegisterReq():
         'X': '',
     }
     try:
-        if data['identity'] is None :
-            user['message'] = "身份信息不能为空"
-            return json.dumps(user)
+        if verifyIdentity(data['identity']):
+            return register(data, user)
         else:
-            if verifyIdentity(data['identity']):
-                return register(data, user)
-            else:
-                user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
-                return json.dumps(user)
+            user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+            return json.dumps(user)
     except Exception as e:
         user['message'] = "{}".format(str(e))
         return json.dumps(user)
@@ -90,11 +86,16 @@ def ChangeNameReq():
 @app.route('/GetNeedSaveReq', methods=["POST"])
 def GetNeedSaveReq():
     data = request.get_json()
+    base={
+        'status': 0,
+        'message': '',
+    }
     try:
         KKAddress = data['KKAddress']
-        return getNeedSave(KKAddress)
+        return getNeedSave(KKAddress,base)
     except Exception as e:
-        return json.dumps([])
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 # 保管秘密份额
 @app.route('/SavePartReq', methods=["POST"])
@@ -115,22 +116,32 @@ def SavePartReq():
 # 查看已经保管的秘密份额
 @app.route('/GetSaveReq', methods=["POST"])
 def GetSaveReq():
+    base = {
+        'status': 0,
+        'message': '',
+    }
     data = request.get_json()
     try:
-        return getSave(data["KKAddress"])
+        return getSave(data["KKAddress"],base)
     except Exception as e:
-        return json.dumps([])
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 #2.Recruiter 四个函数
 # 返回所以可申请查看简历的ap用户
 @app.route('/GetResumeReq', methods=["POST"])
 def GetResumeReq():
     data = request.get_json()
+    base={
+        'status': 0,
+        'message': '',
+    }
     try:
         ReAddress = data['ReAddress']
-        return getResume(ReAddress)
+        return getResume(ReAddress,base)
     except Exception as e:
-        return json.dumps([])
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 # 请求授权查看简历
 @app.route('/RecAuthorizeReq', methods=["POST"])
@@ -160,11 +171,16 @@ def RecAuthorizeReq():
 @app.route('/RecAlreadyAuthorizeReq', methods=["POST"])
 def RecAlreadyAuthorizeReq():
     data = request.get_json()
+    base={
+        'status': 0,
+        'message': '',
+    }
     try:
         ReAddress = data['ReAddress']
-        return recAlreadyAuthorizeReq(ReAddress)
+        return recAlreadyAuthorizeReq(ReAddress,base)
     except Exception as e:
-        return json.dumps([])
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 # 授权成功后可以下载文件
 @app.route('/DownloadFileReq', methods=['POST'])
@@ -189,11 +205,16 @@ def DownloadFileReq():
 @app.route('/GetRequestReq', methods=["POST"])
 def GetRequestReq():
     data = request.get_json()
+    base={
+        'status': 0,
+        'message': '',
+    }
     try:
         ApAddress = data['ApAddress']
-        return getRequest(ApAddress)
+        return getRequest(ApAddress,base)
     except Exception as e:
-        return json.dumps([])
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 # 授权查看简历,不同意更新数据库,同意和合约函数交互+更新数据库
 @app.route('/ApAuthorizeReq', methods=["POST"])

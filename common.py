@@ -282,11 +282,13 @@ def ChangeName(data, change):
     else:
         change['message'] = "用户名不存在"
         return json.dumps(change)
-def getNeedSave(KKAddress):
+def getNeedSave(KKAddress,base):
     condition = f'select * from NeedSave where remainingAmount>0 and address not in (select ApAddress from KKAlreadySave where KKAddress=%s) ;'
     cur.execute(condition,(KKAddress))
     result = cur.fetchall()
-    return json.dumps(result)
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
 
 def SavePart(ApUserName,ApAddress,KKAddress,part):
     part=apiReturnsubkey(ApAddress,KKAddress,part)
@@ -298,18 +300,22 @@ def SavePart(ApUserName,ApAddress,KKAddress,part):
     cur.execute(condition, (ApUserName,ApAddress, KKAddress))
     return json.dumps(part)
 
-def getSave(KKAddress):
+def getSave(KKAddress,base):
     condition = f'select * from KKAlreadySave where KKAddress=%s;'
     cur.execute(condition,(KKAddress))
     result = cur.fetchall()
-    return json.dumps(result)
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
 
 
-def getResume(ReAddress):
+def getResume(ReAddress,base):
     condition = f'select * from resumeForm where address not in (select ApAddress from AlreadyResumeForm where ReAddress=%s) ;'
     cur.execute(condition,(ReAddress))
     result = cur.fetchall()
-    return json.dumps(result)
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
 
 #请求授权查看简历
 def recAuthorize(ApUserName,ApAddress,ReAddress):
@@ -320,17 +326,21 @@ def recAuthorize(ApUserName,ApAddress,ReAddress):
     cur.execute(condition, (ApUserName,ApAddress, ReAddress))
     return True
 
-def recAlreadyAuthorizeReq(ReAddress):
+def recAlreadyAuthorizeReq(ReAddress,base):
     condition = f'select * from AlreadyResumeForm where ReAddress=%s;'
     cur.execute(condition,(ReAddress))
     result = cur.fetchall()
-    return json.dumps(result)
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
 
-def getRequest(address):
+def getRequest(address,base):
     condition = f'select * from AlreadyResumeForm where ApAddress=%s;'
     cur.execute(condition,(address))
     result = cur.fetchall()
-    return json.dumps(result)
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
 
 def apAuthorize(ApAddress,ReAddress):
     re = apiAuthorizeUser(ApAddress, ReAddress)

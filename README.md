@@ -125,8 +125,8 @@ interface LoginReq {
  * @property address 用户地址
  * @property remainingAmount 剩余秘密份额数量(每个kk最多保管同一个用户的秘密份额1分、份)
  */
-interface GetNeedSaveRes{
-    [[userName,address,remainingAmount],[...,...,...]]
+interface GetNeedSaveRes extends BaseRe{
+    list:[[userName,address,remainingAmount],[...,...,...]]
 }
 ```
 
@@ -181,8 +181,8 @@ interface SavePartRes extends BaseRes {
  * @property address 用户地址
  * @property KKAddress kk地址(无所谓的有没有的)
  */
-interface GetNeedSaveRes{
-    [[userName,address,KKAddress],[...,...,...]]
+interface GetNeedSaveRes extends BaseRe{
+    list:[[userName,address,KKAddress],[...,...,...]]
 }
 ```
 
@@ -207,8 +207,8 @@ interface GetNeedSaveRes{
  * @property putTime 简历上传时间(从1970年1月1日00:00:00 UTC到现在的秒数)
  * @property downloadtimes 简历下载次数
  */
-interface GetResumeReq{
-    [[userName,address,putTime,downloadtimes],[...,...,...]]
+interface GetResumeReq extends BaseRe{
+    list: [[userName,address,putTime,downloadtimes],[...,...,...]]
 }
 ```
 
@@ -254,8 +254,8 @@ interface RecAuthorizeRes extends BaseRes {
  * @property ReAddress re用户自己的地址(忽略就好)
  * @property ReAddress 申请状态(int型,0表示在申请中,1表示申请成功)
  */
-interface RecAlreadyAuthorizeRes{
-    [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+interface RecAlreadyAuthorizeRes extends BaseRes{
+    list:[[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
 }
 ```
 
@@ -299,8 +299,8 @@ interface DownloadRes extends BaseRes {
  * @property ReAddress re用户的地址
  * @property ReAddress 申请状态(int型,0表示在申请中,1表示ap已同意申请)
  */
-interface GetRequestRes{
-    [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+interface GetRequestRes extends BaseRe{
+    list: [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
 }
 ```
 
