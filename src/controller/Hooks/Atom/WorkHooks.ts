@@ -9,7 +9,7 @@ import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/us
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {BaseRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, BaseRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     ResumeInfoRes,
@@ -18,10 +18,12 @@ import {
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
-    RequestRequestListRes,
+    RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
 import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
+import {GetNeedSaveReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -195,11 +197,14 @@ interface RecruiterWorkMethod {
 
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
             async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
+                if (userInfo === null) throw "未登录时尝试上传";
                 return new File([encryptHash, S], "ss");
             },
-            async getResumeStatusListAsync() {
+            async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
+                if (userInfo === null) throw "未登录";
                 return {
                     status: 1,
                     message: "",
@@ -207,6 +212,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 };
             },
             async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {
+                if (userInfo === null) throw "未登录时尝试上传";
                 return {
                     status: 1,
                     message: ""
@@ -223,18 +229,34 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
 
-    requestRequestListAsync(): Promise<RequestRequestListRes>;
+    getRequestListAsync(): Promise<RequestListRes>;
 
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
+
     useMethod(): KeyKeeperWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
-                return {status: 1, message: "22"};
+                if (userInfo === null) throw "未登录时尝试上传";
+                const req: GetNeedSaveReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetNeedSaveReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.list.map((val): AccessibleSubKeyInfo => ({
+                        userName: val[0],
+                        address: val[1],
+                        amount: Number(val[2])
+                    }))
+                };
+
             },
-            async requestRequestListAsync(): Promise<RequestRequestListRes> {
+            async getRequestListAsync(): Promise<RequestListRes> {
                 return {status: 1, message: "22"};
             },
             async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {

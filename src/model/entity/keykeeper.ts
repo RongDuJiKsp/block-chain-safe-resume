@@ -1,6 +1,9 @@
-export interface UploadSubKeyRequestInfo{
+export interface UploadSubKeyRequestInfo {
 
 }
-export interface AccessibleSubKeyInfo{
 
+export interface AccessibleSubKeyInfo {
+    userName: string,
+    address: string,
+    amount: number
 }

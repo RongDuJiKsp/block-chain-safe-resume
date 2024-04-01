@@ -44,3 +44,9 @@ export interface ChangeNameRes extends BaseRes {
     newName: string;
 }
 
+//回传数组的响应体
+type StringArray = string[];
+
+export interface ArrayRes extends BaseRes {
+    list: StringArray[]
+}
