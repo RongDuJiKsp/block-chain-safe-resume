@@ -122,10 +122,11 @@ function DropDownOperations({group}: { group: UserGroup }) {
                title={"更改用户昵称"}>
             <div className={"m-8"}>
                 <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
-                    <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"}>
+                    <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"} rules={[{required: true}]}>
                         <Input allowClear/>
                     </Form.Item>
-                    <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"} rules={[{min: 4, max: 12}]}>
+                    <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}
+                                                    rules={[{min: 4, max: 12}, {required: true}]}>
                         <Input allowClear/>
                     </Form.Item>
                 </Form>
