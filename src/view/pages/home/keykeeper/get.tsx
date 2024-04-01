@@ -114,7 +114,9 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<Accessibl
         });
 
     }, [data]);
-    return <Modal open={data !== null} onCancel={canBeClose ? clear : undefined} footer={null}>
+    return <Modal open={data !== null}
+                  onCancel={canBeClose ? clear : () => message.warning("不保存子密钥是不准退出的喵~").then()}
+                  footer={null}>
         <div className={"my-5"}>
             {keyPair === null ?
                 <div>

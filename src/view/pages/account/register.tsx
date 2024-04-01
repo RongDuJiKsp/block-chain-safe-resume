@@ -185,7 +185,10 @@ function GetResultComponent() {
         });
     };
     const onReturnPage = () => {
-        if (!canClose) return;
+        if (!canClose) {
+            message.warning("不保存密钥是不准退出的喵~").then();
+            return;
+        }
         navigate("/", {replace: true});
     };
     return <div className={"h-full  flex flex-col justify-around showing-in"}>
