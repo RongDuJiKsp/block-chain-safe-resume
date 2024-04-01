@@ -172,7 +172,7 @@ function GetResultComponent() {
             message.error("注册时发生异常，请检查网络后重试！").then();
             return;
         }
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys)]), `${res?.res.address?.substring(0, 7)}... of ${res?.identity}`, "key").then(() => message.success("下载成功！"));
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys)]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => message.success("下载成功！"));
     };
     const onReturnPage = () => {
         navigate("/", {replace: true});
