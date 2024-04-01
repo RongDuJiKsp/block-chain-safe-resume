@@ -1,7 +1,7 @@
 import {GetFileTemplate} from "../../model/interface/util.ts";
 
 export const FileTempleHandleImpl: GetFileTemplate = {
-    getKeyKeeperSubKey(X: number, M: number, P: number, NO: number, apName: string, kkName: string): string {
+    getKeyKeeperSubKey(X: string, M: string, P: string, NO: string, apName: string, kkName: string): string {
         return `This Sub Key Handled By ${kkName} , for ${apName} .This is ${NO}th SubKey
         The KeyPair is (P,X,M) with values (${P},${X},${M})
         `;

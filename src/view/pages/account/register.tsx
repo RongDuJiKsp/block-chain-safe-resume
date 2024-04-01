@@ -10,6 +10,7 @@ import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
+import {useBoolean} from "ahooks";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -114,7 +115,6 @@ function SelectIdentityComponent() {
                 message.error(r.message).then();
             }
         }).catch(e => {
-
             message.error(e.message).then();
         });
     };
@@ -166,15 +166,26 @@ function SelectIdentityComponent() {
 function GetResultComponent() {
     const {res} = useContext(RegisterInfoSetterContext);
     const {message} = App.useApp();
+    const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
         if (!res?.res) {
             message.error("注册时发生异常，请检查网络后重试！").then();
+            setCanClose.setTrue();
             return;
         }
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys)]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => message.success("下载成功！"));
+        if (!res.res.status) {
+            message.error("注册时发生异常！ " + res.res.message).then();
+            setCanClose.setTrue();
+            return;
+        }
+        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys, String(res.res.S))]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
+            message.success("下载成功！").then();
+            setCanClose.setTrue();
+        });
     };
     const onReturnPage = () => {
+        if (!canClose) return;
         navigate("/", {replace: true});
     };
     return <div className={"h-full  flex flex-col justify-around showing-in"}>
