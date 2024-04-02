@@ -127,6 +127,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
         return {
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
                 return {
+                    //TODO 和后端联调接口
                     status: 1,
                     message: 'ok',
                     list: []
