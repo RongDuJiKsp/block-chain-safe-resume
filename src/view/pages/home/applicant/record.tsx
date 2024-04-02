@@ -14,7 +14,6 @@ export default function ApplicantRecord() {
     const [tableVal, setTableVal] = useState<ResumeVisitHistoryInfo[]>([]);
     useEffect(() => {
         userService.getResumeRequestHistoryListAsync().then(r => setTableVal(r.list));
-        //TODO: flash render
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12 "}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
