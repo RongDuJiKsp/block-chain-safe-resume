@@ -11,7 +11,7 @@ export default function KeyKeeperNotice() {
     const [flashFlag, changeAction] = useSwapBoolean();
     const [tableVal, setTableVal] = useState<UploadSubKeyRequestInfo[]>([]);
     useEffect(() => {
-        //TODO: flash render
+        //TODO: 编写kk上传密钥的提醒
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
         <div className={"work-window-color basis-3/4 px-8 py-4"}>

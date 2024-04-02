@@ -18,7 +18,6 @@ export default function ApplicantStatus() {
     useEffect(() => {
         userService.getResumeInfoAsync().then(r => setResumeInfo(r));
         userService.getResumeRequestListAsync().then(r => setTableInfo(r.list));
-        //TODO: flash render
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6"}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>

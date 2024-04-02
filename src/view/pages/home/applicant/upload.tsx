@@ -20,7 +20,6 @@ function FileUploader() {
     const onDropFile = (event: React.DragEvent<HTMLInputElement>): void => {
         event.preventDefault();
         setSelectFiles(Array.from(event.dataTransfer.files));
-        console.log(Array.from(event.dataTransfer.files));
     };
     const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>): void => {
         if (event.target.files === null) return;
@@ -37,7 +36,7 @@ function FileUploader() {
             App.message.error("请选择需要上传的文件！").then();
             return;
         }
-        const file = selectedFiles[0];
+        const file = selectedFiles[0];//TODO: 编写上传文件，和后端联调接口
         userServerMethod.updateResumeAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
 
     };
