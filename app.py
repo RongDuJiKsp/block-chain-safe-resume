@@ -192,10 +192,10 @@ def DownloadFileReq():
         'base64': '',
     }
     try:
-        if data['fileHash'] is None :
-            download['message'] = "参数不完整"
-            return json.dumps(download)
-        return downloadByipfs(data['fileHash'],download)
+        fileHash=data['fileHash']
+        ApUserName= data['ApUserName']
+        ReUserName= data['ReUserName']
+        return downloadByipfs(fileHash,ApUserName,ReUserName,download)
     except Exception as e:
         download['message'] = "{}".format(str(e))
         return json.dumps(download)
@@ -251,6 +251,64 @@ def UploadReq():
     except Exception as e:
         upload['message'] = "{}".format(str(e))
         return json.dumps(upload)
+
+@app.route('/GetFileMesReq', methods=["POST"])
+def GetFileMesReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApAddress = data['ApAddress']
+        ReAddress = data['ReAddress']
+        return getFileMes(ApAddress, ReAddress,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+@app.route('/GetDownloadHisReq', methods=["POST"])
+def GetDownloadHisReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApUserName = data['ApUserName']
+        return getDownloadHis(ApUserName,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+#.re模糊查找ap
+@app.route('/SearchApReq', methods=["POST"])
+def SearchApReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        partApUserName = data['partApUserName']
+        return searchAp(partApUserName,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+# 提醒kk上传密钥
+@app.route('/RemindKKReq', methods=["POST"])
+def RemindKKReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        KKAddress = data['KKAddress']
+        return remindKK(KKAddress,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

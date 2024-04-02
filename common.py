@@ -16,8 +16,9 @@ global config
 config = Configs()
 conn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database)
 cur = conn.cursor()
-cur.execute('SET GLOBAL wait_timeout = 288000')
-cur.execute('SET GLOBAL interactive_timeout = 288000')
+cur.execute('SET GLOBAL wait_timeout = 288000000')
+cur.execute('SET GLOBAL interactive_timeout = 288000000')
+cur.execute('set global max_allowed_packet=288000000')
 
 
 def verifyIdentity(identity):
@@ -150,6 +151,29 @@ def apiAuthorizeUser(ApAddress, ReAddress):
     except Exception as e:
         return False
 
+def apiGetresumekey(ReAddress,ApAddress,base):
+    url = config.api_url
+    config.api_data["user"] = ApAddress
+    config.api_data["funcName"] = 'Getresumekey'
+    config.api_data["funcParam"] = [f'{ReAddress}',f'{ApAddress}']
+    response = requests.post(url, json=config.api_data)
+    reslut = response.json()
+    try:
+        if reslut['status'] == "0x0":
+            #还需解析返回值
+            base['status'] = 1
+            types = ['uint', 'string', 'string']
+            decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
+            base['s'] = decoded_data[0]
+            base['fileName'] = decoded_data[1]
+            base['fileType'] = decoded_data[2]
+            return base
+        else:
+            base['message'] = reslut['message']
+            return base
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return base
 def verifyprivateKeys(privateKey, identity, login):
     name = randName()
     url = config.WeBASE_privateKey_api + f'/import?privateKey={privateKey}&userName={name}'
@@ -242,17 +266,24 @@ def getResumeMessage(address, message):
         return json.dumps(message)
 
 
-def downloadByipfs(file_hash, download):
+def downloadByipfs(file_hash,ApUserName,ReUserName,download):
     # 和合约交互获取文件哈希和文件名等
     file_name = "test"
     # 从ipfs处下载文件
     gateway_url = config.ipfs_url_download + f"{file_hash}?download=True&filename={file_name}"
     url = gateway_url + file_hash
     response = requests.get(url)
-    # 和合约交互解密文件
-
     # 返回
     if response.status_code == 200:
+        # 保存到历史记录
+        condition = f'insert into DownloadHisForm(ApUserName,ReUserName,downloadtime) values(%s,%s,UNIX_TIMESTAMP());'
+        cur.execute(condition, (ApUserName, ReUserName))
+        # 向kk发送获取请求
+        condition = f'select KKAddress from KKAlreadySave where ApUserName=%s'
+        cur.execute(condition, (ApUserName))
+        KKAddress= cur.fetchone()[0]
+        condition = f'insert into needKEY(ApUserName,KKAddress,time) values(%s,%s,UNIX_TIMESTAMP());'
+        cur.execute(condition, (ApUserName, KKAddress))
         download['status'] = 1
         download['fileName'] = file_name
         download['body'] = base64.b64encode(response.content).decode('utf-8')
@@ -335,7 +366,7 @@ def recAlreadyAuthorizeReq(ReAddress,base):
     return json.dumps(base)
 
 def getRequest(address,base):
-    condition = f'select * from AlreadyResumeForm where ApAddress=%s;'
+    condition = f'select AlreadyResumeForm.ApUserName,AlreadyResumeForm.ApAddress,Recruiter.userName,AlreadyResumeForm.ReAddress from AlreadyResumeForm join Recruiter on  Recruiter.address=AlreadyResumeForm.ReAddress  where AlreadyResumeForm.ApAddress=%s;'
     cur.execute(condition,(address))
     result = cur.fetchall()
     base['status'] = 1
@@ -355,3 +386,30 @@ def rejectAuthorize(ApAddress,ReAddress):
     condition = f'DELETE FROM AlreadyResumeForm where ApAddress=%s and ReAddress=%s;'
     cur.execute(condition, (ApAddress, ReAddress))
     return json.dumps({'status': 1, 'message': '更新成功'})
+
+def getFileMes(ApAddress, ReAddress,base):
+    return apiGetresumekey(ReAddress,ApAddress,base)
+
+def getDownloadHis(ApUserName,base):
+    condition = f'select * from DownloadHisForm where ApUserName=%s;'
+    cur.execute(condition,(ApUserName))
+    result = cur.fetchall()
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
+
+def searchAp(partApUserName,base):
+    condition = f'select * from resumeForm where userName like %s;'
+    cur.execute(condition,('%'+partApUserName+'%'))
+    result = cur.fetchall()
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
+
+def remindKK(KKAddress,base):
+    condition = f'select * from needKEY where KKAddress=%s;'
+    cur.execute(condition,(KKAddress))
+    result = cur.fetchall()
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)

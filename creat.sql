@@ -58,3 +58,15 @@ CREATE TABLE AlreadyResumeForm(
     ReAddress VARCHAR(255) NOT NULL,
     ststus int NOT NULL
 );
+
+CREATE TABLE DownloadHisForm(
+    ApUserName VARCHAR(255) NOT NULL,
+    ReUserName VARCHAR(255) NOT NULL,
+    downloadtime BIGINT NOT NULL
+);
+
+CREATE TABLE needKEY(
+    ApUserName VARCHAR(255) NOT NULL,
+    KKAddress VARCHAR(255) NOT NULL,
+    time BIGINT NOT NULL
+);

@@ -107,7 +107,7 @@ interface LoginReq {
 
 
 
-#### 4.kk得到所以待保管秘密份额的ap用户
+#### 4.kk得到所有待保管秘密份额的ap用户
 
 ```
  /**
@@ -265,9 +265,13 @@ interface RecAlreadyAuthorizeRes extends BaseRes{
  /**
  * @interface DownloadFileReq
  * @property fileHash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
+ * @property ApUserName 要被下载的ap用户名
+ * @property ReUserName 下载者re用户名
  */
   interface DownloadFileReq {
     fileHash: string;
+    ApUserName: string;
+    ReUserName: string;
  }
 
  /**
@@ -296,11 +300,12 @@ interface DownloadRes extends BaseRes {
  * @interface GetRequestRes
  * @property ApUserName ap用户名(忽略就好)
  * @property ApAddress ap用户自己的地址(忽略就好)
+ * @property ReUserName re用户的用户名
  * @property ReAddress re用户的地址
  * @property ReAddress 申请状态(int型,0表示在申请中,1表示ap已同意申请)
  */
 interface GetRequestRes extends BaseRe{
-    list: [[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+    list: [[ApUserName,ApAddress,ReUserName,ReAddress],[...,...,...]]
 }
 ```
 
@@ -378,4 +383,99 @@ function uploadFile() {
 </script>
 </body>
 </html>
+```
+
+#### 14.获取加密简历文件的对称密钥s、文件名、文件类型(需要先授权)
+
+```
+ /**
+ * @interface GetFileMesReq
+ * @property ApAddress  ap用户地址
+ * @property ReAddress re用户的地址
+ */
+  interface GetFileMesReq {
+    ApAddress: string;
+    ReAddress: string;
+ }
+
+ /**
+ * @interface GetFileMesRes
+ * @extends BaseRes
+ * @property s 对称密钥s
+ * @property fileName 文件名
+ * @property fileType 文件类型
+ */
+interface GetFileMesRes extends BaseRes {
+    s: int;
+    fileName: string;
+    fileType: string;
+}
+```
+
+#### 15.ap查看自己简历的被下载记录
+
+```
+ /**
+ * @interface GetDownloadHisReq
+ * @property ApUserName ap用户名(登陆时已经返回)
+ */
+  interface GetDownloadHisReq {
+    ApUserName: string;
+ }
+
+
+ /**
+ * @interface GetDownloadHisRes
+ * @property ApUserName ap用户名(忽略就好)
+ * @property ReUserName re用户的用户名
+ * @property downloadtime 被下载时间戳
+interface GetDownloadHisRes extends BaseRe{
+    list: [[ApUserName,ReUserName,downloadtime],[...,...,...]]
+}
+```
+
+#### 16.re模糊查找ap
+
+```
+ /**
+ * @interface SearchApReq
+ * @property partApUserName ap用户名部分
+ */
+  interface SearchApReq {
+    partApUserName: string;
+ }
+
+ /**
+ * @interface SearchApRes
+ * @property ApUserName ap用户名 string
+ * @property ApAddress ap用户地址 string 
+ * @property putTime 简历上传时间 int 
+ * @property downloadtimes 简历被下载次数 int 
+interface GetDownloadHisRes extends BaseRe{
+	list: [[ApUserName,ApAddress,putTime,downloadtimes],[...,...,...]]
+}
+```
+
+
+
+#### 17.提示kk上传密钥
+
+```
+ /**
+ * 列出所有需要kk上传密钥的用户
+ * @interface RemindKKReq
+ * @property KKAddress kk地址登录时已经返回
+ */
+  interface RemindKKReq {
+    KKAddress: string;
+ }
+
+ /**
+ * @interface RemindKKRes
+ * @property ApUserName ap用户名 string
+ * @property KKAddress kk地址(忽略即可)
+ * @property time 上传密钥请求发出时间戳 int 
+interface RemindKKRes extends BaseRe{
+	list: [[ApUserName,KKAddress,time],[...,...,...]]
+}
 ```
