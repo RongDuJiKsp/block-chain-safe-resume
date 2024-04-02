@@ -133,6 +133,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
             },
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
+                //TODO 和后端联调接口
                 return {
                     status: 1,
                     message: 'ok',
