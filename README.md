@@ -449,10 +449,8 @@ interface GetDownloadHisRes extends BaseRe{
  * @interface SearchApRes
  * @property ApUserName ap用户名 string
  * @property ApAddress ap用户地址 string 
- * @property putTime 简历上传时间 int 
- * @property downloadtimes 简历被下载次数 int 
 interface GetDownloadHisRes extends BaseRe{
-	list: [[ApUserName,ApAddress,putTime,downloadtimes],[...,...,...]]
+	list: [[ApUserName,ApAddress],[...,...,...]]
 }
 ```
 
