@@ -399,7 +399,7 @@ def getDownloadHis(ApUserName,base):
     return json.dumps(base)
 
 def searchAp(partApUserName,base):
-    condition = f'select * from resumeForm where userName like %s;'
+    condition = f'select userName,address from Applicant where userName like %s;'
     cur.execute(condition,('%'+partApUserName+'%'))
     result = cur.fetchall()
     base['status'] = 1
