@@ -5,6 +5,7 @@ import {SearchOutlined} from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import {useState} from "react";
 import {ColumnsType} from "antd/es/table";
+import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 
 export default function RecruiterRequire() {
 
@@ -16,8 +17,20 @@ export default function RecruiterRequire() {
 }
 
 function SendRequire() {
+    const reService = RecruiterWorkHooks.useMethod();
+    const {message} = App.useApp();
     const onSubmit = (val: RecAuthorizeReq) => {
-        console.log(val);
+        reService.requestResumeLicensingAsync(val.ApUserName, val.ApAddress).then(r => {
+            console.log(r);
+            if (r.status) {
+                message.success("操作成功！").then();
+            } else {
+                message.error("发生错误，错误为" + r.message).then();
+            }
+        }).catch(e => {
+            console.error(e);
+            message.error("发生错误，错误为" + e).then();
+        });
     };
     return <div className={"px-36"}>
         <FindLikeInfo/>

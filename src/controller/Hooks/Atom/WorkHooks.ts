@@ -25,7 +25,7 @@ import {
 import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
 import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
-import {GetResumeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {GetResumeReq, RecAuthorizeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 
 export const alovaClientImpl = createAlova({
@@ -194,7 +194,7 @@ interface RecruiterWorkMethod {
     downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
 
 
-    requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes>;
+    requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes>;
 
     getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
 }
@@ -224,12 +224,12 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     }))
                 };
             },
-            async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {
-                if (userInfo === null) throw "未登录时尝试";
-                return {
-                    status: 1,
-                    message: ""
+            async requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes> {
+                if (userInfo === null) throw "未登录时尝试获取授权";
+                const req: RecAuthorizeReq = {
+                    ApUserName, ApAddress, ReAddress: userInfo.address
                 };
+                return alovaClientImpl.Post<RequestResumeLicensingRes>("/RecAuthorizeReq", req);
             }
         };
     },
