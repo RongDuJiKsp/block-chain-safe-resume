@@ -1,8 +1,8 @@
-import {Button, Popconfirm, Statistic, Table} from "antd";
+import {Button, Popconfirm, Statistic, Table, Tag} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
-import {ReactNode, useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
@@ -71,14 +71,25 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
             align: "center",
             render(_, rec): ReactNode {
                 return <div className={"justify-around flex"}>
-                    <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onAccept(rec)}>
-                        <Button type={"primary"}>授权</Button>
-                    </Popconfirm>
-                    <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onDelay(rec)}>
-                        <Button type={"primary"} danger={true}>拒绝</Button>
-                    </Popconfirm>
+                    {rec.status ? <Tag color={"green"}>已授权</Tag> :
+                        <>
+                            <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onAccept(rec)}>
+                                <Button type={"primary"}>授权</Button>
+                            </Popconfirm>
+                            <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onDelay(rec)}>
+                                <Button type={"primary"} danger={true}>拒绝</Button>
+                            </Popconfirm>
+                        </>}
                 </div>;
-            }
+            },
+            filters: [
+                {text: "未处理", value: false},
+                {text: "已授权", value: true}
+            ],
+            onFilter(value: boolean | React.Key, record: ResumeLicenseRequestInfo): boolean {
+                return Boolean(record.status) === value;
+            },
+            filterResetToDefaultFilteredValue: true,
         },
 
 

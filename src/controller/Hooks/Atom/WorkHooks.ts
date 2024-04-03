@@ -27,8 +27,8 @@ import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykee
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 import {GetResumeReq, RecAuthorizeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
-import {GetDownloadHisReq} from "../../../model/http-bodys/user/applicant/req.ts";
-import {ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
+import {GetDownloadHisReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
+import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -141,35 +141,58 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
             },
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
-                //TODO 和后端联调接口
-                return {
+                if (userInfo === null) throw "在未登录时获取简历申请记录信息";
+                const req: GetRequestReq = {
+                    ApAddress: userInfo.address,
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetRequestReq", req);
+                const goData: ResumeQuestListRes = {
+                    status: res.status,
+                    message: res.message,
+                    list: res.list.map((val): ResumeLicenseRequestInfo => ({
+                        username: val[2],
+                        address: val[3],
+                        status: Number(val[4])
+                    }))
+                };
+                goData.list.sort((a, b) => a.status - b.status);
+                const testData: ResumeQuestListRes = {
                     status: 1,
                     message: 'ok',
                     list: [
                         {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
+                            username: "alibaba",
+                            status: 0,
                         }, {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
                             username: "alibaba"
+                            ,
+                            status: 0,
                         },
                         {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibabababababab"
+                            username: "alibabababababab",
+                            status: 1,
                         },
                         {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
+                            username: "alibaba",
+                            status: 1,
                         },
                         {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
+                            username: "alibaba",
+                            status: 0,
                         }, {
                             address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
+                            username: "alibaba",
+                            status: 1,
                         },
                     ]
                 };
+                testData.list.sort((a, b) => a.status - b.status);
+                return testData;
             },
             async giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes> {
                 return {
