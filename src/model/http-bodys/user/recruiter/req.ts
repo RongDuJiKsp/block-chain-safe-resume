@@ -25,3 +25,11 @@ export interface RecAuthorizeReq {
 export interface GetResumeReq {
     ReAddress: string;
 }
+
+/**
+ * @interface SearchApReq .re模糊查找ap
+ * @property partApUserName ap用户名部分
+ */
+export interface SearchApReq {
+    partApUserName: string;
+}

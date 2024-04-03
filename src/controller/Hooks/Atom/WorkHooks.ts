@@ -22,11 +22,15 @@ import {
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
-import {RecruiterResumeStatusListRes, RequestResumeLicensingRes} from "../../../model/http-bodys/user/recruiter/res.ts";
+import {
+    RecruiterResumeStatusListRes,
+    RequestResumeLicensingRes,
+    SearchApRes
+} from "../../../model/http-bodys/user/recruiter/res.ts";
 import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
-import {GetResumeReq, RecAuthorizeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
-import {ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
+import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {GetDownloadHisReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 
@@ -189,16 +193,28 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 interface RecruiterWorkMethod {
     downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
 
-
     requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes>;
 
     getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
+
+    getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes>;
 }
 
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
+                const req: SearchApReq = {
+                    partApUserName
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/SearchApReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.list.map((val): ApSearchInfo => ({ApUserName: val[0], ApAddress: val[1]}))
+                };
+            },
             async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
                 if (userInfo === null) throw "未登录时尝试下载";
                 return new File([encryptHash, S], "ss");

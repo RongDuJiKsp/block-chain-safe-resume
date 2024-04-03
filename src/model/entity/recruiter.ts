@@ -4,3 +4,7 @@ export interface ConnectingResumeInfo {
     ReAddress: string
     status: number
 }
+export interface ApSearchInfo{
+    ApUserName: string;
+    ApAddress: string;
+}

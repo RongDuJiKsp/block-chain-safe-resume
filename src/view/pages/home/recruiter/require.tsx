@@ -6,6 +6,7 @@ import Search from "antd/es/input/Search";
 import {useState} from "react";
 import {ColumnsType} from "antd/es/table";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApSearchInfo} from "../../../../model/entity/recruiter.ts";
 
 export default function RecruiterRequire() {
 
@@ -52,6 +53,7 @@ function SendRequire() {
         </Form>
     </div>;
 }
+
 //ToDO 和后端联调，实现模糊查找
 function FindLikeInfo() {
     const [isModelVis, setModelAction] = useBoolean();
@@ -64,34 +66,36 @@ function FindLikeInfo() {
     </div>;
 }
 
-type AAAAa = {
-    address: string;
-    name: string;
-}
-const tableColumn: ColumnsType<AAAAa> = [
+const tableColumn: ColumnsType<ApSearchInfo> = [
     {
         title: "用户名",
-        dataIndex: "userName",
+        dataIndex: "ApUserName",
         width: "16%",
         align: "center",
     },
     {
         title: "地址",
-        dataIndex: "address",
+        dataIndex: "ApAddress",
         align: "center"
     },
 ];
 
 function FindLikeInfoModel({vis, close}: { vis: boolean, close: CallBackWithSideEffect }) {
+    const reService = RecruiterWorkHooks.useMethod();
     const {message} = App.useApp();
-    const [tableVal, setTableVal] = useState<AAAAa[]>([]);
+    const [tableVal, setTableVal] = useState<ApSearchInfo[]>([]);
     const onSearch = (val: string) => {
         if (val === "") {
             message.error("搜索内容不能为空").then();
             return;
         }
-        console.log(val);
-        message.success("搜索成功！共找到0个结果").then();
+        reService.getFuzzyLookupListAsync(val).then(r => {
+            if (r.status) {
+                message.success(`搜索成功，共搜索到${r.list.length}个结果`).then();
+                setTableVal(r.list);
+            }
+        });
+
     };
     return <Modal open={vis} footer={null} onCancel={close}>
         <div className={"my-8"}>
