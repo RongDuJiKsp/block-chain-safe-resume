@@ -156,43 +156,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     }))
                 };
                 goData.list.sort((a, b) => a.status - b.status);
-                const testData: ResumeQuestListRes = {
-                    status: 1,
-                    message: 'ok',
-                    list: [
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba",
-                            status: 0,
-                        }, {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                            ,
-                            status: 0,
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibabababababab",
-                            status: 1,
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba",
-                            status: 1,
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba",
-                            status: 0,
-                        }, {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba",
-                            status: 1,
-                        },
-                    ]
-                };
-                testData.list.sort((a, b) => a.status - b.status);
-                return testData;
+                return goData;
             },
             async giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes> {
                 return {
