@@ -12,6 +12,12 @@ export const FileTempleHandleImpl: GetFileTemplate = {
         SafeKey : ${S}
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         `;
+    },
+    getApInfo(ApName: string, ApAddressString: string): string {
+        return `The Search Result is
+        ApName : ${ApName},
+        ApAddress : ${ApAddressString}
+        `;
     }
 
 };

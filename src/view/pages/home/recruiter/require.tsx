@@ -1,12 +1,14 @@
-import {App, Form, Input, Modal, Table} from "antd";
+import {App, Button, Form, Input, Modal, Table} from "antd";
 import {RecAuthorizeReq} from "../../../../model/http-bodys/user/recruiter/req.ts";
 import {useBoolean} from "ahooks";
 import {SearchOutlined} from "@ant-design/icons";
 import Search from "antd/es/input/Search";
-import {useState} from "react";
+import {ReactNode, useState} from "react";
 import {ColumnsType} from "antd/es/table";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ApSearchInfo} from "../../../../model/entity/recruiter.ts";
+import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
+import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 
 export default function RecruiterRequire() {
 
@@ -66,19 +68,6 @@ function FindLikeInfo() {
     </div>;
 }
 
-const tableColumn: ColumnsType<ApSearchInfo> = [
-    {
-        title: "用户名",
-        dataIndex: "ApUserName",
-        width: "16%",
-        align: "center",
-    },
-    {
-        title: "地址",
-        dataIndex: "ApAddress",
-        align: "center"
-    },
-];
 
 function FindLikeInfoModel({vis, close}: { vis: boolean, close: CallBackWithSideEffect }) {
     const reService = RecruiterWorkHooks.useMethod();
@@ -97,6 +86,33 @@ function FindLikeInfoModel({vis, close}: { vis: boolean, close: CallBackWithSide
         });
 
     };
+    const onDownload = (info: ApSearchInfo) => {
+        FileSystemImpl.downloadToFileAsName(new Blob([FileTempleHandleImpl.getApInfo(info.ApUserName, info.ApAddress)]), info.ApUserName + " 's info.key")
+            .then(() => message.success("保存成功！"))
+            .then();
+    };
+    const tableColumn: ColumnsType<ApSearchInfo> = [
+        {
+            title: "用户名",
+            dataIndex: "ApUserName",
+            width: "16%",
+            align: "center",
+        },
+        {
+            title: "地址",
+            dataIndex: "ApAddress",
+            align: "center",
+            ellipsis:true
+        },
+        {
+            title: "操作",
+            render(_, item): ReactNode {
+                return <div className={"flex justify-center"}>
+                    <Button type={"primary"} onClick={() => onDownload(item)}>保存</Button>
+                </div>;
+            }
+        }
+    ];
     return <Modal open={vis} footer={null} onCancel={close}>
         <div className={"my-8"}>
             <Search onSearch={onSearch}/>

@@ -39,4 +39,5 @@ export interface GetFileTemplate {
 
     getKeyKeeperSubKey(X: string, M: string, P: string, NO: string, apName: string, kkName: string): string;
 
+    getApInfo(ApName: string, ApAddressString: string): string;
 }
