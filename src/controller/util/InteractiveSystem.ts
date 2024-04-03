@@ -3,10 +3,12 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
-    arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string): MetaFile {
-        return new File([arrayBuffer], fileName);
+    arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string, fileType): MetaFile {
+        return new File([arrayBuffer], fileName, {
+            type: fileType
+        });
     },
-    fileToArrayBufferAsync(file: MetaFile): Promise<ArrayBuffer> {
+    readFileAsArrayBufferAsync(file: MetaFile): Promise<ArrayBuffer> {
         return new Promise<ArrayBuffer>((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = (ev): void => {
@@ -37,7 +39,7 @@ export const FileSystemImpl: UserFileSystem = {
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
     },
-    readFileAsBase64(file: MetaFile) {
+    readFileAsBase64Async(file: MetaFile) {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = (ev): void => {
