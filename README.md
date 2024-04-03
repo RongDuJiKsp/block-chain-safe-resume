@@ -98,7 +98,6 @@ interface LoginReq {
  * @interface ChangeNameRes 更改用户昵称的响应体
  * @extends BaseRes
  * @property newName 用户新名字
- * @property hash 上传文件时ipfs返回的hash
  */
  interface ChangeNickRes extends BaseRes{
     newName: string;
@@ -242,7 +241,7 @@ interface RecAuthorizeRes extends BaseRes {
  * @interface RecAlreadyAuthorizeReq
  * @property ReAddress re用户地址(登陆时已经返回)
  */
-  interface GetResumeReq {
+  interface RecAlreadyAuthorizeReq {
     ReAddress: string;
  }
 
@@ -252,10 +251,10 @@ interface RecAuthorizeRes extends BaseRes {
  * @property ApUserName ap用户名
  * @property ApAddress ap用户地址
  * @property ReAddress re用户自己的地址(忽略就好)
- * @property ReAddress 申请状态(int型,0表示在申请中,1表示申请成功)
+ * @property ststus 申请状态(int型,0表示在申请中,1表示申请成功)
  */
 interface RecAlreadyAuthorizeRes extends BaseRes{
-    list:[[ApUserName,ApAddress,ReAddress,ReAddress],[...,...,...]]
+    list:[[ApUserName,ApAddress,ReAddress,ststus],[...,...,...]]
 }
 ```
 
@@ -302,10 +301,10 @@ interface DownloadRes extends BaseRes {
  * @property ApAddress ap用户自己的地址(忽略就好)
  * @property ReUserName re用户的用户名
  * @property ReAddress re用户的地址
- * @property ReAddress 申请状态(int型,0表示在申请中,1表示ap已同意申请)
+ * @property ststus 申请状态(int型,0表示在申请中,1表示ap已经同意申请)
  */
 interface GetRequestRes extends BaseRe{
-    list: [[ApUserName,ApAddress,ReUserName,ReAddress],[...,...,...]]
+    list: [[ApUserName,ApAddress,ReUserName,ReAddress,ststus],[...,...,...]]
 }
 ```
 
@@ -336,10 +335,9 @@ interface ApAuthorizeRes extends BaseRes {
 
 ```
 /**
-*上传这块请求我是这么想的前端直接把文件传给后端不需要做什么操作，后端和合约交互把文件内容加密后上传到ipfs并返回hash
+*后端和合约交互,然后把加密文件上传到ipfs并返回hash
 *请求的时候需要get传参userName和address
 */
-
 
  /**
  * @interface UploadRes 上传文件的响应体
