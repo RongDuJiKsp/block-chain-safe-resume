@@ -179,7 +179,7 @@ function GetResultComponent() {
             setCanClose.setTrue();
             return;
         }
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys, String(res.res.S))]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
+        FileSystemImpl.downloadToFileFromSuffixAsync(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys, String(res.res.S))]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
             message.success("下载成功！").then();
             setCanClose.setTrue();
         });

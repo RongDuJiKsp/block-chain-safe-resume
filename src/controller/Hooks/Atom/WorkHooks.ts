@@ -117,7 +117,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    updateResumeAsync(File: File, S: string): Promise<BaseRes>;
+    updateResumeAsync(File: MetaFile, S: string): Promise<BaseRes>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
 
@@ -176,7 +176,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     downloadtimes: "2232"
                 };
             },
-            async updateResumeAsync(File: File, S: string): Promise<BaseRes> {
+            async updateResumeAsync(File: MetaFile, S: string): Promise<BaseRes> {
                 return {
                     status: 1,
                     message: "ojF" + File.name + S
@@ -191,7 +191,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 };
 
 interface RecruiterWorkMethod {
-    downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
+    downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile>;
 
     requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes>;
 
@@ -215,7 +215,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     list: res.list.map((val): ApSearchInfo => ({ApUserName: val[0], ApAddress: val[1]}))
                 };
             },
-            async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
+            async downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile> {
                 if (userInfo === null) throw "未登录时尝试下载";
                 return new File([encryptHash, S], "ss");
             },

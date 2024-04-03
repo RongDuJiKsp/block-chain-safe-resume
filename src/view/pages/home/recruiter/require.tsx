@@ -86,7 +86,7 @@ function FindLikeInfoModel({vis, close}: { vis: boolean, close: CallBackWithSide
 
     };
     const onDownload = (info: ApSearchInfo) => {
-        FileSystemImpl.downloadToFileAsName(new Blob([FileTempleHandleImpl.getApInfo(info.ApUserName, info.ApAddress)]), info.ApUserName + " 's info.key")
+        FileSystemImpl.downloadToFileAsNameAsync(new Blob([FileTempleHandleImpl.getApInfo(info.ApUserName, info.ApAddress)]), info.ApUserName + " 's info.key")
             .then(() => message.success("保存成功！"))
             .then();
     };

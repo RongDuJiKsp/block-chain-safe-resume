@@ -1,17 +1,13 @@
-import {HashedUserRegisterInformation} from "../entity/user.ts";
-
 export interface CryptoOfHash {
     encryptedData(originalData: string, key: string): string;
 
+    encryptedBin(originalBinData: ArrayBuffer, key: string): ArrayBuffer;
+
     decryptedData(encryptedData: string, key: string): string;
+
+    decryptedBin(encryptedBinData: ArrayBuffer, key: string): ArrayBuffer;
 
     hashData(data: string): string;
 }
 
-export interface HashToTranslate {
-    getHashOfUserInfo(info: HashedUserRegisterInformation): string;
-}
 
-export interface Web3Server {
-    keyToAddress(privateKey: string): string;
-}

@@ -1,9 +1,18 @@
 import {SM4} from "gm-crypto";
-import crypto from "crypto";
-import {CryptoOfHash, HashToTranslate} from "../../model/interface/crypto";
-import {HashedUserRegisterInformation} from "../../model/entity/user.ts";
+import * as crypto from "crypto";
+import {CryptoOfHash} from "../../model/interface/crypto";
 
 export const cryptoOfHash: CryptoOfHash = {
+    encryptedBin(originalBinData: ArrayBuffer, key: string): ArrayBuffer {
+        return SM4.encrypt(originalBinData, key, {
+            inputEncoding: "binary"
+        });
+    },
+    decryptedBin(encryptedBinData: ArrayBuffer, key: string): ArrayBuffer {
+        return SM4.decrypt(encryptedBinData, key, {
+            inputEncoding: "binary"
+        });
+    },
     encryptedData(originalData, key) {
         return SM4.encrypt(originalData, key, {
             inputEncoding: 'utf8',
@@ -20,11 +29,6 @@ export const cryptoOfHash: CryptoOfHash = {
         const hash = crypto.createHash('md5');
         hash.update(data);
         return hash.digest('hex');
-    },
-};
-export const hashToTranslate: HashToTranslate = {
-    getHashOfUserInfo(info: HashedUserRegisterInformation): string {
-        return cryptoOfHash.hashData(JSON.stringify(info));
     }
 
 };

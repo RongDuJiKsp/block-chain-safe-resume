@@ -1,15 +1,19 @@
 import {CSSProperties, ReactElement, ReactNode} from "react";
 
 export interface UserFileSystem {
-    downloadToFileFromSuffix(file: BinFile, prefix: string, suffix: string): Promise<void>;
+    downloadToFileFromSuffixAsync(file: BinFile, prefix: string, suffix: string): Promise<void>;
 
-    downloadToFileAsName(file: BinFile, name: string): Promise<void>;
+    downloadToFileAsNameAsync(file: BinFile, name: string): Promise<void>;
 
-    readFileAsBase64(file: File): Promise<string>;
+    readFileAsBase64(file: MetaFile): Promise<string>;
 
     readBase64AsBlob(base64: string, type: string): BinFile;
 
-    base64ToAscii(base64: string): string
+    base64ToAscii(base64: string): string;
+
+    fileToArrayBufferAsync(file: MetaFile): Promise<ArrayBuffer>;
+
+    arrayBufferToFile(arrayBuffer: ArrayBuffer,fileName:string): MetaFile
 
 }
 
