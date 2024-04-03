@@ -22,3 +22,11 @@ export interface ApAuthorizeReq {
     ApAddress: string;
     ReAddress: string;
 }
+
+/**
+ * @interface GetDownloadHisReq .ap查看自己简历的被下载记录
+ * @property ApUserName ap用户名(登陆时已经返回)
+ */
+export interface GetDownloadHisReq {
+    ApUserName: string;
+}

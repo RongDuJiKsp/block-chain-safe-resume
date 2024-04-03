@@ -27,6 +27,8 @@ import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykee
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 import {GetResumeReq, RecAuthorizeReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
+import {GetDownloadHisReq} from "../../../model/http-bodys/user/applicant/req.ts";
+import {ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -124,13 +126,18 @@ interface ApplicantWorkMethod {
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
+                if (userInfo === null) throw "在未登录时获取简历历史记录信息";
+                const req: GetDownloadHisReq = {
+                    ApUserName: userInfo.nick
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetDownloadHisReq", req);
                 return {
-                    //TODO 和后端联调接口
-                    status: 1,
-                    message: 'ok',
-                    list: []
+                    status: res.status,
+                    message: res.message,
+                    list: res.list.map((val): ResumeVisitHistoryInfo => ({ReUserName: val[1], downloadTime: val[2]}))
                 };
             },
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {

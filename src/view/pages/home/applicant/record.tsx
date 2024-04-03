@@ -7,7 +7,6 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts
 import {ResumeVisitHistoryInfo} from "../../../../model/entity/applicant.ts";
 
 
-const tableColumn: ColumnsType<ResumeVisitHistoryInfo> = [{}];//TODO:和后端确定历史记录的内容
 export default function ApplicantRecord() {
     const userService = ApplicantWorkHooks.useMethod();
     const [flashFlag, changeAction] = useSwapBoolean();
@@ -22,6 +21,19 @@ export default function ApplicantRecord() {
         </div>
     </div>;
 }
+const tableColumn: ColumnsType<ResumeVisitHistoryInfo> = [
+    {
+        title: "用户名",
+        dataIndex: "ReUserName",
+        width: "16%",
+        align: "center",
+    },
+    {
+        title: "下载时间",
+        dataIndex: "downloadTime",
+        align: "center"
+    },
+];
 
 function ResumeHistoryComponent({tableVal}: { tableVal: ResumeVisitHistoryInfo[] }) {
     return <div>
