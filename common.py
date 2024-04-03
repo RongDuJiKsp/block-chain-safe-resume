@@ -254,16 +254,20 @@ def uploadIpfs(file,userName, address, upload):
     return json.dumps(upload)
 
 
-def getResumeMessage(address, message):
+def getMoreFileMes(address, base):
     # 在hr表中
     # 查询resumeForm表所有内容
     condition = f'select * from resumeForm where address=%s'
     cur.execute(condition, (address))
     if cur.rowcount:
-        result = cur.fetchall()
-        return json.dumps(result)
+        result=cur.fetchone();
+        base['status'] = 1
+        base['userName'] = result[0]
+        base['putTime'] = result[2]
+        base['downloadtimes'] = result[3]
+        return json.dumps(base)
     else:
-        return json.dumps(message)
+        return json.dumps(base)
 
 
 def downloadByipfs(file_hash,ApUserName,ReUserName,download):

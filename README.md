@@ -475,3 +475,28 @@ interface RemindKKRes extends BaseRe{
 	list: [[ApUserName,KKAddress,time],[...,...,...]]
 }
 ```
+
+#### 18.ap查看简历其他信息(下载总次数，上传时间)
+
+```
+ /**
+ * @interface GetMoreFileMesReq
+ * @property address ap用户名(登陆时已经返回)
+ */
+  interface GetMoreFileMesReq {
+    address: string;
+ }
+
+
+ /**
+ * @interface GetMoreFileMesRes
+ * @property userName ap用户名
+ * @property putTime 简历最近一次上传时间戳 int
+ * @property downloadtimes 简历被下载总次数
+interface GetMoreFileMesRes extends BaseRe{
+    userName: string
+    putTime: int
+    downloadtimes: int
+}
+```
+

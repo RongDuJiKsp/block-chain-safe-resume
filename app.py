@@ -70,16 +70,20 @@ def ChangeNameReq():
         change['message'] = "{}".format(str(e))
         return json.dumps(change)
 
-# @app.route('/GetFileMesReq', methods=["POST"])
-# def GetFileMesReq():
-#     data = request.get_json()
-#     message={}
-#     try:
-#         if data['address'] is None :
-#             return json.dumps(message)
-#         return getResumeMessage(data['address'],message)
-#     except Exception as e:
-#         return json.dumps(message)
+#ap查看简历下载次数等
+@app.route('/GetMoreFileMesReq', methods=["POST"])
+def GetMoreFileMesReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApAddress = data['address']
+        return getMoreFileMes(ApAddress,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 #1.申请秘密份额三个函数
 # 得到所以待保管秘密份额的ap用户
