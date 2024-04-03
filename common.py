@@ -366,7 +366,7 @@ def recAlreadyAuthorizeReq(ReAddress,base):
     return json.dumps(base)
 
 def getRequest(address,base):
-    condition = f'select AlreadyResumeForm.ApUserName,AlreadyResumeForm.ApAddress,Recruiter.userName,AlreadyResumeForm.ReAddress from AlreadyResumeForm join Recruiter on  Recruiter.address=AlreadyResumeForm.ReAddress  where AlreadyResumeForm.ApAddress=%s;'
+    condition = f'select AlreadyResumeForm.ApUserName,AlreadyResumeForm.ApAddress,Recruiter.userName,AlreadyResumeForm.ReAddress ,AlreadyResumeForm.ststus from AlreadyResumeForm join Recruiter on  Recruiter.address=AlreadyResumeForm.ReAddress  where AlreadyResumeForm.ApAddress=%s;'
     cur.execute(condition,(address))
     result = cur.fetchall()
     base['status'] = 1
