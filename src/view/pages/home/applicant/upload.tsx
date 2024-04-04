@@ -37,7 +37,7 @@ function FileUploader() {
             return;
         }
         const file = selectedFiles[0];//TODO: 编写上传文件，和后端联调接口
-        userServerMethod.updateResumeAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
+        userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
 
     };
     return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
@@ -51,14 +51,16 @@ function FileUploader() {
         </div>
         <div className={"h-5/6 basis-3/5 my-auto flex-col gap-12 flex justify-center px-[15%]"}>
             <Form.Item label={"S Key"}>
-                <Input ref={SKeyInputRef} placeholder={"The Val of S"}/>
+                <Input ref={SKeyInputRef} placeholder={"请在此黏贴文件内分发的SKey"}/>
             </Form.Item>
             <Form.Item label={"Selected File Name"}>
                 <Input readOnly={true} onFocus={e => e.target.blur()}
                        value={(selectedFiles.length && selectedFiles[0].type !== "") ? selectedFiles[0].name : "未选择文件"}/>
             </Form.Item>
             <div>
-                <Popconfirm title={"请检查上传的文件是否选择正确！以避免额外的token消耗"} onConfirm={onUploadFile}>
+                <Popconfirm
+                    title={"避免额外的token消耗，请检查上传的文件是否选择正确！同时请检查输入的SafeKey是否正确！错误的SafeKey将使得简历无法解密！"}
+                    onConfirm={onUploadFile}>
                     <button className={"button button-primary"}>Upload</button>
                 </Popconfirm>
             </div>

@@ -9,12 +9,13 @@ import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/us
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, BaseRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     ResumeInfoRes,
     ResumeQuestListRes,
-    ResumeRequestHistoryListRes
+    ResumeRequestHistoryListRes,
+    UploadRes
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
@@ -33,6 +34,7 @@ import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bo
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {GetDownloadHisReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
+import {CryptoSystemImpl} from "../../crypto/hash.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -117,7 +119,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    updateResumeAsync(File: MetaFile, S: string): Promise<BaseRes>;
+    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
 
@@ -176,11 +178,17 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     downloadtimes: "2232"
                 };
             },
-            async updateResumeAsync(File: MetaFile, S: string): Promise<BaseRes> {
-                return {
-                    status: 1,
-                    message: "ojF" + File.name + S
-                };
+            async encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes> {
+                if (userInfo === null) throw "在未登录时上传简历";
+                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(File, S);
+                const formData = new FormData();
+                formData.append("file", encryptedFile);
+                return alovaClientImpl.Post<UploadRes>("/UploadReq", formData, {
+                    params: {
+                        address: userInfo.address,
+                        userName: userInfo.nick
+                    }
+                });
             }
         };
     },
