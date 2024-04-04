@@ -1,11 +1,3 @@
-/**
- * @interface UploadFileReq
- * @property base64 文件的base64
- */
-export interface UploadFileReq {
-    base64: string;
-}
-
 //ap查看所有的简历申请请求
 export interface GetRequestReq {
     ApAddress: string;
@@ -29,4 +21,12 @@ export interface ApAuthorizeReq {
  */
 export interface GetDownloadHisReq {
     ApUserName: string;
+}
+
+/**
+ * @interface GetMoreFileMesReq ap查看简历其他信息(下载总次数，上传时间)
+ * @property address ap用户地址(登陆时已经返回)
+ */
+export interface GetMoreFileMesReq {
+    address: string;
 }

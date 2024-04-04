@@ -32,7 +32,7 @@ import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykee
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
-import {GetDownloadHisReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
+import {GetDownloadHisReq, GetMoreFileMesReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 
@@ -171,12 +171,11 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
             },
             async getResumeInfoAsync(): Promise<ResumeInfoRes> {
-                return {
-                    status: 1,
-                    message: "ok",
-                    putTime: "1989-07-01 12:13:14",
-                    downloadtimes: "2232"
+                if (userInfo === null) throw "在未登录时获取简历申请记录信息";
+                const req: GetMoreFileMesReq = {
+                    address: userInfo.address
                 };
+                return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
             async encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes> {
                 if (userInfo === null) throw "在未登录时上传简历";

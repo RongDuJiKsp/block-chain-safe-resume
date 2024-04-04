@@ -8,6 +8,7 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
 import {ResumeInfoRes} from "../../../../model/http-bodys/user/applicant/res.ts";
+import * as dayjs from "dayjs";
 
 
 export default function ApplicantStatus() {
@@ -33,12 +34,13 @@ export default function ApplicantStatus() {
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
+    console.log(info);
 
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
         <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
-                   value={info?.putTime}/>
+                   value={dayjs.unix(info && info.putTime ? info.putTime : 0).format("YYYY-MM-DD HH:mm")}/>
         <Statistic title={"待处理请求"} prefix={componentUtils.getIcon("icon-money-finance-buyer")}
                    value={0} suffix={"条"}/>
     </div>;

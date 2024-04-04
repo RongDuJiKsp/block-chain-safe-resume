@@ -7,8 +7,8 @@ import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../entity/
 
 //ap获取的简历信息
 export interface ResumeInfoRes extends BaseRes {
-    putTime: string;
-    downloadtimes: string;
+    putTime: number;
+    downloadtimes: number;
 }
 
 //ap获取向ap请求响应的rc的列表
