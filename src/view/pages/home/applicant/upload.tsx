@@ -14,7 +14,7 @@ export default function ApplicantUpload() {
 
 function FileUploader() {
     const userServerMethod = ApplicantWorkHooks.useMethod();
-    const App = APP.useApp();
+    const {message} = APP.useApp();
     const [selectedFiles, setSelectFiles] = useState<File[]>([]);
     const SKeyInputRef = useRef<InputRef>(null);
     const onDropFile = (event: React.DragEvent<HTMLInputElement>): void => {
@@ -28,16 +28,24 @@ function FileUploader() {
     };
     const onUploadFile = (): void => {
         if (!SKeyInputRef.current?.input?.value) {
-            App.message.error("S Key 不能为空！").then();
+            message.error("S Key 不能为空！").then();
             return;
         }
         const inputSKey = SKeyInputRef.current?.input?.value;
         if (!selectedFiles.length) {
-            App.message.error("请选择需要上传的文件！").then();
+            message.error("请选择需要上传的文件！").then();
             return;
         }
-        const file = selectedFiles[0];//TODO: 编写上传文件，和后端联调接口
-        userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => console.log(r), e => console.log(e));
+        const file = selectedFiles[0];
+        userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => {
+            if (r.status) {
+                message.success("文件上传成功！").then();
+            } else {
+                message.error("文件上传失败！原因：" + r.message).then();
+            }
+        }, e => {
+            message.error(e).then();
+        });
 
     };
     return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
