@@ -28,8 +28,8 @@ import {
     RequestResumeLicensingRes,
     SearchApRes
 } from "../../../model/http-bodys/user/recruiter/res.ts";
-import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
-import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
+import {GetNeedSaveReq, RemindKKReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
 import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {
@@ -148,7 +148,10 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 return {
                     status: res.status,
                     message: res.message,
-                    list: res.list.map((val): ResumeVisitHistoryInfo => ({ReUserName: val[1], downloadTime: val[2]}))
+                    list: res.status ? res.list.map((val): ResumeVisitHistoryInfo => ({
+                        ReUserName: val[1],
+                        downloadTime: val[2]
+                    })) : []
                 };
             },
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
@@ -160,11 +163,11 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 const goData: ResumeQuestListRes = {
                     status: res.status,
                     message: res.message,
-                    list: res.list.map((val): ResumeLicenseRequestInfo => ({
+                    list: res.status ? res.list.map((val): ResumeLicenseRequestInfo => ({
                         username: val[2],
                         address: val[3],
                         status: Number(val[4])
-                    }))
+                    })) : []
                 };
                 goData.list.sort((a: ResumeLicenseRequestInfo, b: ResumeLicenseRequestInfo) => a.status - b.status);
                 return goData;
@@ -226,7 +229,9 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 return {
                     status: res.status,
                     message: res.message,
-                    list: res.list.map((val): ApSearchInfo => ({ApUserName: val[0], ApAddress: val[1]}))
+                    list: res.status ?
+                        res.list.map((val): ApSearchInfo => ({ApUserName: val[0], ApAddress: val[1]}))
+                        : []
                 };
             },
             async downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile> {
@@ -242,12 +247,12 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 return {
                     status: res.status,
                     message: res.message,
-                    list: res.list.map((val): ConnectingResumeInfo => ({
+                    list: res.status ? res.list.map((val): ConnectingResumeInfo => ({
                         ApUserName: val[0],
                         ApAddress: val[1],
                         ReAddress: val[2],
                         status: Number(val[3])
-                    }))
+                    })) : []
                 };
             },
             async requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes> {
@@ -294,16 +299,29 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return {
                     status: res.status,
                     message: res.message,
-                    list: res.list.map((val): AccessibleSubKeyInfo => ({
+                    list: res.status ? res.list.map((val): AccessibleSubKeyInfo => ({
                         userName: val[0],
                         address: val[1],
                         amount: Number(val[2])
-                    }))
+                    })) : []
                 };
 
             },
             async getRequestListAsync(): Promise<RequestListRes> {
-                return {status: 1, message: "22"};
+                if (userInfo === null) throw "未登录时尝试获取";
+                const req: RemindKKReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/RemindKKReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ?
+                        res.list.map((val): UploadSubKeyRequestInfo => ({
+                            ApUserName: val[0],
+                            time: val[2]
+                        })) : []
+                };
             },
             async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
                 if (userInfo === null) throw "未登录时尝试上传子密钥";

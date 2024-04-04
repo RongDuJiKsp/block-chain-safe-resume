@@ -9,3 +9,12 @@ export interface SavePartReq {
     address: string;
     KKAddress: string;
 }
+
+/**
+ * 列出所有需要kk上传密钥的用户
+ * @interface RemindKKReq
+ * @property KKAddress kk地址登录时已经返回
+ */
+export interface RemindKKReq {
+    KKAddress: string;
+}

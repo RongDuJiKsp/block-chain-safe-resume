@@ -1,5 +1,6 @@
 export interface UploadSubKeyRequestInfo {
-
+    ApUserName: string,
+    time: string
 }
 
 export interface AccessibleSubKeyInfo {
