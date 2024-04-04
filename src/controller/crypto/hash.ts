@@ -1,9 +1,9 @@
 import {SM3, SM4} from "gm-crypto";
 import * as crypto from "crypto";
-import {CryptoOfHash} from "../../model/interface/crypto";
+import {CryptoSystem} from "../../model/interface/crypto";
 import {FileSystemImpl} from "../util/InteractiveSystem.ts";
 
-export const cryptoOfHash: CryptoOfHash = {
+export const CryptoSystemImpl: CryptoSystem = {
 
     async encryptedFileAsync(originalData: MetaFile, key: string): Promise<MetaFile> {
         return FileSystemImpl.arrayBufferToFile(this.encryptedBin(await FileSystemImpl.readFileAsArrayBufferAsync(originalData), key), originalData.name, originalData.type);
@@ -40,7 +40,8 @@ export const cryptoOfHash: CryptoOfHash = {
     },
     hashDataBySM3(data: string): string {
         return SM3.digest(data, "ascii", "hex");
-    }
+    },
+
 
 
 };

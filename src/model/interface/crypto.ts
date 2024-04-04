@@ -1,4 +1,6 @@
-export interface CryptoOfHash {
+import {CryptoSystemImpl} from "../../controller/crypto/hash.ts";
+
+export interface CryptoSystem {
     encryptedData(originalData: string, key: string): string;
 
     encryptedBin(originalBinData: ArrayBuffer, key: string): ArrayBuffer;
