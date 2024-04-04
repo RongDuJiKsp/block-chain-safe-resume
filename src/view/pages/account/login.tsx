@@ -55,11 +55,11 @@ function LoginComponent() {
     const onLogin = (val: LoginFormType) => {
         if (isLoading) return;
         if (val.identity === UserIdentityEnum.None) {
-            message.error("身份不能为None！").then()
+            message.error("身份不能为None！").then();
             return;
         }
         if (!val.keyword || !val.identity) {
-            message.error("请填写完整！！").then()
+            message.error("请填写完整！！").then();
             return;
         }
         loadingAction.setTrue();

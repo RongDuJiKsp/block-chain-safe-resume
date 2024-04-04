@@ -34,7 +34,7 @@ export default function ApplicantStatus() {
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
-    console.log(info)
+    console.log(info);
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
@@ -55,7 +55,7 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
             else message.error("操作失败，原因：" + r.message).then();
         })
             .catch(e => message.error(e));
-    }
+    };
 
     const tableColumn: ColumnsType<ResumeLicenseRequestInfo> = [
         {
