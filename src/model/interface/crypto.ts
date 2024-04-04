@@ -1,5 +1,3 @@
-import {CryptoSystemImpl} from "../../controller/crypto/hash.ts";
-
 export interface CryptoSystem {
     encryptedData(originalData: string, key: string): string;
 
@@ -20,4 +18,7 @@ export interface CryptoSystem {
 
 }
 
+export interface AlgorithmSystem {
+    calculateEncryptedKeyByS(S: string): string;
+}
 
