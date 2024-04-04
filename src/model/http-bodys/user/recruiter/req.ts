@@ -19,10 +19,10 @@ export interface RecAuthorizeReq {
 }
 
 /**
- * @interface GetResumeReq re查看自己申请查看的简历状态
+ * @interface RecAlreadyAuthorizeReq
  * @property ReAddress re用户地址(登陆时已经返回)
  */
-export interface GetResumeReq {
+export interface RecAlreadyAuthorizeReq {
     ReAddress: string;
 }
 

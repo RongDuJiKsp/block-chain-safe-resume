@@ -29,13 +29,13 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
     const tableColumn: ColumnsType<ConnectingResumeInfo> = [
         {
             title: "用户名",
-            dataIndex: "userName",
+            dataIndex: "ApUserName",
             width: "16%",
             align: "center",
         },
         {
             title: "地址",
-            dataIndex: "address",
+            dataIndex: "ApAddress",
             align: "center"
         },
         {

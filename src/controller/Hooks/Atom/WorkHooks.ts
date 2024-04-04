@@ -30,7 +30,7 @@ import {
 } from "../../../model/http-bodys/user/recruiter/res.ts";
 import {GetNeedSaveReq, RemindKKReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
-import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {RecAlreadyAuthorizeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {
     ApAuthorizeReq,
@@ -240,10 +240,10 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
             },
             async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
                 if (userInfo === null) throw "未登录时尝试获取简历列表";
-                const req: GetResumeReq = {
+                const req: RecAlreadyAuthorizeReq = {
                     ReAddress: userInfo.address
                 };
-                const res = await alovaClientImpl.Post<ArrayRes>("/GetResumeReq", req);
+                const res = await alovaClientImpl.Post<ArrayRes>("/RecAlreadyAuthorizeReq", req);
                 return {
                     status: res.status,
                     message: res.message,
