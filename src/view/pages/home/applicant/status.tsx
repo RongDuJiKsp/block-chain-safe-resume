@@ -8,17 +8,30 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
 import {ResumeInfoRes} from "../../../../model/http-bodys/user/applicant/res.ts";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 
 
 export default function ApplicantStatus() {
     const userService = ApplicantWorkHooks.useMethod();
+    const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
     const [tableInfo, setTableInfo] = useState<ResumeLicenseRequestInfo[]>([]);
     useEffect(() => {
-        userService.getResumeInfoAsync().then(r => setResumeInfo(r));
-        userService.getResumeRequestListAsync().then(r => setTableInfo(r.list));
+        userService.getResumeInfoAsync().then(r => {
+            if (r.status) setResumeInfo(r);
+            else message.error("获取更新时发生失败，原因:" + r.message).then();
+        }).catch(e => {
+            console.error(e);
+            message.error(e.toString()).then();
+        });
+        userService.getResumeRequestListAsync().then(r => {
+            if (r.status) setTableInfo(r.list);
+            else message.error("获取更新时发生失败，原因:" + r.message).then();
+        }).catch(e => {
+            console.error(e);
+            message.error(e.toString()).then();
+        });
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6"}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
@@ -54,7 +67,7 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
             if (r.status) message.success("操作成功").then();
             else message.error("操作失败，原因：" + r.message).then();
         })
-            .catch(e => message.error(e));
+            .catch(e => message.error(e.toString()));
     };
 
     const tableColumn: ColumnsType<ResumeLicenseRequestInfo> = [

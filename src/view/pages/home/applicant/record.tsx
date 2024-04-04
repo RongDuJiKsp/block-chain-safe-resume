@@ -1,4 +1,4 @@
-import {Table} from "antd";
+import {App, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {useEffect, useState} from "react";
@@ -9,10 +9,17 @@ import {ResumeVisitHistoryInfo} from "../../../../model/entity/applicant.ts";
 
 export default function ApplicantRecord() {
     const userService = ApplicantWorkHooks.useMethod();
+    const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [tableVal, setTableVal] = useState<ResumeVisitHistoryInfo[]>([]);
     useEffect(() => {
-        userService.getResumeRequestHistoryListAsync().then(r => setTableVal(r.list));
+        userService.getResumeRequestHistoryListAsync().then(r => {
+            if (r.status) setTableVal(r.list);
+            else message.error("获取更新时发生失败，原因:" + r.message).then();
+        }).catch(e => {
+            console.error(e);
+            message.error(e.toString()).then();
+        });
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12 "}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>

@@ -44,7 +44,7 @@ function FileUploader() {
                 message.error("文件上传失败！原因：" + r.message).then();
             }
         }, e => {
-            message.error(e).then();
+            message.error(e.toString()).then();
         });
 
     };
