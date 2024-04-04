@@ -11,6 +11,7 @@ import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 import {useBoolean} from "ahooks";
+import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -179,7 +180,10 @@ function GetResultComponent() {
             setCanClose.setTrue();
             return;
         }
-        FileSystemImpl.downloadToFileFromSuffixAsync(new Blob([FileTempleHandleImpl.getRegisterKey(res.res.privateKeys, String(res.res.S))]), `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
+        const SKey = AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S));
+        const PrivateKey = res.res.privateKeys;
+        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
+        FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
             message.success("下载成功！").then();
             setCanClose.setTrue();
         });

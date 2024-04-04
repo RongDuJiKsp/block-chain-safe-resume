@@ -6,10 +6,10 @@ export const FileTempleHandleImpl: GetFileTemplate = {
         The KeyPair is (P,X,M) with values (${P},${X},${M})
         `;
     },
-    getRegisterKey(privateKey: string, S: string): string {
+    getRegisterKey(privateKey: string, SKey: string): string {
         return `Please keep your  key, once lost, you can't get it back!
         PrivateValue : ${privateKey}
-        SafeKey : ${S}
+        SafeKey : ${SKey}
         You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
         `;
     },
