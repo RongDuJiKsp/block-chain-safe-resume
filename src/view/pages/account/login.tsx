@@ -54,6 +54,14 @@ function LoginComponent() {
 
     const onLogin = (val: LoginFormType) => {
         if (isLoading) return;
+        if (val.identity === UserIdentityEnum.None) {
+            message.error("身份不能为None！").then()
+            return;
+        }
+        if (!val.keyword || !val.identity) {
+            message.error("请填写完整！！").then()
+            return;
+        }
         loadingAction.setTrue();
         workMethod.loginAsync(val.keyword, val.identity).then(r => {
             if (r.status) {
@@ -76,6 +84,7 @@ function LoginComponent() {
         <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
         <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
             <Form.Item<LoginFormType> name={"keyword"} colon={false}
+                                      rules={[{pattern: /[a-f0-9]+/, message: "存在非法字符或为空"}]}
                                       label={<KeyOutlined className={"text-white"} style={{fontSize: 26}}/>}>
                 <Input allowClear size={"large"} style={{borderRadius: 30}}/>
             </Form.Item>

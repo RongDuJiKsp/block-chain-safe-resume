@@ -1,4 +1,4 @@
-import {Button, Popconfirm, Statistic, Table, Tag} from "antd";
+import {App, Button, Popconfirm, Statistic, Table, Tag} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
@@ -34,8 +34,7 @@ export default function ApplicantStatus() {
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
 function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
-    console.log(info);
-
+    console.log(info)
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
@@ -48,13 +47,16 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
 
 
 function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo[] }) {
-    const onAccept = (data: ResumeLicenseRequestInfo) => {
-        console.log(data);
-    };
-    const onDelay = (data: ResumeLicenseRequestInfo) => {
-        console.log(data);
+    const apService = ApplicantWorkHooks.useMethod();
+    const {message} = App.useApp();
+    const onOpResumeLicense = (status: number, data: ResumeLicenseRequestInfo): void => {
+        apService.giveOrDelayResumeLicensingAsync(data.address, status).then(r => {
+            if (r.status) message.success("操作成功").then();
+            else message.error("操作失败，原因：" + r.message).then();
+        })
+            .catch(e => message.error(e));
+    }
 
-    };
     const tableColumn: ColumnsType<ResumeLicenseRequestInfo> = [
         {
             title: "用户名",
@@ -75,10 +77,10 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
                 return <div className={"justify-around flex"}>
                     {rec.status ? <Tag color={"green"}>已授权</Tag> :
                         <>
-                            <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onAccept(rec)}>
+                            <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onOpResumeLicense(1, rec)}>
                                 <Button type={"primary"}>授权</Button>
                             </Popconfirm>
-                            <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onDelay(rec)}>
+                            <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onOpResumeLicense(0, rec)}>
                                 <Button type={"primary"} danger={true}>拒绝</Button>
                             </Popconfirm>
                         </>}

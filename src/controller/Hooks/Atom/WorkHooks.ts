@@ -32,7 +32,12 @@ import {GetNeedSaveReq, SavePartReq} from "../../../model/http-bodys/user/keykee
 import {AccessibleSubKeyInfo} from "../../../model/entity/keykeeper.ts";
 import {GetResumeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
-import {GetDownloadHisReq, GetMoreFileMesReq, GetRequestReq} from "../../../model/http-bodys/user/applicant/req.ts";
+import {
+    ApAuthorizeReq,
+    GetDownloadHisReq,
+    GetMoreFileMesReq,
+    GetRequestReq
+} from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 
@@ -125,7 +130,7 @@ interface ApplicantWorkMethod {
 
     getResumeRequestListAsync(): Promise<ResumeQuestListRes>;
 
-    giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes>;
+    giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes>;
 
     getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
 }
@@ -161,14 +166,16 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                         status: Number(val[4])
                     }))
                 };
-                goData.list.sort((a, b) => a.status - b.status);
+                goData.list.sort((a: ResumeLicenseRequestInfo, b: ResumeLicenseRequestInfo) => a.status - b.status);
                 return goData;
             },
-            async giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes> {
-                return {
-                    status: 1,
-                    message: 'ok'
+            async giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes> {
+                if (userInfo === null) throw "在未登录时操作验证";
+                const req: ApAuthorizeReq = {
+                    ReAddress, status, ApAddress: userInfo.address
                 };
+                return alovaClientImpl.Post("/ApAuthorizeReq", req);
+
             },
             async getResumeInfoAsync(): Promise<ResumeInfoRes> {
                 if (userInfo === null) throw "在未登录时获取简历申请记录信息";
