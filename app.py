@@ -159,13 +159,14 @@ def RecAuthorizeReq():
         ApUserName = data['ApUserName']
         ApAddress = data['ApAddress']
         ReAddress = data['ReAddress']
-        if recAuthorize(ApUserName,ApAddress,ReAddress) == False:
+        judge,message=recAuthorize(ApUserName, ApAddress, ReAddress)
+        if  judge== False:
             authorize['status'] = 0
-            authorize['message'] = "授权请求失败"
+            authorize['message'] = message
             return json.dumps(authorize)
         else:
             authorize['status'] = 1
-            authorize['message'] = "授权请求成功"
+            authorize['message'] = message
             return json.dumps(authorize)
     except Exception as e:
         authorize['message'] = "{}".format(str(e))
@@ -328,6 +329,21 @@ def UploadKeyReq():
         x = data['x']
         m = data['m']
         return uploadKey(KKAddress,ApUserName,i,x,m,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+#kk变成合法密钥保管人
+@app.route('/ChangeKKReq', methods=["POST"])
+def ChangeKKReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        KKAddress = data['KKAddress']
+        return changeKK(KKAddress,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)

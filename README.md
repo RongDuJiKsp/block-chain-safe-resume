@@ -529,3 +529,23 @@ interface GetMoreFileMesRes extends BaseRe{
 interface UploadKeyRes extends BaseRe{
 }
 ```
+
+#### 20.kk申请成功密钥保管人
+
+```
+ /**
+ * kk上传密钥
+ * @interface ChangeKKReq
+ * @property KKAddress kk地址
+ */
+  interface ChangeKKReq {
+    KKAddress: string
+ }
+
+ /**
+ * @interface ChangeKKRes
+ */
+interface ChangeKKRes extends BaseRe{
+}
+```
+

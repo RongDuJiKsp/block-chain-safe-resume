@@ -54,7 +54,7 @@ def getTableName(identity):
         return 'error'
 
 
-def apiApregister(address, X, M, P, T):
+def apiApregister(address, X, M, P, T,user):
     url = config.api_url
     config.api_data["user"] = address
     config.api_data["funcName"] = 'Apregister'
@@ -62,14 +62,17 @@ def apiApregister(address, X, M, P, T):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        user['message'] = reslut['message']
         if reslut['status'] == "0x0":
-            return True
+            user['status'] = 1
+            return user
         else:
-            return False
+            return user
     except Exception as e:
-        return False
+        user['message'] = "{}".format(str(e))
+        return user
 
-def apiFileUpdate(address,hash_code, file_name, file_type):
+def apiFileUpdate(address,hash_code, file_name, file_type,upload):
     url = config.api_url
     config.api_data["user"] = address
     config.api_data["funcName"] = 'FileUpdate'
@@ -77,12 +80,15 @@ def apiFileUpdate(address,hash_code, file_name, file_type):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        upload['message'] = reslut['message']
         if reslut['status'] == "0x0":
-            return True
+            upload['status'] = 1
+            return upload
         else:
-            return False
+            return upload
     except Exception as e:
-        return False
+        upload['message'] = "{}".format(str(e))
+        return upload
 def apiKeeperaply(KKAddress):
     url = config.api_url
     config.api_data["user"] = KKAddress
@@ -91,12 +97,13 @@ def apiKeeperaply(KKAddress):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        message = reslut['message']
         if reslut['status'] == "0x0":
-            return True
+            return True,message
         else:
-            return False
+            return False,message
     except Exception as e:
-        return False
+        return False,str(e)
 
 def apiReturnsubkey(ApAddress,KKAddress,part):
     url = config.api_url
@@ -106,6 +113,7 @@ def apiReturnsubkey(ApAddress,KKAddress,part):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        part['message'] = reslut['message']
         if reslut['status'] == "0x0":
             #还需解析返回值
             part['status'] = 1
@@ -119,6 +127,7 @@ def apiReturnsubkey(ApAddress,KKAddress,part):
         else:
             return part
     except Exception as e:
+        part['message'] = "{}".format(str(e))
         return part
 
 def apiRecRequest(ReAddress,ApAddress):
@@ -129,12 +138,13 @@ def apiRecRequest(ReAddress,ApAddress):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        message = reslut['message']
         if reslut['status'] == "0x0":
-            return True
+            return True,message
         else:
-            return False
+            return False,message
     except Exception as e:
-        return False
+        return False,str(e)
 
 def apiAuthorizeUser(ApAddress, ReAddress):
     url = config.api_url
@@ -144,12 +154,13 @@ def apiAuthorizeUser(ApAddress, ReAddress):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        message = reslut['message']
         if reslut['status'] == "0x0":
-            return True
+            return True,message
         else:
-            return False
+            return False,message
     except Exception as e:
-        return False
+        return False,str(e)
 
 def apiGetresumekey(ReAddress,ApAddress,base):
     url = config.api_url
@@ -159,6 +170,7 @@ def apiGetresumekey(ReAddress,ApAddress,base):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        base['message'] = reslut['message']
         if reslut['status'] == "0x0":
             #还需解析返回值
             base['status'] = 1
@@ -170,7 +182,6 @@ def apiGetresumekey(ReAddress,ApAddress,base):
             base['fileHash'] = decoded_data[3]
             return base
         else:
-            base['message'] = reslut['message']
             return base
     except Exception as e:
         base['message'] = "{}".format(str(e))
@@ -183,15 +194,16 @@ def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
+        message = reslut['message']
         if reslut['status'] == "0x0":
             #还需解析返回值
             types = ['int']
             decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
-            return decoded_data[0]
+            return decoded_data[0],message
         else:
-            return 0
+            return -1,message
     except Exception as e:
-        return 0
+        return -1,str(e)
 def verifyprivateKeys(privateKey, identity, login):
     name = randName()
     url = config.WeBASE_privateKey_api + f'/import?privateKey={privateKey}&userName={name}'
@@ -219,9 +231,9 @@ def register(data, user):
     userName = randName()
     key = getKey(userName)
     need = getNeed()
+    user=apiApregister(key['address'], need['X'], need['M'], need['P'], need['S'],user)
     # T==S
-    if apiApregister(key['address'], need['X'], need['M'], need['P'], need['S'])==False:
-        user['message'] = "注册失败"
+    if user['status'] == 0:
         return json.dumps(user)
     table_name = getTableName(data['identity'])
     if table_name == 'error':
@@ -233,12 +245,10 @@ def register(data, user):
     if table_name == 'Applicant':
         condition = f"insert into NeedSave(userName,address,remainingAmount) values(%s,%s,5);"
         cur.execute(condition, (userName, key["address"]))
-    elif table_name == 'KeyKeeper':
-        apiKeeperaply(key["address"])
+    # elif table_name == 'KeyKeeper':
+    #     apiKeeperaply(key["address"])
     if cur.rowcount:
         # 更新address状态
-        user['status'] = 1
-        user['message'] = "注册成功"
         user['address'] = key["address"]
         # user['publicKeys'] = key['publicKey']
         user['privateKeys'] = key['privateKey']
@@ -249,6 +259,8 @@ def register(data, user):
         user['X'] = need['X']
         return json.dumps(user)
     else:
+        user['status'] = 0
+        user['message'] = "数据库写入失败"
         return json.dumps(user)
 
 
@@ -261,7 +273,9 @@ def uploadIpfs(file,userName, address, upload):
     if response.status_code == 200:
         data = json.loads(response.text)
         hash_code = data['Hash']
-        apiFileUpdate(address, hash_code, file.filename, file.content_type)
+        upload=apiFileUpdate(address, hash_code, file.filename, file.content_type,upload)
+        if(upload['status']==0):
+            return json.dumps(upload)
         conn.ping()
         condition = f'select * from resumeForm where address=%s'
         cur.execute(condition, (address))
@@ -380,17 +394,17 @@ def getResume(ReAddress,base):
 
 #请求授权查看简历
 def recAuthorize(ApUserName,ApAddress,ReAddress):
-    re = apiRecRequest(ReAddress,ApAddress)
+    re,message= apiRecRequest(ReAddress,ApAddress)
     if re == False:
-        return False
+        return False,message
     #AlreadyResumeForm重复判断
     condition = f'select * from AlreadyResumeForm where ApAddress=%s and ReAddress=%s;'
     cur.execute(condition,(ApAddress,ReAddress))
     if cur.fetchone():
-        return False
+        return False,message
     condition = f'insert into AlreadyResumeForm(ApUserName,ApAddress,ReAddress,ststus,keyNum) values(%s,%s,%s,0,0);'
     cur.execute(condition, (ApUserName,ApAddress, ReAddress))
-    return True
+    return True,message
 
 def recAlreadyAuthorizeReq(ReAddress,base):
     condition = f'select * from AlreadyResumeForm where ReAddress=%s;'
@@ -410,12 +424,12 @@ def getRequest(address,base):
     return json.dumps(base)
 
 def apAuthorize(ApAddress,ReAddress):
-    re = apiAuthorizeUser(ApAddress, ReAddress)
+    re,message = apiAuthorizeUser(ApAddress, ReAddress)
     if re == False:
-        return json.dumps({'status': 0, 'message': '授权失败,请重试'})
+        return json.dumps({'status': 0, 'message': message})
     condition = f'update AlreadyResumeForm set ststus=1 where ApAddress=%s and ReAddress=%s;'
     cur.execute(condition, (ApAddress, ReAddress))
-    return json.dumps({'status': 1, 'message': '授权成功'})
+    return json.dumps({'status': 1, 'message': message})
 
 #拒绝授权更新数据库
 def rejectAuthorize(ApAddress,ReAddress):
@@ -461,14 +475,20 @@ def uploadKey(KKAddress,ApUserName,i,x,m,base):
     condition = f'select address from Applicant where userName=%s;'
     cur.execute(condition,(ApUserName))
     ApAddress = cur.fetchone()[0]
-    part = apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
+    part,message= apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
     if part==1 or part==0:
         condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s and ReAddress=%s;'
         cur.execute(condition, (ApAddress, KKAddress))
         base['status'] = 1
-        base['message'] = '保管密钥上传成功'
+        base['message'] = message
         return json.dumps(base)
     else:
         base['status'] = 0
-        base['message'] = '保管密钥上传失败'
+        base['message'] = message
         return json.dumps(base)
+def changeKK(KKAddress,base):
+    re,message=apiKeeperaply(KKAddress)
+    base['message'] = message
+    if re == False:
+        return json.dumps(base)
+    return json.dumps(base)
