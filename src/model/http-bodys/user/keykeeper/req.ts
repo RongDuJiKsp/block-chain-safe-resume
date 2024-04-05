@@ -18,3 +18,20 @@ export interface SavePartReq {
 export interface RemindKKReq {
     KKAddress: string;
 }
+
+/**
+ * kk上传密钥
+ * @interface UploadKeyReq
+ * @property KKAddress kk地址登录时已经返回
+ * @property ApAddress Ap求职者的地址
+ * @property i 下标i,上传的是第几份份额
+ * @property x  对应x
+ * @property m  对应m
+ */
+export interface UploadKeyReq {
+    KKAddress: string
+    ApAddress: string
+    i: number
+    x: number
+    m: number
+}

@@ -15,10 +15,18 @@ import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 
 export default function KeyKeeperGetSubKey() {
     const kkUserServer = KeyKeeperWorkHook.useMethod();
+    const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [tableVal, setTableVal] = useState<AccessibleSubKeyInfo[]>([]);
     useEffect(() => {
-        kkUserServer.getAccessibleSubKeyListAsync().then(r => setTableVal(r.list));
+        kkUserServer.getAccessibleSubKeyListAsync().then(r => {
+            if (r.status) {
+                setTableVal(r.list);
+                message.success("获取信息成功！").then();
+            } else {
+                message.error("获取信息失败，原因是:" + r.message).then();
+            }
+        });
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
         <div className={"work-window-color basis-3/4 px-8 py-4"}>

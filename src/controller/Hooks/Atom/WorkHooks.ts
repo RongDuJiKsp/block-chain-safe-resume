@@ -28,7 +28,7 @@ import {
     RequestResumeLicensingRes,
     SearchApRes
 } from "../../../model/http-bodys/user/recruiter/res.ts";
-import {GetNeedSaveReq, RemindKKReq, SavePartReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {GetNeedSaveReq, RemindKKReq, SavePartReq, UploadKeyReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
 import {RecAlreadyAuthorizeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
@@ -271,7 +271,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 };
 
 interface KeyKeeperWorkMethod {
-    uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
+    uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
     downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
 
@@ -323,10 +323,12 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                         })) : []
                 };
             },
-            async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
+            async uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
                 if (userInfo === null) throw "未登录时尝试上传子密钥";
-//TODO: 实现kk上传子密钥的功能
-                return {status: 1, message: "22"};
+                const req: UploadKeyReq = {
+                    ApAddress, i, x, m, KKAddress: userInfo.address
+                };
+                return alovaClientImpl.Post("/UploadKeyReq", req);
             }
 
         };
