@@ -484,10 +484,10 @@ interface RemindKKRes extends BaseRe{
 ```
  /**
  * @interface GetMoreFileMesReq
- * @property address ap用户地址(登陆时已经返回)
+ * @property ApUserName ap用户名
  */
   interface GetMoreFileMesReq {
-    address: string;
+    ApUserName: string;
  }
 
 
