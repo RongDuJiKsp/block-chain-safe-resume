@@ -142,7 +142,8 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
                 if (userInfo === null) throw "在未登录时获取简历历史记录信息";
                 const req: GetDownloadHisReq = {
-                    ApUserName: userInfo.nick
+                    ApUserName: userInfo.nick,
+                    ApAddress: userInfo.address
                 };
                 const res = await alovaClientImpl.Post<ArrayRes>("/GetDownloadHisReq", req);
                 return {
@@ -183,7 +184,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
             async getResumeInfoAsync(): Promise<ResumeInfoRes> {
                 if (userInfo === null) throw "在未登录时获取简历申请记录信息";
                 const req: GetMoreFileMesReq = {
-                    address: userInfo.address
+                    ApAddress: userInfo.address
                 };
                 return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
