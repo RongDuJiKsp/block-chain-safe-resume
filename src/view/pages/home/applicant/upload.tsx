@@ -76,8 +76,8 @@ function FileUploader() {
                     onConfirm={onUploadFile}>
                     <button className={"button-primary button button-raised button-rounded button-glow"}>
                         {isLoading ?
-                            <span><LoadingOutlined/> 上传中</span> :
-                            <span>点击上传</span>
+                            <span><LoadingOutlined/>&emsp;上传中&emsp;</span> :
+                            <span>&emsp;点击上传&emsp;</span>
                         }
                     </button>
                 </Popconfirm>
