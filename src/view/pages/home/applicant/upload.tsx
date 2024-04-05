@@ -1,7 +1,8 @@
-import {FileAddOutlined} from "@ant-design/icons";
+import {FileAddOutlined, LoadingOutlined} from "@ant-design/icons";
 import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {useBoolean} from "ahooks";
 
 export default function ApplicantUpload() {
     return <div className={"h-full-screen flex flex-col justify-center basic-window"}>
@@ -16,7 +17,9 @@ function FileUploader() {
     const userServerMethod = ApplicantWorkHooks.useMethod();
     const {message} = APP.useApp();
     const [selectedFiles, setSelectFiles] = useState<File[]>([]);
+    const [isLoading, loadingAction] = useBoolean();
     const SKeyInputRef = useRef<InputRef>(null);
+
     const onDropFile = (event: React.DragEvent<HTMLInputElement>): void => {
         event.preventDefault();
         setSelectFiles(Array.from(event.dataTransfer.files));
@@ -36,8 +39,10 @@ function FileUploader() {
             message.error("请选择需要上传的文件！").then();
             return;
         }
+        loadingAction.setTrue();
         const file = selectedFiles[0];
         userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => {
+            loadingAction.setFalse();
             if (r.status) {
                 message.success("文件上传成功！").then();
             } else {
@@ -69,7 +74,12 @@ function FileUploader() {
                 <Popconfirm
                     title={"避免额外的token消耗，请检查上传的文件是否选择正确！同时请检查输入的SafeKey是否正确！错误的SafeKey将使得简历无法解密！"}
                     onConfirm={onUploadFile}>
-                    <button className={"button button-primary"}>Upload</button>
+                    <button className={"button-primary button button-raised button-rounded button-glow"}>
+                        {isLoading ?
+                            <span><LoadingOutlined/> 上传中</span> :
+                            <span>点击上传</span>
+                        }
+                    </button>
                 </Popconfirm>
             </div>
         </div>

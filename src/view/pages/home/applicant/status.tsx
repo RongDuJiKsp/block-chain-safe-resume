@@ -51,8 +51,8 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
-        <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
-                   value={dayjs.unix(info && info.putTime ? info.putTime : 0).format("YYYY-MM-DD HH:mm")}/>
+        <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")} className={"basis-1/5"}
+                   value={info && info.putTime ?dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm"):"加载中..."}/>
         <Statistic title={"待处理请求"} prefix={componentUtils.getIcon("icon-money-finance-buyer")}
                    value={0} suffix={"条"}/>
     </div>;
