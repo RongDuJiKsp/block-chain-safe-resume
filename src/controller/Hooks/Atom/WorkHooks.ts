@@ -20,17 +20,30 @@ import {
 import {
     AccessibleSubKeyListRes,
     DownloadSubKeysRes,
+    GetFileMesRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
 import {
+    DownloadRes,
     RecruiterResumeStatusListRes,
     RequestResumeLicensingRes,
     SearchApRes
 } from "../../../model/http-bodys/user/recruiter/res.ts";
-import {GetNeedSaveReq, RemindKKReq, SavePartReq, UploadKeyReq} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {
+    GetFileMesReq,
+    GetNeedSaveReq,
+    RemindKKReq,
+    SavePartReq,
+    UploadKeyReq
+} from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
-import {RecAlreadyAuthorizeReq, RecAuthorizeReq, SearchApReq} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {
+    DownloadFileReq,
+    RecAlreadyAuthorizeReq,
+    RecAuthorizeReq,
+    SearchApReq
+} from "../../../model/http-bodys/user/recruiter/req.ts";
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {
     ApAuthorizeReq,
@@ -40,6 +53,7 @@ import {
 } from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
+import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -209,7 +223,11 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 };
 
 interface RecruiterWorkMethod {
-    downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile>;
+    downloadResumeAsync(fileHash: string, SafeKey: string, ApUserName: string, name: string, type: string): Promise<MetaFile>;
+
+    getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes>;
+
+    autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void>;
 
     requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes>;
 
@@ -222,6 +240,18 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
+                const chainMeta = await this.getFileMessageAsync(ApAddress);
+                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                await FileSystemImpl.downloadMetaFileAsync(file);
+            },
+            async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
+                if (userInfo === null) throw "未登录时尝试下载";
+                const req: GetFileMesReq = {
+                    ApAddress, ReAddress: userInfo.address
+                };
+                return alovaClientImpl.Post("/GetFileMesRes", req);
+            },
             async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
                 const req: SearchApReq = {
                     partApUserName
@@ -235,9 +265,14 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                         : []
                 };
             },
-            async downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile> {
+            async downloadResumeAsync(fileHash: string, SafeKey: string, ApUserName: string, name: string, type: string): Promise<MetaFile> {
                 if (userInfo === null) throw "未登录时尝试下载";
-                return new File([encryptHash, S], "ss");//TODO:实现一键下载并且解密的功能
+                const req: DownloadFileReq = {
+                    fileHash, ApUserName, ReUserName: userInfo.nick
+                };
+                const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
+                const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
+                return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
             },
             async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
                 if (userInfo === null) throw "未登录时尝试获取简历列表";

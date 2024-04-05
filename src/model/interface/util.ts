@@ -5,6 +5,8 @@ export interface UserFileSystem {
 
     downloadToFileAsNameAsync(file: BinFile, name: string): Promise<void>;
 
+    downloadMetaFileAsync(file: MetaFile): Promise<void>;
+
     readFileAsBase64Async(file: MetaFile): Promise<string>;
 
     readBase64AsBlob(base64: string, type: string): BinFile;
@@ -13,7 +15,7 @@ export interface UserFileSystem {
 
     readFileAsArrayBufferAsync(file: MetaFile): Promise<ArrayBuffer>;
 
-    arrayBufferToFile(arrayBuffer: ArrayBuffer,fileName:string,fileType:string): MetaFile
+    arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string, fileType: string): MetaFile
 
 }
 

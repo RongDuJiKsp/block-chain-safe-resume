@@ -28,7 +28,12 @@ export default function RecruiterNotice() {
 }
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
-    const onDownloadResume = () => {//TODO 实现一键下载和良好交互
+    const userService = RecruiterWorkHooks.useMethod();
+    const [isLoading, loadingAction] = useBoolean();
+
+    const onDownloadResume =  (info: ConnectingResumeInfo) => {//TODO 实现一键下载和良好交互
+        loadingAction.setTrue();
+
 
     };
     const tableColumn: ColumnsType<ConnectingResumeInfo> = [
@@ -64,7 +69,8 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
             render(_, item): ReactNode {
                 return <div className={"justify-around flex"}>
                     {item.status ?
-                        <Button type={"primary"} onClick={() => onDownloadResume()}>下载简历</Button> :
+                        <Button type={"primary"}
+                                onClick={() => onDownloadResume(item)}>下载简历</Button> :
                         <div>等待中</div>
                     }
                 </div>;
@@ -72,6 +78,7 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
         }
     ];
     return <div>
+        <Spin spinning={isLoading} fullscreen/>
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />

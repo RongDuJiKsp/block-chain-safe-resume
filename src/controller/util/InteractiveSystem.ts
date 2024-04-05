@@ -3,6 +3,16 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
+    async downloadMetaFileAsync(file: MetaFile): Promise<void> {
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+    },
     arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string, fileType): MetaFile {
         return new File([arrayBuffer], fileName, {
             type: fileType

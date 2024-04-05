@@ -1,11 +1,14 @@
 /**
  * @interface DownloadFileReq
- * @property hash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
+ * @property fileHash 文件的ipfs上对应的hash 文件的mime类型和文件名由客户端与区块链直接交互得到
+ * @property ApUserName 要被下载的ap用户名
+ * @property ReUserName 下载者re用户名
  */
 export interface DownloadFileReq {
-    hash: string;
+    fileHash: string;
+    ApUserName: string;
+    ReUserName: string;
 }
-
 /**
  * @interface RecAuthorizeReq re请求授权查看简历
  * @property ApUserName ap用户名

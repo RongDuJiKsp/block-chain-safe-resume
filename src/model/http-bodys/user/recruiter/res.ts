@@ -6,9 +6,10 @@ import {BaseRes} from "../ress.ts";
  * @extends BaseRes
  * @property base64 二进制文件的base64编码
  */
-interface DownloadRes extends BaseRes {
+export interface DownloadRes extends BaseRes {
     base64: string;
 }
+
 
 //rc请求许可的响应体
 export interface RequestResumeLicensingRes extends BaseRes {
