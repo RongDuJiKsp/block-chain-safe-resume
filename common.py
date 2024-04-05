@@ -383,6 +383,11 @@ def recAuthorize(ApUserName,ApAddress,ReAddress):
     re = apiRecRequest(ReAddress,ApAddress)
     if re == False:
         return False
+    #AlreadyResumeForm重复判断
+    condition = f'select * from AlreadyResumeForm where ApAddress=%s and ReAddress=%s;'
+    cur.execute(condition,(ApAddress,ReAddress))
+    if cur.fetchone():
+        return False
     condition = f'insert into AlreadyResumeForm(ApUserName,ApAddress,ReAddress,ststus,keyNum) values(%s,%s,%s,0,0);'
     cur.execute(condition, (ApUserName,ApAddress, ReAddress))
     return True
