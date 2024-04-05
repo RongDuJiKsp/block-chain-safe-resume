@@ -32,7 +32,7 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
     const {message} = App.useApp();
     const [isLoading, loadingAction] = useBoolean();
 
-    const onDownloadResume = (info: ConnectingResumeInfo) => {//TODO 实现一键下载和良好交互
+    const onDownloadResume = (info: ConnectingResumeInfo) => {
         loadingAction.setTrue();
         userService.autoDownloadFile(info.ApAddress, info.ApUserName)
             .then((): void => {
