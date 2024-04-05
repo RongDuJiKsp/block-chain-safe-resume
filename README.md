@@ -252,9 +252,10 @@ interface RecAuthorizeRes extends BaseRes {
  * @property ApAddress ap用户地址
  * @property ReAddress re用户自己的地址(忽略就好)
  * @property ststus 申请状态(int型,0表示在申请中,1表示申请成功)
+ * @property keyNum 如果申请通过会显示获得的秘密份额个数,当秘密份额>=3时可以通过接口14获得简历信息。如果申请状态为0则该字段为0无实际意义
  */
 interface RecAlreadyAuthorizeRes extends BaseRes{
-    list:[[ApUserName,ApAddress,ReAddress,ststus],[...,...,...]]
+    list:[[ApUserName,ApAddress,ReAddress,ststus,keyNum],[...,...,...]]
 }
 ```
 
@@ -383,7 +384,7 @@ function uploadFile() {
 </html>
 ```
 
-#### 14.获取加密简历文件的对称密钥s、文件名、文件类型(需要先授权)
+#### 14.获取加密简历文件的对称密钥s、文件名、文件类型、文件hash
 
 ```
  /**
@@ -402,11 +403,13 @@ function uploadFile() {
  * @property s 对称密钥s
  * @property fileName 文件名
  * @property fileType 文件类型
+ * @property fileHash 文件hash
  */
 interface GetFileMesRes extends BaseRes {
     s: int;
     fileName: string;
     fileType: string;
+    fileHash: string;
 }
 ```
 
@@ -500,3 +503,29 @@ interface GetMoreFileMesRes extends BaseRe{
 }
 ```
 
+#### 18.kk上传密钥
+
+```
+ /**
+ * kk上传密钥
+ * @interface UploadKeyReq
+ * @property KKAddress kk地址登录时已经返回
+ * @property ApAddress Ap求职者的地址
+ * @property i 下标i,上传的是第几份份额
+ * @property x  对应x
+ * @property m  对应m
+ */
+  interface UploadKeyReq {
+    KKAddress: string
+    ApAddress: string
+    i: int
+    x: int
+    m: int
+ }
+
+ /**
+ * @interface UploadKeyRes
+ */
+interface UploadKeyRes extends BaseRe{
+}
+```

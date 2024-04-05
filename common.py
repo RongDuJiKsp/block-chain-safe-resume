@@ -14,11 +14,11 @@ from eth_abi import decode
 
 global config
 config = Configs()
-conn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database)
+conn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database,autocommit=True,charset='utf8')
 cur = conn.cursor()
 cur.execute('SET GLOBAL wait_timeout = 288000000')
 cur.execute('SET GLOBAL interactive_timeout = 288000000')
-cur.execute('set global max_allowed_packet=288000000')
+cur.execute('set global max_allowed_packet = 288000000')
 
 
 def verifyIdentity(identity):
@@ -162,11 +162,12 @@ def apiGetresumekey(ReAddress,ApAddress,base):
         if reslut['status'] == "0x0":
             #还需解析返回值
             base['status'] = 1
-            types = ['uint', 'string', 'string']
+            types = ['uint', 'string', 'string', 'string']
             decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
             base['s'] = decoded_data[0]
             base['fileName'] = decoded_data[1]
             base['fileType'] = decoded_data[2]
+            base['fileHash'] = decoded_data[3]
             return base
         else:
             base['message'] = reslut['message']
@@ -174,6 +175,23 @@ def apiGetresumekey(ReAddress,ApAddress,base):
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return base
+def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
+    url = config.api_url
+    config.api_data["user"] = KKAddress
+    config.api_data["funcName"] = 'keeperkeyjudge'
+    config.api_data["funcParam"] = [f'{ApAddress}',f'{i}',f'{x}',f'{m}']
+    response = requests.post(url, json=config.api_data)
+    reslut = response.json()
+    try:
+        if reslut['status'] == "0x0":
+            #还需解析返回值
+            types = ['int']
+            decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
+            return decoded_data[0]
+        else:
+            return 0
+    except Exception as e:
+        return 0
 def verifyprivateKeys(privateKey, identity, login):
     name = randName()
     url = config.WeBASE_privateKey_api + f'/import?privateKey={privateKey}&userName={name}'
@@ -244,8 +262,15 @@ def uploadIpfs(file,userName, address, upload):
         data = json.loads(response.text)
         hash_code = data['Hash']
         apiFileUpdate(address, hash_code, file.filename, file.content_type)
-        condition = f'insert into resumeForm(userName,address,putTime,downloadtimes) values(%s,%s,UNIX_TIMESTAMP(),0);'
-        cur.execute(condition, (userName,address))
+        conn.ping()
+        condition = f'select * from resumeForm where address=%s'
+        cur.execute(condition, (address))
+        if(cur.rowcount):
+            condition = f'update resumeForm set putTime=UNIX_TIMESTAMP() where address=%s;'
+            cur.execute(condition, (address))
+        else:
+            condition = f'insert into resumeForm(userName,address,putTime,downloadtimes) values(%s,%s,UNIX_TIMESTAMP(),0);'
+            cur.execute(condition, (userName,address))
     else:
         return json.dumps(upload)
     upload['status'] = 1
@@ -258,9 +283,11 @@ def getMoreFileMes(address, base):
     # 在hr表中
     # 查询resumeForm表所有内容
     condition = f'select * from resumeForm where address=%s'
-    cur.execute(condition, (address))
-    if cur.rowcount:
-        result=cur.fetchone();
+    connn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database,autocommit=True, charset='utf8')
+    curr = connn.cursor()
+    curr.execute(condition, address)
+    if curr.rowcount:
+        result=curr.fetchone()
         base['status'] = 1
         base['userName'] = result[0]
         base['putTime'] = result[2]
@@ -294,7 +321,6 @@ def downloadByipfs(file_hash,ApUserName,ReUserName,download):
         return download
     else:
         return download
-
 
 def ChangeName(data, change):
     table_name = getTableName(data['identity'])
@@ -357,7 +383,7 @@ def recAuthorize(ApUserName,ApAddress,ReAddress):
     re = apiRecRequest(ReAddress,ApAddress)
     if re == False:
         return False
-    condition = f'insert into AlreadyResumeForm(ApUserName,ApAddress,ReAddress,ststus) values(%s,%s,%s,0);'
+    condition = f'insert into AlreadyResumeForm(ApUserName,ApAddress,ReAddress,ststus,keyNum) values(%s,%s,%s,0,0);'
     cur.execute(condition, (ApUserName,ApAddress, ReAddress))
     return True
 
@@ -371,6 +397,7 @@ def recAlreadyAuthorizeReq(ReAddress,base):
 
 def getRequest(address,base):
     condition = f'select AlreadyResumeForm.ApUserName,AlreadyResumeForm.ApAddress,Recruiter.userName,AlreadyResumeForm.ReAddress ,AlreadyResumeForm.ststus from AlreadyResumeForm join Recruiter on  Recruiter.address=AlreadyResumeForm.ReAddress  where AlreadyResumeForm.ApAddress=%s;'
+    cur = conn.cursor()
     cur.execute(condition,(address))
     result = cur.fetchall()
     base['status'] = 1
@@ -392,6 +419,13 @@ def rejectAuthorize(ApAddress,ReAddress):
     return json.dumps({'status': 1, 'message': '更新成功'})
 
 def getFileMes(ApAddress, ReAddress,base):
+    condition = f'select keyNum from AlreadyResumeForm where ApAddress=%s and ReAddress=%s;'
+    cur.execute(condition,(ApAddress, ReAddress))
+    result = cur.fetchone()
+    if result[0]<3:
+        base['status'] = 0
+        base['message'] = '您还未获得三个及以上的秘密份额'
+        return json.dumps(base)
     return apiGetresumekey(ReAddress,ApAddress,base)
 
 def getDownloadHis(ApUserName,base):
@@ -417,3 +451,16 @@ def remindKK(KKAddress,base):
     base['status'] = 1
     base['list'] = result
     return json.dumps(base)
+
+def uploadKey(KKAddress,ApAddress,i,x,m,base):
+    part = apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
+    if part==1 or part==0:
+        condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s and ReAddress=%s;'
+        cur.execute(condition, (ApAddress, KKAddress))
+        base['status'] = 1
+        base['message'] = '保管密钥上传成功'
+        return json.dumps(base)
+    else:
+        base['status'] = 0
+        base['message'] = '保管密钥上传失败'
+        return json.dumps(base)

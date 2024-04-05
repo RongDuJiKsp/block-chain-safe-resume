@@ -56,7 +56,8 @@ CREATE TABLE AlreadyResumeForm(
     ApUserName VARCHAR(255) NOT NULL,
     ApAddress VARCHAR(255) NOT NULL,
     ReAddress VARCHAR(255) NOT NULL,
-    ststus int NOT NULL
+    ststus int NOT NULL,
+    keyNum int NOT NULL
 );
 
 CREATE TABLE DownloadHisForm(

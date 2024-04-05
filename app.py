@@ -313,6 +313,24 @@ def RemindKKReq():
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
+#kk上传密钥
+@app.route('/UploadKeyReq', methods=["POST"])
+def UploadKeyReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        KKAddress = data['KKAddress']
+        ApAddress = data['ApAddress']
+        i = data['i']
+        x = data['x']
+        m = data['m']
+        return uploadKey(KKAddress,ApAddress,i,x,m,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)

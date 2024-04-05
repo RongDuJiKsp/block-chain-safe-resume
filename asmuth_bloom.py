@@ -138,10 +138,8 @@ def getNeed():
     bit_k  = k.bit_length()
     #print("bits of k", bit_k)
     testlist = [5]
-
     timdis = []
     timrc = []
-
     round = 1
 
     for n in testlist:
