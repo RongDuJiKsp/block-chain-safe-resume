@@ -484,10 +484,10 @@ interface RemindKKRes extends BaseRe{
 ```
  /**
  * @interface GetMoreFileMesReq
- * @property ApUserName ap用户名
+ * @property ApAddress ap用户地址
  */
   interface GetMoreFileMesReq {
-    ApUserName: string;
+    ApAddress: string;
  }
 
 
@@ -503,21 +503,21 @@ interface GetMoreFileMesRes extends BaseRe{
 }
 ```
 
-#### 18.kk上传密钥
+#### 19.kk上传密钥
 
 ```
  /**
  * kk上传密钥
  * @interface UploadKeyReq
  * @property KKAddress kk地址登录时已经返回
- * @property ApAddress Ap求职者的地址
+ * @property ApUserName Ap用户名
  * @property i 下标i,上传的是第几份份额
  * @property x  对应x
  * @property m  对应m
  */
   interface UploadKeyReq {
     KKAddress: string
-    ApAddress: string
+    ApUserName: string
     i: int
     x: int
     m: int

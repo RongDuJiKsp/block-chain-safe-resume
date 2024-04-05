@@ -79,8 +79,8 @@ def GetMoreFileMesReq():
         'message': '',
     }
     try:
-        ApUserName = data['ApUserName']
-        return getMoreFileMes(ApUserName,base)
+        ApAddress = data['ApAddress']
+        return getMoreFileMes(ApAddress,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
@@ -323,11 +323,11 @@ def UploadKeyReq():
     }
     try:
         KKAddress = data['KKAddress']
-        ApAddress = data['ApAddress']
+        ApUserName = data['ApUserName']
         i = data['i']
         x = data['x']
         m = data['m']
-        return uploadKey(KKAddress,ApAddress,i,x,m,base)
+        return uploadKey(KKAddress,ApUserName,i,x,m,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)

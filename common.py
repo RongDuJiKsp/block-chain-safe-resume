@@ -279,13 +279,13 @@ def uploadIpfs(file,userName, address, upload):
     return json.dumps(upload)
 
 
-def getMoreFileMes(ApUserName, base):
+def getMoreFileMes(ApAddress, base):
     # 在hr表中
     # 查询resumeForm表所有内容
-    condition = f'select * from resumeForm where userName=%s'
+    condition = f'select * from resumeForm where address=%s'
     connn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database,autocommit=True, charset='utf8')
     curr = connn.cursor()
-    curr.execute(condition, ApUserName)
+    curr.execute(condition, ApAddress)
     if curr.rowcount:
         result=curr.fetchone()
         base['status'] = 1
@@ -452,7 +452,10 @@ def remindKK(KKAddress,base):
     base['list'] = result
     return json.dumps(base)
 
-def uploadKey(KKAddress,ApAddress,i,x,m,base):
+def uploadKey(KKAddress,ApUserName,i,x,m,base):
+    condition = f'select address from Applicant where userName=%s;'
+    cur.execute(condition,(ApUserName))
+    ApAddress = cur.fetchone()[0]
     part = apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
     if part==1 or part==0:
         condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s and ReAddress=%s;'
