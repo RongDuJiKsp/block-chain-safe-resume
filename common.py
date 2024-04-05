@@ -279,13 +279,13 @@ def uploadIpfs(file,userName, address, upload):
     return json.dumps(upload)
 
 
-def getMoreFileMes(address, base):
+def getMoreFileMes(ApUserName, base):
     # 在hr表中
     # 查询resumeForm表所有内容
-    condition = f'select * from resumeForm where address=%s'
+    condition = f'select * from resumeForm where userName=%s'
     connn = pymysql.connect(host=config.host, user=config.user, password=config.password, database=config.database,autocommit=True, charset='utf8')
     curr = connn.cursor()
-    curr.execute(condition, address)
+    curr.execute(condition, ApUserName)
     if curr.rowcount:
         result=curr.fetchone()
         base['status'] = 1
