@@ -5,10 +5,13 @@ import {StepProps} from "antd/es/steps";
 import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {RegisterRes} from "../../../model/http-bodys/ress.ts";
+import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
+import {useBoolean} from "ahooks";
+import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -68,10 +71,10 @@ function RegisterPage() {
     const reStart = () => {
         setCurrentStep(0);
     };
-    return <div className={"overflow-hidden  register-page-bg-color login-full-anima"}>
+    return <div className={"overflow-hidden register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
-                <div className={"mt-[35%]"}>
+                <div className={"mt-[35%] bg-better-write py-8 px-6"}>
                     <Steps direction="vertical" items={stepItems} current={currentStep}/>
                 </div>
             </div>
@@ -113,14 +116,13 @@ function SelectIdentityComponent() {
                 message.error(r.message).then();
             }
         }).catch(e => {
-
             message.error(e.message).then();
         });
     };
 
-    return <div className={"h-full flex flex-col justify-around"}>
+    return <div className={"h-full flex flex-col justify-around  dark-mode-text"}>
         <div className={"basis-3/5"}>
-            <div className={"pt-8 flex flex-col gap-12"}>
+            <div className={"pt-8 flex flex-col gap-12 "}>
                 <p className={"text-center text-2xl font-sans"}>系统身份介绍</p>
                 <p className={"text-lg"}>
                     Applicant: <br/>
@@ -148,7 +150,7 @@ function SelectIdentityComponent() {
         <div className={"basis-1/12"}>
             <div className={"h-full flex justify-center gap-14"}>
                 {keys.map((val, index) => val !== UserIdentityEnum.None &&
-                    <button key={"select-id-button" + index} className={"button button-3d button-pill"}
+                    <button key={"select-id-button" + index} className={"button button-3d button-pill button-royal"}
                             onClick={() => setSelectedIdentity(val as UserIdentityEnum)}>{val}</button>)}
             </div>
         </div>
@@ -165,26 +167,36 @@ function SelectIdentityComponent() {
 function GetResultComponent() {
     const {res} = useContext(RegisterInfoSetterContext);
     const {message} = App.useApp();
+    const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
-        console.log(res, res?.res.privateKeys);
-        const fileContext = `Please keep your  key, once lost, you can't get it back!
-        PrivateValue : ${res?.res.privateKeys}
-        address : ${res?.res.address}
-        SafeKey:${res?.res.S}
-        SubSafeKeyPair[M,X] :${res?.res.M.map((val, index) => {
-            return `\n        [${val},${res?.res.X[index]}]`;
-        })}
-        You can login with PrivateValue and verify with SafeKey and Find SafeKey with SubSafeKey
-        Please give the SubKey to the key holder who has been granted the right to pledge
-        `;
-        FileSystemImpl.downloadToFileFromSuffix(new Blob([fileContext]), `${res?.res.address?.substring(0, 7)}... of ${res?.identity}`, "key").then(() => message.success("下载成功！"));
+        if (!res?.res) {
+            message.error("注册时发生异常，请检查网络后重试！").then();
+            setCanClose.setTrue();
+            return;
+        }
+        if (!res.res.status) {
+            message.error("注册时发生异常！ " + res.res.message).then();
+            setCanClose.setTrue();
+            return;
+        }
+        const SKey = AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S));
+        const PrivateKey = res.res.privateKeys;
+        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
+        FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
+            message.success("下载成功！").then();
+            setCanClose.setTrue();
+        });
     };
     const onReturnPage = () => {
+        if (!canClose) {
+            message.warning("不保存密钥是不准退出的喵~").then();
+            return;
+        }
         navigate("/", {replace: true});
     };
-    return <div className={"h-full  flex flex-col justify-around "}>
-        <div className={"border-2 border-purple-300 bg-half-write basis-2/3"}>
+    return <div className={"h-full  flex flex-col justify-around showing-in"}>
+        <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
             <Result status={res?.res.status ? "success" : "error"}
                     title={res?.res.status ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>

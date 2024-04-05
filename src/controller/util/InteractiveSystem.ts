@@ -3,11 +3,43 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
-
-    async downloadToFileFromSuffix(file: BinFile, prefix: string, suffix: string): Promise<void> {
-        await this.downloadToFileAsName(file, prefix + "." + suffix);
+    async downloadMetaFileAsync(file: MetaFile): Promise<void> {
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
     },
-    async downloadToFileAsName(file: BinFile, name: string): Promise<void> {
+    arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string, fileType): MetaFile {
+        return new File([arrayBuffer], fileName, {
+            type: fileType
+        });
+    },
+    readFileAsArrayBufferAsync(file: MetaFile): Promise<ArrayBuffer> {
+        return new Promise<ArrayBuffer>((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = (ev): void => {
+                const reader = ev.target;
+                if (reader === null || reader.result === null) {
+                    reject("Null Error");
+                    return;
+                }
+                resolve(reader.result as ArrayBuffer);
+            };
+            fileReader.onerror = (ev) => {
+                reject(ev.target?.error);
+            };
+            fileReader.readAsArrayBuffer(file);
+        });
+    },
+
+    async downloadToFileFromSuffixAsync(file: BinFile, prefix: string, suffix: string): Promise<void> {
+        await this.downloadToFileAsNameAsync(file, prefix + "." + suffix);
+    },
+    async downloadToFileAsNameAsync(file: BinFile, name: string): Promise<void> {
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
         link.href = url;
@@ -17,7 +49,7 @@ export const FileSystemImpl: UserFileSystem = {
         URL.revokeObjectURL(url);
         document.body.removeChild(link);
     },
-    readFileAsBase64(file: File) {
+    readFileAsBase64Async(file: MetaFile) {
         return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
             fileReader.onload = (ev): void => {

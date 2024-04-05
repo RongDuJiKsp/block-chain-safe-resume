@@ -1,9 +1,26 @@
-import {SM4} from "gm-crypto";
-import crypto from "crypto";
-import {CryptoOfHash, HashToTranslate} from "../../model/interface/crypto";
-import {HashedUserRegisterInformation} from "../../model/entity/user.ts";
+import {SM3, SM4} from "gm-crypto";
+import * as crypto from "crypto";
+import {CryptoSystem} from "../../model/interface/crypto";
+import {FileSystemImpl} from "../util/InteractiveSystem.ts";
 
-export const cryptoOfHash: CryptoOfHash = {
+export const CryptoSystemImpl: CryptoSystem = {
+
+    async encryptedFileAsync(originalData: MetaFile, key: string): Promise<MetaFile> {
+        return FileSystemImpl.arrayBufferToFile(this.encryptedBin(await FileSystemImpl.readFileAsArrayBufferAsync(originalData), key), originalData.name, originalData.type);
+    },
+    async decryptedFileAsync(encryptedBinData: MetaFile, key: string): Promise<MetaFile> {
+        return FileSystemImpl.arrayBufferToFile(this.decryptedBin(await FileSystemImpl.readFileAsArrayBufferAsync(encryptedBinData), key), encryptedBinData.name, encryptedBinData.type);
+    },
+    encryptedBin(originalBinData: ArrayBuffer, key: string): ArrayBuffer {
+        return SM4.encrypt(originalBinData, key, {
+            inputEncoding: "binary"
+        });
+    },
+    decryptedBin(encryptedBinData: ArrayBuffer, key: string): ArrayBuffer {
+        return SM4.decrypt(encryptedBinData, key, {
+            inputEncoding: "binary"
+        });
+    },
     encryptedData(originalData, key) {
         return SM4.encrypt(originalData, key, {
             inputEncoding: 'utf8',
@@ -21,10 +38,10 @@ export const cryptoOfHash: CryptoOfHash = {
         hash.update(data);
         return hash.digest('hex');
     },
-};
-export const hashToTranslate: HashToTranslate = {
-    getHashOfUserInfo(info: HashedUserRegisterInformation): string {
-        return cryptoOfHash.hashData(JSON.stringify(info));
-    }
+    hashDataBySM3(data: string): string {
+        return SM3.digest(data, "ascii", "hex");
+    },
+
+
 
 };

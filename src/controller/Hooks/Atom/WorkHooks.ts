@@ -5,25 +5,55 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/reqs.ts";
+import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
+import {ArrayRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
-    AccessibleSubKeyListRes,
-    BaseRes,
-    ChangeNameRes,
     GiveOrDelayResumeLicensingRes,
-    LoginRes,
-    RecruiterResumeStatusListRes,
-    RegisterRes,
-    RequestRequestListRes,
-    RequestResumeLicensingRes,
     ResumeInfoRes,
     ResumeQuestListRes,
     ResumeRequestHistoryListRes,
+    UploadRes
+} from "../../../model/http-bodys/user/applicant/res.ts";
+import {
+    AccessibleSubKeyListRes,
+    DownloadSubKeysRes,
+    GetFileMesRes,
+    RequestListRes,
     UploadSubKeyRes
-} from "../../../model/http-bodys/ress.ts";
+} from "../../../model/http-bodys/user/keykeeper/res.ts";
+import {
+    DownloadRes,
+    RecruiterResumeStatusListRes,
+    RequestResumeLicensingRes,
+    SearchApRes
+} from "../../../model/http-bodys/user/recruiter/res.ts";
+import {
+    GetFileMesReq,
+    GetNeedSaveReq,
+    RemindKKReq,
+    SavePartReq,
+    UploadKeyReq
+} from "../../../model/http-bodys/user/keykeeper/req.ts";
+import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
+import {
+    DownloadFileReq,
+    RecAlreadyAuthorizeReq,
+    RecAuthorizeReq,
+    SearchApReq
+} from "../../../model/http-bodys/user/recruiter/req.ts";
+import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
+import {
+    ApAuthorizeReq,
+    GetDownloadHisReq,
+    GetMoreFileMesReq,
+    GetRequestReq
+} from "../../../model/http-bodys/user/applicant/req.ts";
+import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
+import {CryptoSystemImpl} from "../../crypto/hash.ts";
+import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
 export const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -88,7 +118,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                     privateKeys: privateKey,
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
-
+                console.log("login User", res);
                 const info: BasicUserState = {
                     identity: identity, nick: res.userName, address: res.address
                 };
@@ -108,76 +138,81 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    updateResumeAsync(File: File, S: string): Promise<BaseRes>;
+    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
 
     getResumeRequestListAsync(): Promise<ResumeQuestListRes>;
 
-    giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes>;
+    giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes>;
 
     getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
+                if (userInfo === null) throw "在未登录时获取简历历史记录信息";
+                const req: GetDownloadHisReq = {
+                    ApUserName: userInfo.nick,
+                    ApAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetDownloadHisReq", req);
                 return {
-                    status: 1,
-                    message: 'ok',
-                    list: []
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): ResumeVisitHistoryInfo => ({
+                        ReUserName: val[1],
+                        downloadTime: val[2]
+                    })) : []
                 };
             },
             async getResumeRequestListAsync(): Promise<ResumeQuestListRes> {
-                return {
-                    status: 1,
-                    message: 'ok',
-                    list: [
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                        }, {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibabababababab"
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                        },
-                        {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                        }, {
-                            address: "0x7F6aAe679dC0bD7d6ecF62224A5a3423877d6Be7",
-                            username: "alibaba"
-                        },
-                    ]
+                if (userInfo === null) throw "在未登录时获取简历申请记录信息";
+                const req: GetRequestReq = {
+                    ApAddress: userInfo.address,
                 };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetRequestReq", req);
+                const goData: ResumeQuestListRes = {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): ResumeLicenseRequestInfo => ({
+                        username: val[2],
+                        address: val[3],
+                        status: Number(val[4])
+                    })) : []
+                };
+                goData.list.sort((a: ResumeLicenseRequestInfo, b: ResumeLicenseRequestInfo) => a.status - b.status);
+                return goData;
             },
-            async giveOrDelayResumeLicensingAsync(): Promise<GiveOrDelayResumeLicensingRes> {
-                return {
-                    status: 1,
-                    message: 'ok'
+            async giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes> {
+                if (userInfo === null) throw "在未登录时操作验证";
+                const req: ApAuthorizeReq = {
+                    ReAddress, status, ApAddress: userInfo.address
                 };
+                return alovaClientImpl.Post("/ApAuthorizeReq", req);
+
             },
             async getResumeInfoAsync(): Promise<ResumeInfoRes> {
-                return {
-                    status: 1,
-                    message: "ok",
-                    putTime: "1989-07-01 12:13:14",
-                    downloadtimes: "2232"
+                if (userInfo === null) throw "在未登录时获取简历申请记录信息";
+                const req: GetMoreFileMesReq = {
+                    ApAddress: userInfo.address
                 };
+                return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
-            async updateResumeAsync(File: File, S: string): Promise<BaseRes> {
-                return {
-                    status: 1,
-                    message: "ojF" + File.name + S
-                };
+            async encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes> {
+                if (userInfo === null) throw "在未登录时上传简历";
+                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(File, S);
+                const formData = new FormData();
+                formData.append("file", encryptedFile);
+                return alovaClientImpl.Post<UploadRes>("/UploadReq", formData, {
+                    params: {
+                        address: userInfo.address,
+                        userName: userInfo.nick
+                    }
+                });
             }
         };
     },
@@ -188,31 +223,81 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 };
 
 interface RecruiterWorkMethod {
-    downloadResumeAsync(encryptHash: string, S: string): Promise<File>;
+    downloadResumeAsync(fileHash: string, SafeKey: string, ApUserName: string, name: string, type: string): Promise<MetaFile>;
+
+    getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes>;
+
+    autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void>;
+
+    requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes>;
 
     getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes>;
 
-    requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes>;
+    getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes>;
 }
 
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
-            async downloadResumeAsync(encryptHash: string, S: string): Promise<File> {
-                return new File([encryptHash, S], "ss");
+            async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
+                const chainMeta = await this.getFileMessageAsync(ApAddress);
+                if (!chainMeta.status) throw chainMeta.message;
+                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                await FileSystemImpl.downloadMetaFileAsync(file);
             },
-            async getResumeStatusListAsync() {
+            async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
+                if (userInfo === null) throw "未登录时尝试下载";
+                const req: GetFileMesReq = {
+                    ApAddress, ReAddress: userInfo.address
+                };
+                return alovaClientImpl.Post("/GetFileMesReq", req);
+            },
+            async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
+                const req: SearchApReq = {
+                    partApUserName
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/SearchApReq", req);
                 return {
-                    status: 1,
-                    message: "",
-                    list: []
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ?
+                        res.list.map((val): ApSearchInfo => ({ApUserName: val[0], ApAddress: val[1]}))
+                        : []
                 };
             },
-            async requestResumeLicensingAsync(): Promise<RequestResumeLicensingRes> {
-                return {
-                    status: 1,
-                    message: ""
+            async downloadResumeAsync(fileHash: string, SafeKey: string, ApUserName: string, name: string, type: string): Promise<MetaFile> {
+                if (userInfo === null) throw "未登录时尝试下载";
+                const req: DownloadFileReq = {
+                    fileHash, ApUserName, ReUserName: userInfo.nick
                 };
+                const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
+                const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
+                return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
+            },
+            async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
+                if (userInfo === null) throw "未登录时尝试获取简历列表";
+                const req: RecAlreadyAuthorizeReq = {
+                    ReAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/RecAlreadyAuthorizeReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): ConnectingResumeInfo => ({
+                        ApUserName: val[0],
+                        ApAddress: val[1],
+                        ReAddress: val[2],
+                        status: Number(val[3])
+                    })) : []
+                };
+            },
+            async requestResumeLicensingAsync(ApUserName: string, ApAddress: string): Promise<RequestResumeLicensingRes> {
+                if (userInfo === null) throw "未登录时尝试获取授权";
+                const req: RecAuthorizeReq = {
+                    ApUserName, ApAddress, ReAddress: userInfo.address
+                };
+                return alovaClientImpl.Post<RequestResumeLicensingRes>("/RecAuthorizeReq", req);
             }
         };
     },
@@ -223,24 +308,64 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 };
 
 interface KeyKeeperWorkMethod {
-    uploadSubKeyAsync(): Promise<UploadSubKeyRes>;
+    uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
-    requestRequestListAsync(): Promise<RequestRequestListRes>;
+    downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
+
+    getRequestListAsync(): Promise<RequestListRes>;
 
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
+
     useMethod(): KeyKeeperWorkMethod {
+        const userInfo = useAtomValue(userInfoAtom);
         return {
+            async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
+                if (userInfo === null) throw "未登录时尝试获取子密钥";
+                const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};
+                return alovaClientImpl.Post<DownloadSubKeysRes>("/SavePartReq", req);
+            },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
-                return {status: 1, message: "22"};
+                if (userInfo === null) throw "未登录时尝试上传";
+                const req: GetNeedSaveReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetNeedSaveReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): AccessibleSubKeyInfo => ({
+                        userName: val[0],
+                        address: val[1],
+                        amount: Number(val[2])
+                    })) : []
+                };
+
             },
-            async requestRequestListAsync(): Promise<RequestRequestListRes> {
-                return {status: 1, message: "22"};
+            async getRequestListAsync(): Promise<RequestListRes> {
+                if (userInfo === null) throw "未登录时尝试获取";
+                const req: RemindKKReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/RemindKKReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ?
+                        res.list.map((val): UploadSubKeyRequestInfo => ({
+                            ApUserName: val[0],
+                            time: val[2]
+                        })) : []
+                };
             },
-            async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
-                return {status: 1, message: "22"};
+            async uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
+                if (userInfo === null) throw "未登录时尝试上传子密钥";
+                const req: UploadKeyReq = {
+                    ApAddress, i, x, m, KKAddress: userInfo.address
+                };
+                return alovaClientImpl.Post("/UploadKeyReq", req);
             }
 
         };
