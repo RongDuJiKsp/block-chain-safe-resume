@@ -1,7 +1,7 @@
 import {App, Button, Form, Input, Modal, Table} from "antd";
 import {RecAuthorizeReq} from "../../../../model/http-bodys/user/recruiter/req.ts";
 import {useBoolean} from "ahooks";
-import {SearchOutlined} from "@ant-design/icons";
+import {LoadingOutlined, SearchOutlined} from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import {ReactNode, useState} from "react";
 import {ColumnsType} from "antd/es/table";
@@ -13,7 +13,7 @@ import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 export default function RecruiterRequire() {
 
     return <div className={"flex flex-col gap-14 justify-center basic-window h-full-screen"}>
-        <div className={"basis-3/5  mx-44 px-24 py-16  work-window-color"}>
+        <div className={"basis-3/5  mx-44 px-24 py-12  work-window-color"}>
             <SendRequire/>
         </div>
     </div>;
@@ -22,9 +22,11 @@ export default function RecruiterRequire() {
 function SendRequire() {
     const reService = RecruiterWorkHooks.useMethod();
     const {message} = App.useApp();
+    const [isLoading, loadingAction] = useBoolean();
     const onSubmit = (val: RecAuthorizeReq) => {
+        loadingAction.setTrue();
         reService.requestResumeLicensingAsync(val.ApUserName, val.ApAddress).then(r => {
-            console.log(r);
+            loadingAction.setFalse();
             if (r.status) {
                 message.success("操作成功！").then();
             } else {
@@ -48,8 +50,13 @@ function SendRequire() {
                 <Input/>
             </Form.Item>
             <Form.Item>
-                <div className={"flex justify-center"}>
-                    <button className={"button-3d button button-pill button-primary "}>发送请求</button>
+                <div className={"flex justify-center mt-5"}>
+                    <button className={"button-3d button button-pill button-primary "}>
+                        {isLoading ?
+                            <span><LoadingOutlined/>&emsp;正在发送</span>:
+                            <span>点击发送请求</span>
+                        }
+                    </button>
                 </div>
             </Form.Item>
         </Form>
@@ -94,17 +101,19 @@ function FindLikeInfoModel({vis, close}: { vis: boolean, close: CallBackWithSide
         {
             title: "用户名",
             dataIndex: "ApUserName",
-            width: "16%",
+            width: "28%",
             align: "center",
+            ellipsis: true
         },
         {
             title: "地址",
             dataIndex: "ApAddress",
             align: "center",
-            ellipsis:true
+            ellipsis: true
         },
         {
             title: "操作",
+            width: "16%",
             render(_, item): ReactNode {
                 return <div className={"flex justify-center"}>
                     <Button type={"primary"} onClick={() => onDownload(item)}>保存</Button>
