@@ -118,7 +118,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                     privateKeys: privateKey,
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
-
+                console.log("login User", res);
                 const info: BasicUserState = {
                     identity: identity, nick: res.userName, address: res.address
                 };
@@ -242,6 +242,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
+                if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
                 await FileSystemImpl.downloadMetaFileAsync(file);
             },
@@ -250,7 +251,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const req: GetFileMesReq = {
                     ApAddress, ReAddress: userInfo.address
                 };
-                return alovaClientImpl.Post("/GetFileMesRes", req);
+                return alovaClientImpl.Post("/GetFileMesReq", req);
             },
             async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
                 const req: SearchApReq = {

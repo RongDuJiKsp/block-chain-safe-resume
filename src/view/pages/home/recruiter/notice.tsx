@@ -29,12 +29,19 @@ export default function RecruiterNotice() {
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
     const userService = RecruiterWorkHooks.useMethod();
+    const {message} = App.useApp();
     const [isLoading, loadingAction] = useBoolean();
 
-    const onDownloadResume =  (info: ConnectingResumeInfo) => {//TODO 实现一键下载和良好交互
+    const onDownloadResume = (info: ConnectingResumeInfo) => {//TODO 实现一键下载和良好交互
         loadingAction.setTrue();
-
-
+        userService.autoDownloadFile(info.ApAddress, info.ApUserName)
+            .then((): void => {
+                message.success("文件下载成功").then();
+            })
+            .catch((e): void => {
+                message.error("文件下载失败，原因为 " + e.toString()).then();
+            })
+            .finally(loadingAction.setFalse);
     };
     const tableColumn: ColumnsType<ConnectingResumeInfo> = [
         {
@@ -78,7 +85,7 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
         }
     ];
     return <div>
-        <Spin spinning={isLoading} fullscreen/>
+        <Spin spinning={isLoading} fullscreen delay={500}/>
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
