@@ -1,4 +1,4 @@
-import {App, Button, Popconfirm, Statistic, Table, Tag} from "antd";
+import {App, Button, Popconfirm, Spin, Statistic, Table, Tag} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import CountUp from "react-countup";
@@ -9,6 +9,7 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
 import {ResumeInfoRes} from "../../../../model/http-bodys/user/applicant/res.ts";
 import dayjs from "dayjs";
+import {useBoolean} from "ahooks";
 
 
 export default function ApplicantStatus() {
@@ -17,7 +18,9 @@ export default function ApplicantStatus() {
     const [flashFlag, changeAction] = useSwapBoolean();
     const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
     const [tableInfo, setTableInfo] = useState<ResumeLicenseRequestInfo[]>([]);
+    const [isLoading, loadingAction] = useBoolean();
     useEffect(() => {
+        loadingAction.setTrue();
         userService.getResumeInfoAsync().then(r => {
             if (r.status) setResumeInfo(r);
             else message.error("获取更新时发生失败，原因:" + r.message).then();
@@ -31,12 +34,14 @@ export default function ApplicantStatus() {
         }).catch(e => {
             console.error(e);
             message.error(e.toString()).then();
-        });
+        }).finally(loadingAction.setFalse);
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6"}>
         <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问请求"} onFresh={changeAction}/>
-            <ResumeRequestComponent tableVal={tableInfo}/>
+           <Spin delay={500} spinning={isLoading}>
+               <ResumeRequestComponent tableVal={tableInfo}/>
+           </Spin>
         </div>
         <div className={" bg-white py-8 "}>
             <ResumeInfoComponent info={resumeInfo}/>

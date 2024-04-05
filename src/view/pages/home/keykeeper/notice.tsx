@@ -1,4 +1,4 @@
-import {App, Button, Modal, Table} from "antd";
+import {App, Button, Modal, Spin, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {ReactNode, useEffect, useState} from "react";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
@@ -7,14 +7,17 @@ import {UploadSubKeyRequestInfo} from "../../../../model/entity/keykeeper.ts";
 import {KeyKeeperWorkHook} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import dayjs from "dayjs";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
+import {useBoolean} from "ahooks";
 
 
 export default function KeyKeeperNotice() {
     const kkServer = KeyKeeperWorkHook.useMethod();
     const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
+    const [isLoading, loadingAction] = useBoolean();
     const [tableVal, setTableVal] = useState<UploadSubKeyRequestInfo[]>([]);
     useEffect(() => {
+        loadingAction.setTrue();
         kkServer.getRequestListAsync().then(r => {
             if (r.status) {
                 setTableVal(r.list);
@@ -25,12 +28,14 @@ export default function KeyKeeperNotice() {
         }).catch(e => {
             console.error(e);
             message.error(e.toString()).then();
-        });
+        }).finally(loadingAction.setFalse);
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
         <div className={"work-window-color basis-3/4 px-8 py-4"}>
             <TableHeader title={"待上传请求"} onFresh={changeAction}/>
-            <RequestTableComponent tableVal={tableVal}/>
+            <Spin spinning={isLoading} delay={500}>
+                <RequestTableComponent tableVal={tableVal}/>
+            </Spin>
         </div>
     </div>;
 }

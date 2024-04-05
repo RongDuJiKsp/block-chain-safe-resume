@@ -1,23 +1,28 @@
-import {Button, Table, Tag} from "antd";
+import {App, Button, Spin, Table, Tag} from "antd";
 import {ColumnsType} from "antd/es/table";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {ReactNode, useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {useBoolean} from "ahooks";
 
 
 export default function RecruiterNotice() {
     const userService = RecruiterWorkHooks.useMethod();
+    const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
     const [tableVal, setTableVal] = useState<ConnectingResumeInfo[]>([]);
+    const [isLoading, loadingAction] = useBoolean();
     useEffect(() => {
-        userService.getResumeStatusListAsync().then(r => setTableVal(r.list));
+        userService.getResumeStatusListAsync().then(r => setTableVal(r.list)).catch(e => message.success(e.toString()).then()).finally(loadingAction.setFalse);
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window"}>
         <div className={"basis-3/4  mx-11  pt-6 px-6 work-window-color"}>
             <TableHeader title={"申请简历状态"} onFresh={changeAction}/>
-            <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
+            <Spin spinning={isLoading} delay={500}>
+                <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
+            </Spin>
         </div>
     </div>;
 }
