@@ -35,3 +35,12 @@ export interface UploadKeyReq {
     x: number
     m: number
 }
+/**
+ * @interface GetFileMesReq
+ * @property ApAddress  ap用户地址
+ * @property ReAddress re用户的地址
+ */
+export interface GetFileMesReq {
+    ApAddress: string;
+    ReAddress: string;
+}

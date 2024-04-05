@@ -23,3 +23,18 @@ export interface RequestListRes extends BaseRes {
 export interface AccessibleSubKeyListRes extends BaseRes {
     list: AccessibleSubKeyInfo[];
 }
+
+/**
+ * @interface GetFileMesRes
+ * @extends BaseRes
+ * @property s 对称密钥s
+ * @property fileName 文件名
+ * @property fileType 文件类型
+ * @property fileHash 文件hash
+ */
+export interface GetFileMesRes extends BaseRes {
+    s: number;
+    fileName: string;
+    fileType: string;
+    fileHash: string;
+}
