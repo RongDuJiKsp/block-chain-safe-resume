@@ -236,7 +236,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
             },
             async downloadResumeAsync(encryptHash: string, S: string): Promise<MetaFile> {
                 if (userInfo === null) throw "未登录时尝试下载";
-                return new File([encryptHash, S], "ss");
+                return new File([encryptHash, S], "ss");//TODO:实现一键下载并且解密的功能
             },
             async getResumeStatusListAsync(): Promise<RecruiterResumeStatusListRes> {
                 if (userInfo === null) throw "未登录时尝试获取简历列表";
@@ -325,7 +325,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
             },
             async uploadSubKeyAsync(): Promise<UploadSubKeyRes> {
                 if (userInfo === null) throw "未登录时尝试上传子密钥";
-
+//TODO: 实现kk上传子密钥的功能
                 return {status: 1, message: "22"};
             }
 

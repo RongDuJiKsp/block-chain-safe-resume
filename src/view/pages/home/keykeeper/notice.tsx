@@ -18,6 +18,7 @@ export default function KeyKeeperNotice() {
         kkServer.getRequestListAsync().then(r => {
             if (r.status) {
                 setTableVal(r.list);
+                message.success("信息获取成功").then();
             } else {
                 message.error("发生错误：" + r.message).then();
             }
@@ -75,8 +76,8 @@ function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[]
     </div>;
 }
 
-function UploadSubKeyModel({prop}: ModelPropsWithInfoAndClear<UploadSubKeyRequestInfo>) {
-    return <Modal open={prop !== null}>
+function UploadSubKeyModel({data}: ModelPropsWithInfoAndClear<UploadSubKeyRequestInfo>) {
+    return <Modal open={data !== null}>
 
     </Modal>;
 }

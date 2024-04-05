@@ -23,7 +23,7 @@ export default function RecruiterNotice() {
 }
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {
-    const onDownloadResume = () => {
+    const onDownloadResume = () => {//TODO 实现一键下载和良好交互
 
     };
     const tableColumn: ColumnsType<ConnectingResumeInfo> = [
@@ -70,5 +70,5 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
-    </div>;
+    </div>;//TODO:更改表格展示使其能够展示详细状态
 }
