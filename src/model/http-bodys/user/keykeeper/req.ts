@@ -30,7 +30,7 @@ export interface RemindKKReq {
  */
 export interface UploadKeyReq {
     KKAddress: string
-    ApAddress: string
+    ApUserName: string
     i: number
     x: number
     m: number

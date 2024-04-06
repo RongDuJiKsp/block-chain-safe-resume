@@ -85,16 +85,27 @@ function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[]
 
 function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<UploadSubKeyRequestInfo>) {
     const kkServer = KeyKeeperWorkHook.useMethod();
+    const {message} = App.useApp();
     const [conformLoading, conformLoadingAction] = useBoolean();
     const [formRef] = useForm<UploadKeyReq>();
     const onConform = (val: UploadKeyReq): void => {
         if (data === null) return;
         conformLoadingAction.setTrue();
-// kkServer.uploadSubKeyAsync(data.ApUserName,val.ApAddress,val.)
+        kkServer.uploadSubKeyAsync(data.ApUserName, val.i, val.x, val.m).then(r => {
+            if (r.status) {
+                message.success("上传成功").then();
+                clear();
+            }
+            else message.error("上传失败，原因为 " + r.message).then();
+        }).catch(e => {
+            console.error(e);
+            message.error("发生错误，错误为：" + e).then();
+        }).finally(conformLoadingAction.setFalse);
     };
 
 
-    return <Modal open={data !== null} onCancel={clear} onOk={formRef.submit} destroyOnClose={true} confirmLoading={conformLoading}>
+    return <Modal open={data !== null} onCancel={clear} onOk={formRef.submit} destroyOnClose={true}
+                  confirmLoading={conformLoading}>
         <div className={"my-6"}>
             <div className={"flex flex-col gap-6 my-3"}>
                 <p>请在此为指定用户上传密钥</p>

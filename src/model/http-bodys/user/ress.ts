@@ -52,5 +52,5 @@ export interface ArrayRes extends BaseRes {
 }
 
 export interface GetTokenRes extends BaseRes {
-    token: number;
+    balance: number;
 }

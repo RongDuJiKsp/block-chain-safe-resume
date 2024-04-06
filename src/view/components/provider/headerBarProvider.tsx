@@ -99,7 +99,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
         loginServer.getTokenNumberAsync().then(r => {
             if (r.status) {
                 message.success("刷新成功！").then();
-                setTokenVal(r.token);
+                setTokenVal(r.balance);
             } else message.error("刷新失败！原因：" + r.message).then();
         }).catch(e => {
             message.error("刷新失败！原因：" + e).then();
