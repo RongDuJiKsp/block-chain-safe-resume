@@ -19,6 +19,7 @@ import {
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
+    ChangeKKRes,
     DownloadSubKeysRes,
     GetFileMesRes,
     RequestListRes,
@@ -31,6 +32,7 @@ import {
     SearchApRes
 } from "../../../model/http-bodys/user/recruiter/res.ts";
 import {
+    ChangeKKReq,
     GetFileMesReq,
     GetNeedSaveReq,
     RemindKKReq,
@@ -315,6 +317,8 @@ interface KeyKeeperWorkMethod {
     getRequestListAsync(): Promise<RequestListRes>;
 
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
+
+    getPermissionToBeKK(): Promise<ChangeKKRes>;
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
@@ -322,6 +326,13 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
     useMethod(): KeyKeeperWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async getPermissionToBeKK(): Promise<ChangeKKRes> {
+                if (userInfo === null) throw "未登录时尝试获取权限";
+                const req: ChangeKKReq = {
+                    KKAddress: userInfo.address
+                };
+                return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
+            },
             async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
                 if (userInfo === null) throw "未登录时尝试获取子密钥";
                 const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};

@@ -38,3 +38,8 @@ export interface GetFileMesRes extends BaseRes {
     fileType: string;
     fileHash: string;
 }
+/**
+ * @interface ChangeKKRes kk成为合法的保管人
+ */
+export interface ChangeKKRes extends BaseRes{
+}
