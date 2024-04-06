@@ -255,9 +255,9 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
-                console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                console.log("***",file);
                 await FileSystemImpl.downloadMetaFileAsync(file);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
@@ -265,6 +265,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const req: GetFileMesReq = {
                     ApAddress, ReAddress: userInfo.address
                 };
+                console.log(req);
                 return alovaClientImpl.Post("/GetFileMesReq", req);
             },
             async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
@@ -286,6 +287,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     fileHash, ApUserName, ReUserName: userInfo.nick
                 };
                 const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
+                console.log("res:",res);
                 const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
                 return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
             },
