@@ -69,8 +69,8 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
             title: "操作",
             width: "17%",
             align: "center",
-            render(_, item): ReactNode {
-                return <div className={"justify-around flex"}>
+            render(_, item, index): ReactNode {
+                return <div className={"justify-around flex"} key={"of" + index}>
                     <Popconfirm title={`确认获取保管该用户(${item.userName.substring(0, 8) + ".."})的子密钥？`}
                                 onConfirm={() => onAccept(item)}>
                         <Button type={"primary"}>获取</Button>

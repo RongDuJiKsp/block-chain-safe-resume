@@ -181,6 +181,7 @@ function GetResultComponent() {
             setCanClose.setTrue();
             return;
         }
+        console.log(res);
         const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
         const PrivateKey = res.res.privateKeys;
         const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);

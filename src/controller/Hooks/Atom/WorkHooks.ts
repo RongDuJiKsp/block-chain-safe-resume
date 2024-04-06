@@ -255,6 +255,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
+                console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
                 await FileSystemImpl.downloadMetaFileAsync(file);
