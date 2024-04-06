@@ -232,7 +232,9 @@ def ApAuthorizeReq():
         ReAddress = data['ReAddress']
         if status == 0:
             return rejectAuthorize(ApAddress,ReAddress)
-        return apAuthorize(ApAddress,ReAddress)
+        else:
+            updataNeedKEY(ApAddress)
+            return apAuthorize(ApAddress,ReAddress)
     except Exception as e:
         return json.dumps({'status': 0, 'message': '{}'.format(str(e))})
 # 简历上传函数

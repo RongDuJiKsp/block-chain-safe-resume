@@ -54,11 +54,11 @@ def getTableName(identity):
         return 'error'
 
 
-def apiApkeysupload(address, X, M, P, T,user):
+def apiApkeysupload(address, X, M, P,user):
     url = config.api_url
     config.api_data["user"] = address
     config.api_data["funcName"] = 'Apkeysupload'
-    config.api_data["funcParam"] = [f'{X}', f'{M}',f'{P}', f'{T}']
+    config.api_data["funcParam"] = [f'{X}', f'{M}',f'{P}', f'{3}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
@@ -196,14 +196,14 @@ def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
     try:
         message = reslut['message']
         if reslut['status'] == "0x0":
-            #还需解析返回值
+            # 还需解析返回值
             types = ['int']
             decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
             return decoded_data[0],message
         else:
-            return -1,message
+            return 1,message
     except Exception as e:
-        return -1,str(e)
+        return 1,str(e)
 
 def apiBalance(address,base):
     url = config.api_url
@@ -250,7 +250,7 @@ def register(data, user):
     try:
         if table_name == 'Applicant':
             need = getNeed()
-            user=apiApkeysupload(key['address'], need['X'], need['M'], need['P'], need['S'],user)
+            user=apiApkeysupload(key['address'], need['X'], need['M'], need['P'],user)
             if user['status'] == 0:
                 return json.dumps(user)
             condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
@@ -336,15 +336,9 @@ def downloadByipfs(file_hash,ApUserName,ReUserName,download):
         # 保存到历史记录
         condition = f'insert into DownloadHisForm(ApUserName,ReUserName,downloadtime) values(%s,%s,UNIX_TIMESTAMP());'
         cur.execute(condition, (ApUserName, ReUserName))
-        # 向kk发送获取请求
-        condition = f'select KKAddress from KKAlreadySave where ApUserName=%s'
-        cur.execute(condition, (ApUserName))
-        KKAddress= cur.fetchone()[0]
-        condition = f'insert into needKEY(ApUserName,KKAddress,time) values(%s,%s,UNIX_TIMESTAMP());'
-        cur.execute(condition, (ApUserName, KKAddress))
         download['status'] = 1
         download['fileName'] = file_name
-        download['body'] = base64.b64encode(response.content).decode('utf-8')
+        download['base64'] = base64.b64encode(response.content).decode('utf-8')
         return download
     else:
         return download
@@ -489,15 +483,16 @@ def uploadKey(KKAddress,ApUserName,i,x,m,base):
     cur.execute(condition,(ApUserName))
     ApAddress = cur.fetchone()[0]
     part,message= apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
-    if part==1 or part==0:
-        condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s and ReAddress=%s;'
-        cur.execute(condition, (ApAddress, KKAddress))
+    if part==0:
+        condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s;'
+        cur.execute(condition, (ApAddress))
         base['status'] = 1
         base['message'] = message
         return json.dumps(base)
     else:
         base['status'] = 0
         base['message'] = message
+        print("uploadKey get part")
         return json.dumps(base)
 def changeKK(KKAddress,base):
     re,message=apiKeeperApply(KKAddress)
@@ -509,3 +504,18 @@ def changeKK(KKAddress,base):
 
 def getBalance(address,base):
     return apiBalance(address,base)
+
+def updataNeedKEY(ApAddress):
+    # 向kk发送获取请求
+    condition = f'select ApUserName,KKAddress from KKAlreadySave where ApAddress=%s'
+    cur.execute(condition, (ApAddress))
+    result=cur.fetchall()
+    for row in result:
+        ApUserName= row[0]
+        KKAddress = row[1]
+        condition = f'insert into needKEY(ApUserName,KKAddress,time) values(%s,%s,UNIX_TIMESTAMP());'
+        cur.execute(condition, (ApUserName, KKAddress))
+
+if __name__ == '__main__':
+    base={"status":0,"message":""}
+    print(apiDownloadResume("0x113baf7e26aef234df3acdedf13077b7bc41bdd0","0xbd3985298dc373145efa818473e4a4cfa5a32e7f"))
