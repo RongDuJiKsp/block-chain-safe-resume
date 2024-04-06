@@ -70,7 +70,7 @@ function LoginComponent() {
             } else message.error("登录失败").then();
             loadingAction.setFalse();
         }).catch(e => {
-            console.error(e);
+            message.error("登录失败，原因：" + e.toString()).then();
             loadingAction.setFalse();
         });
     };

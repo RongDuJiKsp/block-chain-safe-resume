@@ -50,3 +50,7 @@ type StringArray = string[];
 export interface ArrayRes extends BaseRes {
     list: StringArray[]
 }
+
+export interface GetTokenRes extends BaseRes {
+    token: number;
+}

@@ -1,7 +1,7 @@
 import "./provider.css";
 import logo from "../../../assets/logo-p.png";
 import title from "../../../assets/title.png";
-import {PropsWithChildren, ReactNode} from "react";
+import {PropsWithChildren, ReactNode, useEffect, useState} from "react";
 import {App, Dropdown, Form, Input, Modal} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
@@ -11,6 +11,7 @@ import {useBoolean} from "ahooks";
 import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 import {useForm} from "antd/es/form/Form";
 import {UserGroup} from "../../../model/entity/user.ts";
+import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -65,6 +66,8 @@ function DropDownOperations({group}: { group: UserGroup }) {
     const {message} = App.useApp();
     const loginServer = UserWorkHooks.useMethod();
     const {userInfo} = UserWorkHooks.useValue();
+    const [tokenVal, setTokenVal] = useState(0);
+    const [freshToken, freshAction] = useSwapBoolean();
     const [isChangeNickOpen, changeNickOpenAction] = useBoolean();
     const [isLogoutOpen, logoutOpenAction] = useBoolean();
     const [form] = useForm<ChangeNickFormProps>();
@@ -92,7 +95,16 @@ function DropDownOperations({group}: { group: UserGroup }) {
             loginServer.logout();
         }
     };
-
+    useEffect(() => {
+        loginServer.getTokenNumberAsync().then(r => {
+            if (r.status) {
+                message.success("刷新成功！").then();
+                setTokenVal(r.token);
+            } else message.error("刷新失败！原因：" + r.message).then();
+        }).catch(e => {
+            message.error("刷新失败！原因：" + e).then();
+        });
+    }, [freshToken]);
     const dropDownItems: ItemType[] = [
         {
             key: "nick",
@@ -104,7 +116,8 @@ function DropDownOperations({group}: { group: UserGroup }) {
         },
         {
             key: "token",
-            label: componentUtils.getIconVal("icon-token", 0),
+            label: componentUtils.getIconVal("icon-token", tokenVal),
+            onClick: freshAction
         },
         {
             key: "nick-cng",

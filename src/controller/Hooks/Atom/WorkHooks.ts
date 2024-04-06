@@ -9,7 +9,7 @@ import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/us
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     ResumeInfoRes,
@@ -84,6 +84,8 @@ interface UserWorkMethod {
     logout(): void;
 
     changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes>;
+
+    getTokenNumberAsync(): Promise<GetTokenRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -96,6 +98,13 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     useMethod(): UserWorkMethod {
         const [info, setInfo] = useAtom(userInfoAtom);
         return {
+            async getTokenNumberAsync(): Promise<GetTokenRes> {
+                return {
+                    status: 2,
+                    message: "ok",
+                    token: 24,
+                };
+            },
             async changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes> {
                 if (info === null) throw "在未登录的情况下尝试修改用户名";
                 const request: ChangeNameReq = {
@@ -121,6 +130,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
                 console.log("login User", res);
+                if (!res.status) throw res.message;
                 const info: BasicUserState = {
                     identity: identity, nick: res.userName, address: res.address
                 };
