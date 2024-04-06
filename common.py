@@ -54,10 +54,10 @@ def getTableName(identity):
         return 'error'
 
 
-def apiApregister(address, X, M, P, T,user):
+def apiApkeysupload(address, X, M, P, T,user):
     url = config.api_url
     config.api_data["user"] = address
-    config.api_data["funcName"] = 'Apregister'
+    config.api_data["funcName"] = 'Apkeysupload'
     config.api_data["funcParam"] = [f'{X}', f'{M}',f'{P}', f'{T}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -89,10 +89,10 @@ def apiFileUpdate(address,hash_code, file_name, file_type,upload):
     except Exception as e:
         upload['message'] = "{}".format(str(e))
         return upload
-def apiKeeperaply(KKAddress):
+def apiKeeperApply(KKAddress):
     url = config.api_url
     config.api_data["user"] = KKAddress
-    config.api_data["funcName"] = 'keeperaply'
+    config.api_data["funcName"] = 'KeeperApply'
     config.api_data["funcParam"] = []
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -108,7 +108,7 @@ def apiKeeperaply(KKAddress):
 def apiReturnsubkey(ApAddress,KKAddress,part):
     url = config.api_url
     config.api_data["user"] = KKAddress
-    config.api_data["funcName"] = 'returnsubkey'
+    config.api_data["funcName"] = 'Returnsubkey'
     config.api_data["funcParam"] = [f'{ApAddress}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -149,7 +149,7 @@ def apiRecRequest(ReAddress,ApAddress):
 def apiAuthorizeUser(ApAddress, ReAddress):
     url = config.api_url
     config.api_data["user"] = ApAddress
-    config.api_data["funcName"] = 'authorizeUser'
+    config.api_data["funcName"] = 'AuthorizeUser'
     config.api_data["funcParam"] = [f'{ReAddress}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -162,10 +162,10 @@ def apiAuthorizeUser(ApAddress, ReAddress):
     except Exception as e:
         return False,str(e)
 
-def apiGetresumekey(ReAddress,ApAddress,base):
+def apiDownloadResume(ReAddress,ApAddress,base):
     url = config.api_url
     config.api_data["user"] = ApAddress
-    config.api_data["funcName"] = 'Getresumekey'
+    config.api_data["funcName"] = 'DownloadResume'
     config.api_data["funcParam"] = [f'{ReAddress}',f'{ApAddress}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -189,7 +189,7 @@ def apiGetresumekey(ReAddress,ApAddress,base):
 def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
     url = config.api_url
     config.api_data["user"] = KKAddress
-    config.api_data["funcName"] = 'keeperkeyjudge'
+    config.api_data["funcName"] = 'KeeperkeysUpload'
     config.api_data["funcParam"] = [f'{ApAddress}',f'{i}',f'{x}',f'{m}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
@@ -204,6 +204,17 @@ def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
             return -1,message
     except Exception as e:
         return -1,str(e)
+
+def apiBalance(address,base):
+    url = config.api_url
+    config.api_data["user"] = address
+    config.api_data["funcName"] = 'balance'
+    config.api_data["funcParam"] = [f'{address}']
+    response = requests.post(url, json=config.api_data)
+    reslut = response.json()
+    base['status'] = 1
+    base['balance'] = int(reslut[0])
+    return base
 def verifyprivateKeys(privateKey, identity, login):
     name = randName()
     url = config.WeBASE_privateKey_api + f'/import?privateKey={privateKey}&userName={name}'
@@ -228,39 +239,41 @@ def verifyprivateKeys(privateKey, identity, login):
 
 
 def register(data, user):
-    userName = randName()
-    key = getKey(userName)
-    need = getNeed()
-    user=apiApregister(key['address'], need['X'], need['M'], need['P'], need['S'],user)
     # T==S
-    if user['status'] == 0:
-        return json.dumps(user)
     table_name = getTableName(data['identity'])
     if table_name == 'error':
         user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
         return json.dumps(user)
+    userName = randName()
+    key = getKey(userName)
     # 插入用户信息
-    condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
-    cur.execute(condition, (userName, key["address"], key['publicKey'], need['P']))
-    if table_name == 'Applicant':
-        condition = f"insert into NeedSave(userName,address,remainingAmount) values(%s,%s,5);"
-        cur.execute(condition, (userName, key["address"]))
-    # elif table_name == 'KeyKeeper':
-    #     apiKeeperaply(key["address"])
-    if cur.rowcount:
-        # 更新address状态
-        user['address'] = key["address"]
-        # user['publicKeys'] = key['publicKey']
-        user['privateKeys'] = key['privateKey']
-        # user['identity'] = data['identity']
-        user['S'] = need['S']
-        user['P'] = need['P']
-        user['M'] = need['M']
-        user['X'] = need['X']
-        return json.dumps(user)
-    else:
+    try:
+        if table_name == 'Applicant':
+            need = getNeed()
+            user=apiApkeysupload(key['address'], need['X'], need['M'], need['P'], need['S'],user)
+            if user['status'] == 0:
+                return json.dumps(user)
+            condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
+            cur.execute(condition, (userName, key["address"], key['publicKey'], need['P']))
+            condition = f"insert into NeedSave(userName,address,remainingAmount) values(%s,%s,5);"
+            cur.execute(condition, (userName, key["address"]))
+            user['address'] = key["address"]
+            user['privateKeys'] = key['privateKey']
+            user['S'] = need['S']
+            user['P'] = need['P']
+            user['M'] = need['M']
+            user['X'] = need['X']
+            return json.dumps(user)
+        else:
+            condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
+            cur.execute(condition, (userName, key["address"], key['publicKey'], '222'))
+            user['status'] = 1
+            user['address'] = key["address"]
+            user['privateKeys'] = key['privateKey']
+            return json.dumps(user)
+    except Exception as e:
         user['status'] = 0
-        user['message'] = "数据库写入失败"
+        user['message'] = "{}".format(str(e))
         return json.dumps(user)
 
 
@@ -445,7 +458,7 @@ def getFileMes(ApAddress, ReAddress,base):
         base['status'] = 0
         base['message'] = '您还未获得三个及以上的秘密份额'
         return json.dumps(base)
-    return apiGetresumekey(ReAddress,ApAddress,base)
+    return apiDownloadResume(ReAddress,ApAddress,base)
 
 def getDownloadHis(ApUserName,base):
     condition = f'select * from DownloadHisForm where ApUserName=%s;'
@@ -487,8 +500,12 @@ def uploadKey(KKAddress,ApUserName,i,x,m,base):
         base['message'] = message
         return json.dumps(base)
 def changeKK(KKAddress,base):
-    re,message=apiKeeperaply(KKAddress)
+    re,message=apiKeeperApply(KKAddress)
     base['message'] = message
     if re == False:
         return json.dumps(base)
+    base['status'] = 1
     return json.dumps(base)
+
+def getBalance(address,base):
+    return apiBalance(address,base)

@@ -549,3 +549,24 @@ interface ChangeKKRes extends BaseRe{
 }
 ```
 
+#### 21.查询token余额
+
+```
+ /**
+ * kk上传密钥
+ * @interface GetBalanceReq
+ * @property address 用户
+ */
+  interface GetBalanceReq {
+    address: string
+ }
+
+ /**
+ * @interface GetBalanceRes
+ * @interface balance token余额
+ */
+interface GetBalanceRes extends BaseRe{
+	balance:int
+}
+```
+

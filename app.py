@@ -271,6 +271,7 @@ def GetFileMesReq():
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
+
 @app.route('/GetDownloadHisReq', methods=["POST"])
 def GetDownloadHisReq():
     data = request.get_json()
@@ -347,6 +348,19 @@ def ChangeKKReq():
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
-
+#查询token余额
+@app.route('/GetBalanceReq', methods=["POST"])
+def GetBalanceReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        address = data['address']
+        return getBalance(address,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5100, debug=False)
