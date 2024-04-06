@@ -5,11 +5,11 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {ChangeNameReq, LoginReq, RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
+import {ChangeNameReq, GetTokenReq, LoginReq, RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     ResumeInfoRes,
@@ -19,6 +19,7 @@ import {
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
+    ChangeKKRes,
     DownloadSubKeysRes,
     GetFileMesRes,
     RequestListRes,
@@ -31,6 +32,7 @@ import {
     SearchApRes
 } from "../../../model/http-bodys/user/recruiter/res.ts";
 import {
+    ChangeKKReq,
     GetFileMesReq,
     GetNeedSaveReq,
     RemindKKReq,
@@ -82,6 +84,8 @@ interface UserWorkMethod {
     logout(): void;
 
     changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes>;
+
+    getTokenNumberAsync(): Promise<GetTokenRes>;
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -93,7 +97,15 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
     },
     useMethod(): UserWorkMethod {
         const [info, setInfo] = useAtom(userInfoAtom);
+
         return {
+            async getTokenNumberAsync(): Promise<GetTokenRes> {
+                if (info === null) throw "在未登录的情况下尝试获取token";
+                const req: GetTokenReq = {
+                    address: info.address
+                };
+                return alovaClientImpl.Post("/GetBalanceReq", req);
+            },
             async changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes> {
                 if (info === null) throw "在未登录的情况下尝试修改用户名";
                 const request: ChangeNameReq = {
@@ -119,6 +131,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
                 console.log("login User", res);
+                if (!res.status) throw res.message;
                 const info: BasicUserState = {
                     identity: identity, nick: res.userName, address: res.address
                 };
@@ -244,6 +257,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                console.log("***",file);
                 await FileSystemImpl.downloadMetaFileAsync(file);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
@@ -251,6 +265,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const req: GetFileMesReq = {
                     ApAddress, ReAddress: userInfo.address
                 };
+                console.log(req);
                 return alovaClientImpl.Post("/GetFileMesReq", req);
             },
             async getFuzzyLookupListAsync(partApUserName: string): Promise<SearchApRes> {
@@ -272,6 +287,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     fileHash, ApUserName, ReUserName: userInfo.nick
                 };
                 const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
+                console.log("res:",res);
                 const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
                 return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
             },
@@ -308,13 +324,15 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 };
 
 interface KeyKeeperWorkMethod {
-    uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
+    uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
     downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
 
     getRequestListAsync(): Promise<RequestListRes>;
 
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
+
+    getPermissionToBeKK(): Promise<ChangeKKRes>;
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
@@ -322,6 +340,13 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
     useMethod(): KeyKeeperWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async getPermissionToBeKK(): Promise<ChangeKKRes> {
+                if (userInfo === null) throw "未登录时尝试获取权限";
+                const req: ChangeKKReq = {
+                    KKAddress: userInfo.address
+                };
+                return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
+            },
             async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
                 if (userInfo === null) throw "未登录时尝试获取子密钥";
                 const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};
@@ -346,10 +371,13 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
             },
             async getRequestListAsync(): Promise<RequestListRes> {
                 if (userInfo === null) throw "未登录时尝试获取";
+
                 const req: RemindKKReq = {
                     KKAddress: userInfo.address
                 };
+                console.log(req);
                 const res = await alovaClientImpl.Post<ArrayRes>("/RemindKKReq", req);
+                console.log(res);
                 return {
                     status: res.status,
                     message: res.message,
@@ -360,10 +388,10 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                         })) : []
                 };
             },
-            async uploadSubKeyAsync(ApAddress: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
+            async uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
                 if (userInfo === null) throw "未登录时尝试上传子密钥";
                 const req: UploadKeyReq = {
-                    ApAddress, i, x, m, KKAddress: userInfo.address
+                    ApUserName: ApUsername, i, x, m, KKAddress: userInfo.address
                 };
                 return alovaClientImpl.Post("/UploadKeyReq", req);
             }

@@ -14,4 +14,3 @@ export interface BasicUserState {
     address: string;
 }
 
-

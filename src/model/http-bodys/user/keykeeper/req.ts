@@ -30,7 +30,7 @@ export interface RemindKKReq {
  */
 export interface UploadKeyReq {
     KKAddress: string
-    ApAddress: string
+    ApUserName: string
     i: number
     x: number
     m: number
@@ -43,4 +43,12 @@ export interface UploadKeyReq {
 export interface GetFileMesReq {
     ApAddress: string;
     ReAddress: string;
+}
+/**
+ * kk申请成功密钥保管人
+ * @interface ChangeKKReq
+ * @property KKAddress kk地址
+ */
+export interface ChangeKKReq {
+    KKAddress: string
 }

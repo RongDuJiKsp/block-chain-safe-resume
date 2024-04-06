@@ -39,6 +39,7 @@ export default function KeyKeeperGetSubKey() {
 function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKeyInfo[] }) {
     const {message} = App.useApp();
     const [selectedInfo, setSelectedInfo] = useState<AccessibleSubKeyInfo | null>(null);
+    const [withoutPermission, setWithoutPermission] = useBoolean();
     const onAccept = (info: AccessibleSubKeyInfo) => {
         message.info("正在发起请求，请稍后...").then();
         setSelectedInfo(info);
@@ -68,8 +69,8 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
             title: "操作",
             width: "17%",
             align: "center",
-            render(_, item): ReactNode {
-                return <div className={"justify-around flex"}>
+            render(_, item, index): ReactNode {
+                return <div className={"justify-around flex"} key={"of" + index}>
                     <Popconfirm title={`确认获取保管该用户(${item.userName.substring(0, 8) + ".."})的子密钥？`}
                                 onConfirm={() => onAccept(item)}>
                         <Button type={"primary"}>获取</Button>
@@ -79,10 +80,14 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
         }
     ];
     return <div>
+        <GetPermissionToBeKK clear={setWithoutPermission.setFalse} data={withoutPermission}/>
         <GetAccessibleSubKey data={selectedInfo} clear={onClearSelected}/>
         <Table<AccessibleSubKeyInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
+        <div className={"mt-7"}>还不是密钥保管人？
+            <span onClick={setWithoutPermission.setTrue} className={"text-gray-400"}>点击这里</span>
+        </div>
     </div>;
 }
 
@@ -138,6 +143,40 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<Accessibl
                         </button>
                     </div>
                 </div>}
+        </div>
+    </Modal>;
+}
+
+function GetPermissionToBeKK({data, clear}: ModelPropsWithInfoAndClear<boolean>) {
+    const kkUserServer = KeyKeeperWorkHook.useMethod();
+    const [isLoading, setLoading] = useBoolean();
+    const {message} = App.useApp();
+    const onGetPermission: CallBackWithSideEffect = () => {
+        setLoading.setTrue();
+        kkUserServer.getPermissionToBeKK().then(r => {
+            console.log(r);
+            if (r.status) {
+                message.success("操作成功！").then();
+                clear();
+            } else {
+                message.error("发生错误:" + r.message).then();
+            }
+        }).catch(e => {
+            message.error("发生错误:" + e.toString()).then();
+        }).finally(() => {
+            setLoading.setFalse();
+        });
+    };
+    return <Modal open={!!data} footer={null} onCancel={clear}>
+        <div className={"my-3"}>
+            <p className={"my-3"}>
+                请点击按钮获取保管子密钥权限
+                系统将自动质押积分以获取权限
+            </p>
+            <Button type={"primary"} onClick={onGetPermission}>{isLoading ?
+                <span><LoadingOutlined/>&thinsp;获取中&thinsp;... </span> :
+                <span>&ensp;获取权限&ensp;</span>
+            }</Button>
         </div>
     </Modal>;
 }

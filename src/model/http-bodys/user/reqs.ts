@@ -23,3 +23,6 @@ export interface ChangeNameReq {
     privateKey: string;
 }
 
+export interface GetTokenReq {
+    address: string;
+}

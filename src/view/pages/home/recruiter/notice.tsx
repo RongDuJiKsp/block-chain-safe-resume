@@ -89,5 +89,5 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
-    </div>;//TODO:更改表格展示使其能够展示详细状态
+    </div>;
 }

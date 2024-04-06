@@ -108,6 +108,7 @@ function SelectIdentityComponent() {
             return;
         }
         registerServer.registerAsync(selectedIdentity).then(r => {
+            console.log(r);
             if (r.status) {
                 registerInfoHandle.resSetter?.call(null, {identity: selectedIdentity, res: r});
                 message.success("注册成功").then();
@@ -180,7 +181,8 @@ function GetResultComponent() {
             setCanClose.setTrue();
             return;
         }
-        const SKey = AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S));
+        console.log(res);
+        const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
         const PrivateKey = res.res.privateKeys;
         const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
         FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
