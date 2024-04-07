@@ -74,7 +74,7 @@ function RegisterPage() {
     return <div className={"overflow-hidden register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
-                <div className={"mt-[35%] bg-better-write py-8 px-6"}>
+                <div className={"mt-[35%] bg-better-write py-8 px-6 basic-shadow-box"}>
                     <Steps direction="vertical" items={stepItems} current={currentStep}/>
                 </div>
             </div>

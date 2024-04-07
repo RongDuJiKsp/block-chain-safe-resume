@@ -27,7 +27,7 @@ const identityOption: DefaultOptionType[] = [
 function LoginPage() {
     return <div>
         <div
-            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around container-shadow"}>
+            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around  basic-shadow-box"}>
             <div className={"text-right pr-5 basis-1/6 pt-2 dark-mode-text"}>
                 切换
                 {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>

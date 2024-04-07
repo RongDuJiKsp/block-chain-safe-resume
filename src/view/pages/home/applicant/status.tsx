@@ -36,14 +36,14 @@ export default function ApplicantStatus() {
             message.error(e.toString()).then();
         }).finally(loadingAction.setFalse);
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6"}>
-        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
+    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6  "}>
+        <div className={"bg-white basic-shadow-box px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问请求"} onFresh={changeAction}/>
            <Spin delay={500} spinning={isLoading}>
                <ResumeRequestComponent tableVal={tableInfo}/>
            </Spin>
         </div>
-        <div className={" bg-white py-8 "}>
+        <div className={" bg-white py-8 basic-shadow-box "}>
             <ResumeInfoComponent info={resumeInfo}/>
         </div>
 

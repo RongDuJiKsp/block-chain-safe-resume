@@ -25,7 +25,7 @@ export default function ApplicantRecord() {
         }).finally(loadingAction.setFalse);
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-12 "}>
-        <div className={"bg-white border-[0.1px] border-gray-300 px-6 py-4 basis-3/4"}>
+        <div className={"bg-white  px-6 py-4 basis-3/4 basic-shadow-box"}>
             <TableHeader title={"访问记录"} onFresh={changeAction}/>
             <Spin spinning={isLoading} delay={500}>
                 <ResumeHistoryTable tableVal={tableVal}/>
