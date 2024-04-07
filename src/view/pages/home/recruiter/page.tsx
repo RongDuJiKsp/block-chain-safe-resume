@@ -24,6 +24,8 @@ export default function RecruiterPage() {
 
 
     return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
-        <RecruiterRoutes/>
+        <div className={"window-color-back"}>
+            <RecruiterRoutes/>
+        </div>
     </HeaderBarProvider>;
 }

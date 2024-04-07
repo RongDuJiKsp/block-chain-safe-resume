@@ -21,7 +21,7 @@
 html {
     user-select: none;
     min-height: 100vh;
-    background-color: #abcdef;
+    @apply window-image-back
 }
 
 .h-full-screen {
@@ -54,4 +54,7 @@ html {
     border-radius: 0.75rem;
     border: 1px rgb(91, 92, 94);
     box-shadow: #2f2f2f 2px 2px 5px;
+}
+.window-color-back{
+    background-color: #abcdef;
 }
