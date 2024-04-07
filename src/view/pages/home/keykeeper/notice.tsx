@@ -33,7 +33,7 @@ export default function KeyKeeperNotice() {
         }).finally(loadingAction.setFalse);
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
-        <div className={"work-window-color basis-3/4 px-8 py-4"}>
+        <div className={"work-window-color basis-3/4 basic-shadow-box px-8 py-4"}>
             <TableHeader title={"待上传请求"} onFresh={changeAction}/>
             <Spin spinning={isLoading} delay={500}>
                 <RequestTableComponent tableVal={tableVal}/>

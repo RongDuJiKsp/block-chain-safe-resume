@@ -13,7 +13,7 @@ import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 export default function RecruiterRequire() {
 
     return <div className={"flex flex-col gap-14 justify-center basic-window h-full-screen"}>
-        <div className={"basis-3/5  mx-44 px-24 py-12  work-window-color"}>
+        <div className={"basis-3/5  mx-44 px-24 py-12  work-window-color basic-shadow-box"}>
             <SendRequire/>
         </div>
     </div>;

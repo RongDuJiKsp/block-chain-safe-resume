@@ -5,8 +5,8 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts
 import {useBoolean} from "ahooks";
 
 export default function ApplicantUpload() {
-    return <div className={"h-full-screen flex flex-col justify-center basic-window"}>
-        <div className={"basis-3/5"}>
+    return <div className={"h-full-screen flex flex-col justify-center basic-window  "}>
+        <div className={"basis-3/5 basic-shadow-box bg-white"}>
             <FileUploader/>
         </div>
     </div>;
@@ -53,7 +53,7 @@ function FileUploader() {
         });
 
     };
-    return <div className={"bg-white border-[0.2px] border-gray-300 p-7 flex justify-around h-full"}>
+    return <div className={" p-7 flex justify-around h-full"}>
         <div className={"basis-1/3 h-5/6 my-auto border-[3px] border-dotted bg-gray-50"}>
             <div className={"h-full flex flex-col gap-12 justify-center relative"}>
                 <div className={"mx-auto"}><FileAddOutlined style={{fontSize: 77}}/></div>

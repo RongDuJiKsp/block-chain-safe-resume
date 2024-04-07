@@ -29,7 +29,7 @@ export default function KeyKeeperGetSubKey() {
         });
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
-        <div className={"work-window-color basis-3/4 px-8 py-4"}>
+        <div className={"work-window-color basis-3/4 px-8 py-4 basic-shadow-box"}>
             <TableHeader title={"可保管子密钥"} onFresh={changeAction}/>
             <AccessibleSubKeyTableComponent tableVal={tableVal}/>
         </div>
