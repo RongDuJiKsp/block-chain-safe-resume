@@ -28,6 +28,8 @@ const ThisUserGroup: UserGroup = {
 
 export default function ApplicantPage() {
     return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
-        <ApplicantRoutes/>
+        <div className={"window-color-back"}>
+            <ApplicantRoutes/>
+        </div>
     </HeaderBarProvider>;
 }

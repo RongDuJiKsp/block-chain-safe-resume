@@ -127,21 +127,23 @@ function SelectIdentityComponent() {
                 <p className={"text-center text-2xl font-sans"}>系统身份介绍</p>
                 <p className={"text-lg"}>
                     Applicant: <br/>
-                    Applicant是简历所有者，拥有持有该文件的绝对权利。Applicant对简历进行加密，同时将加密后的简历对应的搜索索引上传到云服务器。任何人都不能查看Applicant的简历，除非Applicant授权
+                    Applicant是求职者用户,即简历所有者,拥有自身简历文件的绝对控制权。
+                    Applicant使用随机数密钥对简历文件进行对称加密,将加密后的简历上传至IPFS系
+                    统,并将对应的IPFS文件哈希上链存储。
                 </p>
                 <p className={"text-lg"}>
                     Recruiter: <br/>
-                    用户要求下载完整的简历信息。请求
-                    授权后，通过智能合约合成完整的密钥。Recruiter 输入地址后
-                    加密恢复客户端并调用合约接收解密密钥，完成
-                    可以获取明文简历。同时，Recruiter 可以使用合约生成搜索
-                    用于搜索包含关键字的简历的令牌。
+                    Recruiter是企业HR用户,可向Applicant用户发出授权请求,等等对应Ap同意授权
+                    并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平
+                    台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者
+                    的未经篡改的完整简历信息。
                 </p>
                 <p className={"text-lg"}>
                     Key keeper:<br/>
-                    Key keeper 通过安全通道接收 Applicant 的子密钥，并可以接收保管人
-                    Key keeper可以通过提供以下方式从Recruiter获得部分token:<br/>
-                    子项通过智能合约正确执行，并协助恢复对称密钥。
+                    Key keeper是密钥保管人用户,在上交积分质押成为合法Kk后,可通过安全通道接
+                    收Applicant密钥的秘密份额进行托管,在对应Applicant发出授权操作后上交智能
+                    合约,使合约正常合成密钥,从而正常响应授权请求。同时,Kk通过积极托管行为可
+                    获得积分奖励。
                 </p>
             </div>
         </div>

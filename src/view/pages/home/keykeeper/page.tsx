@@ -23,6 +23,8 @@ const headBarItems: ItemsAndPic[] = [
 export default function KeyKeeperPage() {
 
     return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
-        <KeyKeeperRoutes/>
+        <div className={"window-color-back"}>
+            <KeyKeeperRoutes/>
+        </div>
     </HeaderBarProvider>;
 }
