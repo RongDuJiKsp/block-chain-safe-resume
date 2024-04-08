@@ -55,6 +55,15 @@ html {
     border: 1px rgb(91, 92, 94);
     box-shadow: #2f2f2f 2px 2px 5px;
 }
+.basic-green-shadow-box {
+    border-radius: 0.75rem;
+    border: 1px rgb(91, 92, 94);
+    box-shadow: #80dc76 2px 2px 5px;
+}
+.basic-uncolored-box{
+    border: 1px rgb(91, 92, 94);
+    border-radius: 0.75rem;
+}
 .window-color-back{
     background-color: #abcdef;
 }

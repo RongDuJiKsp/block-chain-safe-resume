@@ -12,6 +12,7 @@ import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
 import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 import {useBoolean} from "ahooks";
 import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
+import {motion} from "framer-motion";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -95,12 +96,33 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
+type InfoContext = {
+    title: string,
+    message: string,
+    key: UserIdentityEnum,
+}
+const texts: InfoContext[] = [
+    {
+        key: UserIdentityEnum.Applicant,
+        title: "Applicant",
+        message: " Applicant是求职者用户,即简历所有者,拥有自身简历文件的绝对控制权。Applicant使用随机数密钥对简历文件进行对称加密,将加密后的简历上传至IPFS系统,并将对应的IPFS文件哈希上链存储。"
+    },
+    {
+        key: UserIdentityEnum.Recruiter,
+        title: "Recruiter",
+        message: "Recruiter是企业HR用户,可向Applicant用户发出授权请求,等待对应Ap同意授权,并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者 的未经篡改的完整简历信息"
+    },
+    {
+        key: UserIdentityEnum.KeyKeeper,
+        title: "Key keeper",
+        message: "Key keeper是密钥保管人用户,在上交积分质押成为合法Kk后,可通过安全通道接 收Applicant密钥的秘密份额进行托管,在对应Applicant发出授权操作后上交智能 合约,使合约正常合成密钥,从而正常响应授权请求。同时,Kk通过积极托管行为可 获得积分奖励。"
+    }
+];
 
 function SelectIdentityComponent() {
     const registerInfoHandle = useContext(RegisterInfoSetterContext);
     const registerServer = UserWorkHooks.useMethod();
     const {message} = App.useApp();
-    const keys = Object.keys(UserIdentityEnum);
     const [selectedIdentity, setSelectedIdentity] = useState<UserIdentityEnum>(UserIdentityEnum.None);
     const onNextClick = (): void => {
         if (selectedIdentity === UserIdentityEnum.None) {
@@ -121,40 +143,16 @@ function SelectIdentityComponent() {
         });
     };
 
-    return <div className={"h-full flex flex-col justify-around  dark-mode-text"}>
-        <div className={"basis-3/5"}>
-            <div className={"pt-8 flex flex-col gap-12 "}>
-                <p className={"text-center text-2xl font-sans"}>系统身份介绍</p>
-                <p className={"text-lg"}>
-                    Applicant: <br/>
-                    Applicant是求职者用户,即简历所有者,拥有自身简历文件的绝对控制权。
-                    Applicant使用随机数密钥对简历文件进行对称加密,将加密后的简历上传至IPFS系
-                    统,并将对应的IPFS文件哈希上链存储。
-                </p>
-                <p className={"text-lg"}>
-                    Recruiter: <br/>
-                    Recruiter是企业HR用户,可向Applicant用户发出授权请求,等等对应Ap同意授权
-                    并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平
-                    台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者
-                    的未经篡改的完整简历信息。
-                </p>
-                <p className={"text-lg"}>
-                    Key keeper:<br/>
-                    Key keeper是密钥保管人用户,在上交积分质押成为合法Kk后,可通过安全通道接
-                    收Applicant密钥的秘密份额进行托管,在对应Applicant发出授权操作后上交智能
-                    合约,使合约正常合成密钥,从而正常响应授权请求。同时,Kk通过积极托管行为可
-                    获得积分奖励。
-                </p>
-            </div>
-        </div>
-        <div className={"basis-1/12"}>
-            <p className={"text-center text-2xl my-7"}>请选择你需要注册的身份</p>
-        </div>
-        <div className={"basis-1/12"}>
-            <div className={"h-full flex justify-center gap-14"}>
-                {keys.map((val, index) => val !== UserIdentityEnum.None &&
-                    <button key={"select-id-button" + index} className={"button button-3d button-pill button-royal"}
-                            onClick={() => setSelectedIdentity(val as UserIdentityEnum)}>{val}</button>)}
+    return <div className={"h-full flex flex-col justify-center"}>
+        <div className={"basis-2/5"}>
+            <div className={"pt-8 flex flex-row gap-12 justify-around"}>
+                {texts.map((unit, index) => (
+                    <div key={"text-info-of" + index}
+                         className={unit.key === selectedIdentity ? "basic-green-shadow-box bg-better-write max-w-[42%] h-fit " : "basic-shadow-box bg-better-write max-w-[42%] h-fit"}>
+                        <ShowIdentityAndSelect onClick={() => setSelectedIdentity(unit.key)}
+                                               isSelected={unit.key === selectedIdentity} info={unit}/>
+                    </div>
+                ))}
             </div>
         </div>
         <div className={"basis-1/12"}>
@@ -166,6 +164,26 @@ function SelectIdentityComponent() {
     </div>;
 }
 
+interface ShowingIdentityParam {
+    onClick: CallBackWithSideEffect;
+    info: InfoContext;
+    isSelected: boolean
+}
+
+function ShowIdentityAndSelect({onClick, info}: ShowingIdentityParam) {
+    const [isHovered, setHoveredAction] = useBoolean();
+    return <motion.div onClick={onClick} onMouseOver={setHoveredAction.setTrue} onMouseOut={setHoveredAction.setFalse}
+                       className={"px-8 py-3"}>
+        <motion.p className={"font-sans text-lg text-center"}>{info.title}</motion.p>
+        <motion.p className={"overflow-hidden"} transition={{duration: 0.8,ease:"easeInOut"}} animate={{
+            height: isHovered ? "auto" : 0,
+            width: isHovered ? "auto" : 0,
+            opacity: isHovered ? 1 : 0,
+            marginTop: isHovered ? "1.4rem" : 0,
+            marginBottom: isHovered ? "1.1rem" : 0,
+        }}> {info.message}</motion.p>
+    </motion.div>;
+}
 
 function GetResultComponent() {
     const {res} = useContext(RegisterInfoSetterContext);
