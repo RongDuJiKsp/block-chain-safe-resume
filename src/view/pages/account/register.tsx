@@ -16,9 +16,9 @@ import {motion} from "framer-motion";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
-    if (currentStep < targetStep) return "Waiting here";
+    if (currentStep < targetStep) return "等待中";
     else if (currentStep === targetStep) return description;
-    else return "Well done";
+    else return "已完成";
 }
 
 
@@ -158,7 +158,7 @@ function SelectIdentityComponent() {
         <div className={"basis-1/12"}>
             <div className={"justify-center flex"}>
                 <button className={"button button-raised button-primary "}
-                        onClick={onNextClick}>Continue With {selectedIdentity}</button>
+                        onClick={onNextClick}>以身份 : {selectedIdentity} 继续</button>
             </div>
         </div>
     </div>;
