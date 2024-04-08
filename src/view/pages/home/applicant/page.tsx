@@ -8,7 +8,7 @@ const headBarItems: ItemsAndPic[] = [
     {
         logo: componentUtils.getIcon("icon-status", {fontSize: 32}),
         routerPath: APPLICANT_THIS_PATH + "/status",
-        text: "简历状态"
+        text: "授权请求"
     },
     {
         logo: componentUtils.getIcon("icon-cloudupload-fill", {fontSize: 32}),
