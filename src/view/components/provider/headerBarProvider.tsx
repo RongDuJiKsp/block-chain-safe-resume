@@ -149,9 +149,13 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <p className={"py-3"}>请确认你要退出登录？</p>
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
-            <div className={"flex"}>
-                <span>{group.userHeader}</span>
-                <span className={"text-lg align-middle"}>&ensp;About Me</span>
+            <div className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3"}>
+                <div className={"my-auto"}>
+                    <span>{group.userHeader}</span>
+                </div>
+                <div className={"my-auto"}>
+                    <span className={"text-lg align-middle"}>&ensp;个人信息</span>
+                </div>
             </div>
         </Dropdown>
     </>;
