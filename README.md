@@ -40,6 +40,7 @@
   interface RegisterRes extends BaseRes {
     address: string,
     privateKeys: string,
+   	encryptPrivateKeys: string
     S: number,
     P: number,
     M: number[],
@@ -567,6 +568,56 @@ interface ChangeKKRes extends BaseRe{
  */
 interface GetBalanceRes extends BaseRe{
 	balance:int
+}
+```
+
+#### 22.查询所有kk
+
+```
+ /**
+ * @interface GetAllKKReq
+ * @property ApAddress ap用户地址(登陆时已经返回)
+ */
+  interface GetAllKKReq {
+    ApAddress: string;
+ }
+
+
+ /**
+ * @interface GetAllKKRes
+ * @property userName kk用户名
+ * @property address kk用户地址
+ * @property publicKeys kk公钥
+ * @property p 没有用的不要管
+ */
+interface GetAllKKRes extends BaseRe{
+    list:[[userName,address,publicKeys,P],[...,...,...]]
+}
+```
+
+#### 23.分发秘密份额给特定kk
+
+```
+ /**
+ * @interface PostOnekeyReq
+ * @property KKAddress KK用户地址
+ * @property ApAddress Ap用户地址
+ * @property publicKeys kk公钥
+ * @property  一组秘密份额 i,x,m
+ */
+  interface PostOnekeyReq {
+    KKAddress: string;
+    publicKeys: string
+    i: int
+    x: int
+    m: int
+ }
+
+
+ /**
+ * @interface PostOnekeyRes
+ */
+interface PostOnekeyRes extends BaseRe{
 }
 ```
 
