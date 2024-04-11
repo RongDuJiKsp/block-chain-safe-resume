@@ -6,6 +6,7 @@ import {ReactNode, useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ColumnsType} from "antd/es/table";
 import {BasicEncryptInfo} from "../../../../model/entity/user.ts";
+import {ColumnFilterItem} from "antd/es/table/interface";
 
 export default function ApplicationSend() {
     const userService = ApplicantWorkHooks.useMethod();
@@ -40,6 +41,9 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
             dataIndex: "name",
             width: "16%",
             align: "center",
+            filterSearch(input: string, item: ColumnFilterItem): boolean {
+                return input === item.value;
+            }
         },
         {
             title: "地址",
