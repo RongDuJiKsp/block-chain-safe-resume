@@ -398,6 +398,21 @@ def PostOnekeyReq():
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
 
+@app.route('/KKDownloadKeyReq', methods=["POST"])
+def KKDownloadKeyReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        KKAddress = data['KKAddress']
+        ApAddress = data['ApAddress']
+        encryptPrivateKeys=data['encryptPrivateKeys']
+        return KKDownloadKey(KKAddress,ApAddress,encryptPrivateKeys,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5100, debug=False)

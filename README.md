@@ -107,7 +107,7 @@ interface LoginReq {
 
 
 
-#### 4.kk得到所有待保管秘密份额的ap用户
+#### ==4==.kk得到所有待保管秘密份额的ap用户
 
 ```
  /**
@@ -132,7 +132,7 @@ interface GetNeedSaveRes extends BaseRe{
 
 示例:`{"KKAddress":"0xdd5d634fd9737fbad195ec5216eecde4b7f943ca"}`
 
-#### 5.kk秘密份额保管申请
+#### ==5==.kk秘密份额保管申请
 
 ```
  /**
@@ -606,18 +606,45 @@ interface GetAllKKRes extends BaseRe{
  * @property  一组秘密份额 i,x,m
  */
   interface PostOnekeyReq {
-    KKAddress: string;
+    KKAddress: string
+    ApAddress: string
     publicKeys: string
     i: int
     x: int
     m: int
  }
 
-
  /**
  * @interface PostOnekeyRes
  */
 interface PostOnekeyRes extends BaseRe{
+}
+```
+
+
+
+#### 24.kk下载秘密份额
+
+```
+ /**
+ * @interface KKDownloadKeyReq
+ * @property KKAddress KK用户地址
+ * @property ApAddress Ap用户地址
+ * @property encryptPrivateKeys kk私钥
+ */
+  interface KKDownloadKeyReq {
+    KKAddress: string
+    ApAddress: string
+    encryptPrivateKeys: string
+ }
+
+ /**
+ * @interface KKDownloadKeyRes
+ */
+interface KKDownloadKeyRes extends BaseRe{
+    i: int
+    x: int
+    m: int
 }
 ```
 

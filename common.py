@@ -123,12 +123,6 @@ def apiReturnsubkey(ApAddress,KKAddress,part):
         if reslut['status'] == "0x0":
             #还需解析返回值
             part['status'] = 1
-            types = ['uint', 'uint', 'uint', 'uint']
-            decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
-            part['i'] = decoded_data[0]
-            part['x'] = decoded_data[1]
-            part['m'] = decoded_data[2]
-            part['p'] = decoded_data[3]
             return part
         else:
             return part
@@ -192,11 +186,11 @@ def apiDownloadResume(ReAddress,ApAddress,base):
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return base
-def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
+def apiKeeperkeyUpload(KKAddress,ApAddress,i,keyHash):
     url = config.api_url
     config.api_data["user"] = KKAddress
     config.api_data["funcName"] = 'KeeperkeysUpload'
-    config.api_data["funcParam"] = [f'{ApAddress}',f'{i}',f'{x}',f'{m}']
+    config.api_data["funcParam"] = [f'{ApAddress}',f'{i}',f'{keyHash}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
@@ -207,9 +201,9 @@ def apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m):
             decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
             return decoded_data[0],message
         else:
-            return 1,message
+            return 0,message
     except Exception as e:
-        return 1,str(e)
+        return 0,str(e)
 
 def apiBalance(address,base):
     url = config.api_url
@@ -221,14 +215,6 @@ def apiBalance(address,base):
     base['status'] = 1
     base['balance'] = int(reslut[0])
     return base
-
-def saveArray(X, M, P, address):
-    tmp={}
-    tmp['i']=0
-    tmp['X']=X
-    tmp['M']=M
-    config.neeedSave[address]=tmp
-    config.aleadySave[address]={}
 
 def getFuckS(ApAddress):
     I=[]
@@ -245,12 +231,7 @@ def getFuckS(ApAddress):
     condition = f'select P from Applicant where address=%s;'
     cur.execute(condition, (ApAddress))
     P = cur.fetchone()[0]
-    # 合成函数
-    #
-    #
-    #
-    #
-    #
+    return ChineseSurplus(X,M,3,P)
 
 def RSAKeyGen():
     private_key = rsa.generate_private_key(
@@ -313,7 +294,7 @@ def register(data, user):
                 onetmp.append(hashlib.sha256(tmp.encode('utf-8')).hexdigest())
 
             user=apiApkeysupload(key["address"],onetmp,user)
-
+            config.aleadySave[key["address"]]={}
             if user['status'] == 0:
                 return json.dumps(user)
             condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
@@ -447,9 +428,7 @@ def getNeedSave(KKAddress,base):
     return json.dumps(base)
 
 def SavePart(ApUserName,ApAddress,KKAddress,part):
-    # part=apiReturnsubkey(ApAddress,KKAddress,part)
-    # if part['status']==0:
-    #     return json.dumps(part)
+    apiReturnsubkey(ApAddress,KKAddress,part)
     if(config.neeedSave[ApAddress]['i']==4):
         del config.neeedSave[ApAddress]
         return json.dumps(part)
@@ -537,10 +516,6 @@ def getFileMes(ApAddress, ReAddress,base):
         return json.dumps(base)
     #获取S
     S=getFuckS(ApAddress)
-    if(S==-1):
-        base['status'] = 0
-        base['message'] = '份额合成错误'
-        return json.dumps(base)
     base['s']=S
     #这个接口不获取S了
     return apiDownloadResume(ReAddress,ApAddress,base)
@@ -573,8 +548,10 @@ def uploadKey(KKAddress,ApUserName,i,x,m,base):
     condition = f'select address from Applicant where userName=%s;'
     cur.execute(condition,(ApUserName))
     ApAddress = cur.fetchone()[0]
-    part,message= apiKeeperkeyjudge(KKAddress,ApAddress,i,hashlib.sha256(x.encode('utf-8')).hexdigest(),hashlib.sha256(m.encode('utf-8')).hexdigest())
-    if part==0:
+    tmp = str(i) + str(x) + str(m)
+    keyHash=hashlib.sha256(tmp.encode('utf-8')).hexdigest()
+    part,message= apiKeeperkeyUpload(KKAddress,ApAddress,i,keyHash)
+    if part==1:
         condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s;'
         cur.execute(condition, (ApAddress))
         tmp = {}
@@ -622,6 +599,7 @@ def getAllKK(ApAddress,base):
 def PostOnekey(KKAddress,ApAddress,publicKeys,i,x,m,base):
     messageX = str(x).encode()
     messageM = str(m).encode()
+    publicKeys=serialization.load_pem_public_key(publicKeys.encode(),backend=default_backend())
     # 使用公钥进行加密
     ciphertextX = publicKeys.encrypt(
         messageX,
@@ -647,7 +625,40 @@ def PostOnekey(KKAddress,ApAddress,publicKeys,i,x,m,base):
     base['message'] = '上传成功'
     return json.dumps(base)
 
+def KKDownloadKey(KKAddress,ApAddress,encryptPrivateKeys,base):
+    condition = f'select i,x,m from APKKsaveKey where KKAddress=%s and ApAddress=%s;'
+    cur.execute(condition,(KKAddress,ApAddress))
+    result = cur.fetchone()
+    if result:
+        private_key = serialization.load_pem_private_key(encryptPrivateKeys.encode(), password=None, backend=default_backend())
+        x = base64.b64decode(result[1].encode())
+        m = base64.b64decode(result[2].encode())
+        messageX = private_key.decrypt(
+            x,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        messageM = private_key.decrypt(
+            m,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        base['status'] = 1
+        base['i'] = result[0]
+        base['x'] = messageX.decode()
+        base['m'] = messageM.decode()
+        return json.dumps(base)
+    else:
+        base['status'] = 0
+        base['message'] = '没有找到对应的数据'
+        return json.dumps(base)
 
 if __name__ == '__main__':
-    base={"status":0,"message":""}
-    print(apiDownloadResume("0x113baf7e26aef234df3acdedf13077b7bc41bdd0","0xbd3985298dc373145efa818473e4a4cfa5a32e7f"))
+    base={}
+    print(PostOnekey("0x113baf7e26aef234df3acdedf13077b7bc41bdd0","0xbd3985298dc373145efa818473e4a4cfa5a32e7f","-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC1AxS8V37hjbA3yQ8AlJJTYide\nbNQ9AT0P0JBBDrzxEJVRYOUiTeSOV14pYgnjOoHVoQJsZcp0x+qx997lJhySvjU2\n/Yyydgq12VTVybGt9pmqgiFuVIFRP3SAb5NEx/+Mq758mTViF8DB5ebyvUDZ0vM/\nv+1/x6OOA5AhRWtosQIDAQAB\n-----END PUBLIC KEY-----",1,2,3,base))

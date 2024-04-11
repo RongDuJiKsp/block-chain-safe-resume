@@ -22,7 +22,6 @@ class Configs:
     WeBASE_privateKey_api="http://47.97.255.9:5002/WeBASE-Front/privateKey"
 
     # 内存数组
-    neeedSave={}
     aleadySave={}
     # 合约函数调用
     api_url = f'http://47.97.255.9:5002/WeBASE-Front/trans/handle'
