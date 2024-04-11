@@ -1,5 +1,5 @@
 import {useAtom, useAtomValue} from "jotai";
-import {BasicUserState} from "../../../model/entity/user.ts";
+import {BasicEncryptInfo, BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
@@ -51,9 +51,11 @@ import {
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {
     ApAuthorizeReq,
+    GetAllKKReq,
     GetDownloadHisReq,
     GetMoreFileMesReq,
-    GetRequestReq
+    GetRequestReq,
+    PostOnekeyReq
 } from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
@@ -165,25 +167,39 @@ interface ApplicantWorkMethod {
 
     getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes>;
 
-    sendSubKeyToKKAsync(S: string, M: string, i: string): Promise<SendSubKeyToKKRes>;
+    sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey: string, kkAddress: string): Promise<SendSubKeyToKKRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
-            async sendSubKeyToKKAsync(S: string, M: string, i: string): Promise<SendSubKeyToKKRes> {
-                console.log(S,M,i);
-                return  {
-                    status: 1,
-                    message: "ok",
+            async sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey, kkAddress: string): Promise<SendSubKeyToKKRes> {
+                if (userInfo === null) throw "在未登录时分发kk密钥";
+                const req: PostOnekeyReq = {
+                    i: Number(i),
+                    x: Number(X),
+                    m: Number(M),
+                    publicKeys: kkPublicKey,
+                    KKAddress: kkAddress,
+                    ApAddress: userInfo.address
                 };
+                return alovaClientImpl.Post<SendSubKeyToKKRes>("/PostOnekeyReq", req);
             },
             async getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes> {
+                if (userInfo === null) throw "在未登录时获取kk列表";
+                const req: GetAllKKReq = {
+                    ApAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetAllKKReq", req);
                 return {
-                    status: 1,
-                    message: "ok",
-                    list: []
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): BasicEncryptInfo => ({
+                        name: val[0],
+                        address: val[1],
+                        publicKey: val[2]
+                    })) : []
                 };
             },
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
