@@ -22,8 +22,11 @@ export default function ApplicantStatus() {
     useEffect(() => {
         loadingAction.setTrue();
         userService.getResumeInfoAsync().then(r => {
-            if (r.status) setResumeInfo(r);
-            else message.error("获取更新时发生失败，原因:" + r.message).then();
+            if (r.status === 1) {
+                setResumeInfo(r);
+            } else if (r.status === 2) {
+                message.info("没有查询到上传的信息，请上传信息").then();
+            } else message.error("获取更新时发生失败，原因:" + r.message).then();
         }).catch(e => {
             console.error(e);
             message.error(e.toString()).then();
@@ -39,9 +42,9 @@ export default function ApplicantStatus() {
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6  "}>
         <div className={"bg-white basic-shadow-box px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问请求"} onFresh={changeAction}/>
-           <Spin delay={500} spinning={isLoading}>
-               <ResumeRequestComponent tableVal={tableInfo}/>
-           </Spin>
+            <Spin delay={500} spinning={isLoading}>
+                <ResumeRequestComponent tableVal={tableInfo}/>
+            </Spin>
         </div>
         <div className={" bg-white py-8 basic-shadow-box "}>
             <ResumeInfoComponent info={resumeInfo}/>
@@ -56,8 +59,9 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
-        <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")} className={"basis-1/5"}
-                   value={info && info.putTime ?dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm"):"加载中..."}/>
+        <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
+                   className={"basis-1/5"}
+                   value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "加载中..."}/>
         <Statistic title={"待处理请求"} prefix={componentUtils.getIcon("icon-money-finance-buyer")}
                    value={0} suffix={"条"}/>
     </div>;
