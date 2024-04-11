@@ -11,6 +11,12 @@ from asmuth_bloom import *
 import pymysql
 import requests
 from eth_abi import decode
+import hashlib
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 
 global config
 config = Configs()
@@ -54,11 +60,11 @@ def getTableName(identity):
         return 'error'
 
 
-def apiApkeysupload(address, X, M, P,user):
+def apiApkeysupload(address, onetmp,user):
     url = config.api_url
     config.api_data["user"] = address
     config.api_data["funcName"] = 'Apkeysupload'
-    config.api_data["funcParam"] = [f'{X}', f'{M}',f'{P}', f'{3}']
+    config.api_data["funcParam"] = [f'{onetmp}']
     response = requests.post(url, json=config.api_data)
     reslut = response.json()
     try:
@@ -174,12 +180,12 @@ def apiDownloadResume(ReAddress,ApAddress,base):
         if reslut['status'] == "0x0":
             #还需解析返回值
             base['status'] = 1
-            types = ['uint', 'string', 'string', 'string']
+            types = ['string', 'string', 'string']
             decoded_data = decode(types, bytes.fromhex(reslut['output'][2:]))
-            base['s'] = decoded_data[0]
-            base['fileName'] = decoded_data[1]
-            base['fileType'] = decoded_data[2]
-            base['fileHash'] = decoded_data[3]
+            #base['s'] = decoded_data[0]
+            base['fileName'] = decoded_data[0]
+            base['fileType'] = decoded_data[1]
+            base['fileHash'] = decoded_data[2]
             return base
         else:
             return base
@@ -215,6 +221,57 @@ def apiBalance(address,base):
     base['status'] = 1
     base['balance'] = int(reslut[0])
     return base
+
+def saveArray(X, M, P, address):
+    tmp={}
+    tmp['i']=0
+    tmp['X']=X
+    tmp['M']=M
+    config.neeedSave[address]=tmp
+    config.aleadySave[address]={}
+
+def getFuckS(ApAddress):
+    I=[]
+    X=[]
+    M=[]
+    for i in range(0,5):
+        if i in config.aleadySave[ApAddress]:
+            I.append(i)
+            X.append(config.aleadySave[ApAddress][i]['x'])
+            M.append(config.aleadySave[ApAddress][i]['m'])
+    # 删除
+    del config.aleadySave[ApAddress]
+    config.aleadySave[ApAddress]={}
+    condition = f'select P from Applicant where address=%s;'
+    cur.execute(condition, (ApAddress))
+    P = cur.fetchone()[0]
+    # 合成函数
+    #
+    #
+    #
+    #
+    #
+
+def RSAKeyGen():
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=1024,
+        backend=default_backend()
+    )
+    # 生成公钥
+    public_key = private_key.public_key()
+    # 将私钥转换为PEM格式
+    pem_private_key = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+    # 将公钥转换为PEM格式
+    pem_public_key = public_key.public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    return pem_public_key.decode(),pem_private_key.decode()
 def verifyprivateKeys(privateKey, identity, login):
     name = randName()
     url = config.WeBASE_privateKey_api + f'/import?privateKey={privateKey}&userName={name}'
@@ -250,7 +307,13 @@ def register(data, user):
     try:
         if table_name == 'Applicant':
             need = getNeed()
-            user=apiApkeysupload(key['address'], need['X'], need['M'], need['P'],user)
+            onetmp=[]
+            for i in range(0,5):
+                tmp=str(i)+str(need['X'][i])+str(need['M'][i])
+                onetmp.append(hashlib.sha256(tmp.encode('utf-8')).hexdigest())
+
+            user=apiApkeysupload(key["address"],onetmp,user)
+
             if user['status'] == 0:
                 return json.dumps(user)
             condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
@@ -263,6 +326,16 @@ def register(data, user):
             user['P'] = need['P']
             user['M'] = need['M']
             user['X'] = need['X']
+            user['encryptPrivateKeys']=''
+            return json.dumps(user)
+        elif(table_name=='KeyKeeper'):
+            public_key, private_key = RSAKeyGen()
+            condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
+            cur.execute(condition, (userName, key["address"], public_key, '222'))
+            user['status'] = 1
+            user['address'] = key["address"]
+            user['privateKeys'] = key['privateKey']
+            user['encryptPrivateKeys'] = private_key
             return json.dumps(user)
         else:
             condition = f"insert into {table_name}(userName,address,publicKeys,P) values(%s,%s,%s,%s);"
@@ -270,6 +343,7 @@ def register(data, user):
             user['status'] = 1
             user['address'] = key["address"]
             user['privateKeys'] = key['privateKey']
+            user['encryptPrivateKeys'] = ''
             return json.dumps(user)
     except Exception as e:
         user['status'] = 0
@@ -373,13 +447,22 @@ def getNeedSave(KKAddress,base):
     return json.dumps(base)
 
 def SavePart(ApUserName,ApAddress,KKAddress,part):
-    part=apiReturnsubkey(ApAddress,KKAddress,part)
-    if part['status']==0:
+    # part=apiReturnsubkey(ApAddress,KKAddress,part)
+    # if part['status']==0:
+    #     return json.dumps(part)
+    if(config.neeedSave[ApAddress]['i']==4):
+        del config.neeedSave[ApAddress]
         return json.dumps(part)
     condition = f'UPDATE NeedSave SET remainingAmount = remainingAmount - 1 where address=%s;'
     cur.execute(condition,(ApAddress))
     condition = f'insert into KKAlreadySave(ApUserName,ApAddress,KKAddress) values(%s,%s,%s);'
-    cur.execute(condition, (ApUserName,ApAddress, KKAddress))
+    cur.execute(condition,(ApUserName,ApAddress, KKAddress))
+    part['status'] = 1
+    part['i'] = config.neeedSave[ApAddress]['i']
+    part['x'] = config.neeedSave[ApAddress]['X'][part['i']]
+    part['m'] = config.neeedSave[ApAddress]['M'][part['i']]
+    part['p'] = config.neeedSave[ApAddress]['P']
+    config.neeedSave[ApAddress]['i'] += 1
     return json.dumps(part)
 
 def getSave(KKAddress,base):
@@ -452,6 +535,14 @@ def getFileMes(ApAddress, ReAddress,base):
         base['status'] = 0
         base['message'] = '您还未获得三个及以上的秘密份额'
         return json.dumps(base)
+    #获取S
+    S=getFuckS(ApAddress)
+    if(S==-1):
+        base['status'] = 0
+        base['message'] = '份额合成错误'
+        return json.dumps(base)
+    base['s']=S
+    #这个接口不获取S了
     return apiDownloadResume(ReAddress,ApAddress,base)
 
 def getDownloadHis(ApUserName,base):
@@ -482,10 +573,14 @@ def uploadKey(KKAddress,ApUserName,i,x,m,base):
     condition = f'select address from Applicant where userName=%s;'
     cur.execute(condition,(ApUserName))
     ApAddress = cur.fetchone()[0]
-    part,message= apiKeeperkeyjudge(KKAddress,ApAddress,i,x,m)
+    part,message= apiKeeperkeyjudge(KKAddress,ApAddress,i,hashlib.sha256(x.encode('utf-8')).hexdigest(),hashlib.sha256(m.encode('utf-8')).hexdigest())
     if part==0:
         condition = f'update AlreadyResumeForm set keyNum = keyNum+1 where ApAddress=%s;'
         cur.execute(condition, (ApAddress))
+        tmp = {}
+        tmp['x'] = x
+        tmp['m'] = m
+        config.aleadySave[ApAddress][i].update(tmp)
         base['status'] = 1
         base['message'] = message
         return json.dumps(base)
@@ -515,6 +610,43 @@ def updataNeedKEY(ApAddress):
         KKAddress = row[1]
         condition = f'insert into needKEY(ApUserName,KKAddress,time) values(%s,%s,UNIX_TIMESTAMP());'
         cur.execute(condition, (ApUserName, KKAddress))
+
+def getAllKK(ApAddress,base):
+    condition = f'select * from KeyKeeper where address not in (select KKAddress from KeyKeeper where ApAddress=%s);'
+    cur.execute(condition,(ApAddress))
+    result = cur.fetchall()
+    base['status'] = 1
+    base['list'] = result
+    return json.dumps(base)
+
+def PostOnekey(KKAddress,ApAddress,publicKeys,i,x,m,base):
+    messageX = str(x).encode()
+    messageM = str(m).encode()
+    # 使用公钥进行加密
+    ciphertextX = publicKeys.encrypt(
+        messageX,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    ciphertextM = publicKeys.encrypt(
+        messageM,
+        padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=None
+        )
+    )
+    ciphertextX=base64.b64encode(ciphertextX).decode('utf-8')
+    ciphertextM=base64.b64encode(ciphertextM).decode('utf-8')
+    condition = f'insert into APKKsaveKey(ApAddress,KKAddress,i,x,m) values(%s,%s,%d,%s,%s);'
+    cur.execute(condition, (KKAddress,ApAddress,i,ciphertextX,ciphertextM))
+    base['status'] = 1
+    base['message'] = '上传成功'
+    return json.dumps(base)
+
 
 if __name__ == '__main__':
     base={"status":0,"message":""}

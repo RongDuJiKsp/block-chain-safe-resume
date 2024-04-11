@@ -350,6 +350,7 @@ def ChangeKKReq():
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
+
 #查询token余额
 @app.route('/GetBalanceReq', methods=["POST"])
 def GetBalanceReq():
@@ -364,5 +365,39 @@ def GetBalanceReq():
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
+@app.route('/GetAllKKReq', methods=["POST"])
+def GetAllKKReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApAddress = data['ApAddress']
+        return getAllKK(ApAddress,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+@app.route('/PostOnekeyReq', methods=["POST"])
+def PostOnekeyReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        KKAddress= data['KKAddress']
+        ApAddress = data['ApAddress']
+        publicKeys=data['publicKeys']
+        i=data['i']
+        x=data['x']
+        m=data['m']
+        return PostOnekey(KKAddress,ApAddress,publicKeys,i,x,m,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5100, debug=False)

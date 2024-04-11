@@ -56,7 +56,7 @@ def getk(m,k,N,P):
     return k1, r
 
 # Chinese residual definition to solve the equation
-def ChineseSurplus(k,d,t,r,p):
+def ChineseSurplus(k,d,t,p):
     m = d[0:t]
     a = k[0:t]
     # Step1:Calculate the multiplication
@@ -78,7 +78,7 @@ def ChineseSurplus(k,d,t,r,p):
     for i in range(0, len(m)):
         x = x + Mj[i] * Mj1[i] * a[i]
     result = x % m1
-    return result - r*p
+    return result%p
 
 
 # Define the d array
@@ -169,7 +169,9 @@ def getNeed():
             ti.append(end_dis-start_dis)
 
             start = time.time()
-            result = ChineseSurplus(k1, m, t, r, P)
+            result = ChineseSurplus(k1, m, t, P)
+            print("k1:"+str(k1)+" m:"+str(m)+" t:"+str(t)+" r:"+str(r)+" P:"+str(P))
+            print(str(result))
             end = time.time()
 
             t2.append(end - start)

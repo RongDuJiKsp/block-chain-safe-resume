@@ -23,7 +23,7 @@ CREATE TABLE Recruiter (
 CREATE TABLE KeyKeeper (
     userName VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
-    publicKeys VARCHAR(255) NOT NULL,
+    publicKeys VARCHAR(2048) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 
@@ -70,4 +70,12 @@ CREATE TABLE needKEY(
     ApUserName VARCHAR(255) NOT NULL,
     KKAddress VARCHAR(255) NOT NULL,
     time BIGINT NOT NULL
+);
+
+CREATE TABLE APKKsaveKey(
+    ApAddress VARCHAR(255) NOT NULL,
+    KKAddress VARCHAR(255) NOT NULL,
+    i BIGINT NOT NULL,
+    x VARCHAR(255) NOT NULL,
+    m VARCHAR(255) NOT NULL,
 );
