@@ -1,5 +1,6 @@
 import {BaseRes} from "../ress.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../entity/applicant.ts";
+import {BasicEncryptInfo} from "../../../entity/user.ts";
 
 /**
  * 响应体设计的核心就是 传输的一定是可序列化对象 将对象序列化为json BaseRes为基类 剩下的字段随便搞 然后传输json
@@ -33,4 +34,11 @@ export interface GiveOrDelayResumeLicensingRes extends BaseRes {
  */
 export interface UploadRes extends BaseRes {
     hash: string;
+}
+
+export interface KKInfoForSendListRes extends BaseRes {
+    list: BasicEncryptInfo[];
+}
+export interface SendSubKeyToKKRes extends BaseRes{
+
 }

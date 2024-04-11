@@ -12,9 +12,11 @@ import {atomWithStorage} from "jotai/utils";
 import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
+    KKInfoForSendListRes,
     ResumeInfoRes,
     ResumeQuestListRes,
     ResumeRequestHistoryListRes,
+    SendSubKeyToKKRes,
     UploadRes
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
@@ -160,12 +162,30 @@ interface ApplicantWorkMethod {
     giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes>;
 
     getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
+
+    getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes>;
+
+    sendSubKeyToKKAsync(S: string, M: string, i: string): Promise<SendSubKeyToKKRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async sendSubKeyToKKAsync(S: string, M: string, i: string): Promise<SendSubKeyToKKRes> {
+                console.log(S,M,i);
+                return  {
+                    status: 1,
+                    message: "ok",
+                };
+            },
+            async getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes> {
+                return {
+                    status: 1,
+                    message: "ok",
+                    list: []
+                };
+            },
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
                 if (userInfo === null) throw "在未登录时获取简历历史记录信息";
                 const req: GetDownloadHisReq = {
@@ -257,7 +277,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
-                console.log("***",file);
+                console.log("***", file);
                 await FileSystemImpl.downloadMetaFileAsync(file);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
@@ -287,7 +307,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     fileHash, ApUserName, ReUserName: userInfo.nick
                 };
                 const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
-                console.log("res:",res);
+                console.log("res:", res);
                 const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
                 return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
             },

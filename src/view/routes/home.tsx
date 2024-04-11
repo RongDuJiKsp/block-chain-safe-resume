@@ -6,6 +6,7 @@ import RecruiterRequire from "../pages/home/recruiter/require.tsx";
 import ApplicantUpload from "../pages/home/applicant/upload.tsx";
 import ApplicantRecord from "../pages/home/applicant/record.tsx";
 import KeyKeeperGetSubKey from "../pages/home/keykeeper/get.tsx";
+import ApplicantSend from "../pages/home/applicant/send.tsx";
 
 export const APPLICANT_THIS_PATH: string = "/home/Applicant";
 
@@ -14,6 +15,7 @@ export function ApplicantRoutes() {
         <Route path={"/status"} element={<ApplicantStatus/>}/>
         <Route path={"/upload"} element={<ApplicantUpload/>}/>
         <Route path={"/record"} element={<ApplicantRecord/>}/>
+        <Route path={"/send"} element={<ApplicantSend/>}/>
         <Route path={"/*"} element={<Navigate to={APPLICANT_THIS_PATH + "/status"}/>}/>
     </Routes>;
 }
