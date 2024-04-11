@@ -53,7 +53,7 @@ function FunctionItems({items}: { items: ItemsAndPic[] }) {
     return <div className={"flex justify-end h-full gap-8"}>
         {items.map((value, index) => {
             return <NavLink to={value.routerPath} draggable={false}
-                            className={({isActive}) => isActive ? "active-nav" : "basis-nav"}
+                            className={({isActive}) => isActive ? "active-nav nav-button-bg-color-blue" : "basis-nav nav-button-bg-color-blue"}
                             key={"item-map" + index}>
                 {value.logo}
                 <div className={"text-center my-auto font-mono font-bold text-lg"}>{value.text}</div>
@@ -149,7 +149,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <p className={"py-3"}>请确认你要退出登录？</p>
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
-            <div className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3"}>
+            <div className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3 nav-button-bg-color-green"}>
                 <div className={"my-auto"}>
                     <span>{group.userHeader}</span>
                 </div>
