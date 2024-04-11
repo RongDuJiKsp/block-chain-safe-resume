@@ -158,7 +158,8 @@ function SelectIdentityComponent() {
         <div className={"basis-1/12"}>
             <div className={"justify-center flex"}>
                 <button className={"button button-raised button-primary "}
-                        onClick={onNextClick}>以身份 : {selectedIdentity} 继续</button>
+                        onClick={onNextClick}>以身份 : {selectedIdentity} 继续
+                </button>
             </div>
         </div>
     </div>;
@@ -175,7 +176,7 @@ function ShowIdentityAndSelect({onClick, info}: ShowingIdentityParam) {
     return <motion.div onClick={onClick} onMouseOver={setHoveredAction.setTrue} onMouseOut={setHoveredAction.setFalse}
                        className={"px-8 py-3"}>
         <motion.p className={"font-sans text-lg text-center"}>{info.title}</motion.p>
-        <motion.p className={"overflow-hidden"} transition={{duration: 0.8,ease:"easeInOut"}} animate={{
+        <motion.p className={"overflow-hidden"} transition={{duration: 0.8, ease: "easeInOut"}} animate={{
             height: isHovered ? "auto" : 0,
             width: isHovered ? "auto" : 0,
             opacity: isHovered ? 1 : 0,
@@ -204,7 +205,7 @@ function GetResultComponent() {
         console.log(res);
         const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
         const PrivateKey = res.res.privateKeys;
-        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
+        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, res.res.X, res.res.M)]);
         FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
             message.success("下载成功！").then();
             setCanClose.setTrue();

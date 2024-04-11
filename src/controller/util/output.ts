@@ -6,13 +6,17 @@ export const FileTempleHandleImpl: GetFileTemplate = {
         The KeyPair is (P,X,M) with values (${P},${X},${M})
         `;
     },
-    getRegisterKey(privateKey: string, SKey: string): string {
+    getRegisterKey(privateKey: string, SKey: string, X: number[], M: number[]): string {
         return `Please keep your  key, once lost, you can't get it back!
         PrivateValue : ${privateKey}
-        SafeKey : ${SKey}
         You can login with PrivateValue 
-        If You Are Applicant ,You Can verify with SafeKey 
-        `;
+        SafeKey : ${SKey}
+        If You Are Applicant ,You Need to Upload With SubKey
+        Pairs: ${X.map((X, index): string => `(${index},${X},${M[index]})`)}
+        If You Are Applicant ,You Need to Distribution SubKey with (i,x,m) pair
+        PrivateKey: 
+        If You Are KeyKeeper You Need To get SubKey With PrivateKey
+         `;
     },
     getApInfo(ApName: string, ApAddressString: string): string {
         return `The Search Result is
