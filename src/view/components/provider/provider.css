@@ -36,3 +36,7 @@
     transition-duration: 1s;
     @apply item-container item-shadow-active  basis-1/6 flex justify-around hover:text-black rounded-lg
 }
+
+.shadow-float {
+    box-shadow: 0 0 5px gray;
+}

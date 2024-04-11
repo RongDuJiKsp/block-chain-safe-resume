@@ -81,7 +81,7 @@ function LoginComponent() {
         cleanData();
     }, []);
     return <div className={"flex flex-col justify-around h-full dark-mode-text"}>
-        <div className={"text-center text-2xl font-bold"}>欢迎来到安全简历登录系统</div>
+        <div className={"text-center text-2xl font-bold"}>欢迎来到SafeCV Zone平台</div>
         <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
             <Form.Item<LoginFormType> name={"keyword"} colon={false}
                                       rules={[{pattern: /[a-f0-9]+/, message: "存在非法字符或为空"}]}

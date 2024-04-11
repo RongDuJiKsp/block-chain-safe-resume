@@ -85,8 +85,8 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
         <Table<AccessibleSubKeyInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
-        <div className={"mt-7"}>还不是密钥保管人？
-            <span onClick={setWithoutPermission.setTrue} className={"text-gray-400"}>点击这里</span>
+        <div className={"mt-7"}>提示未成为合法的密钥保管人？
+            <span onClick={setWithoutPermission.setTrue} className={"text-gray-400 underline underline-offset-4"}>点击这里申请成为保管人</span>
         </div>
     </div>;
 }

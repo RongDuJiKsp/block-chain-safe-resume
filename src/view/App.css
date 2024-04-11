@@ -21,7 +21,9 @@
 html {
     user-select: none;
     min-height: 100vh;
-    @apply window-image-back
+    background-image: url("../assets/bg.jpeg");
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .h-full-screen {
@@ -54,6 +56,15 @@ html {
     border-radius: 0.75rem;
     border: 1px rgb(91, 92, 94);
     box-shadow: #2f2f2f 2px 2px 5px;
+}
+.basic-green-shadow-box {
+    border-radius: 0.75rem;
+    border: 1px rgb(91, 92, 94);
+    box-shadow: #80dc76 2px 2px 5px;
+}
+.basic-uncolored-box{
+    border: 1px rgb(91, 92, 94);
+    border-radius: 0.75rem;
 }
 .window-color-back{
     background-color: #abcdef;
