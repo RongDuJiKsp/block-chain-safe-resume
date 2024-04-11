@@ -25,6 +25,7 @@ import {
     DownloadSubKeysRes,
     GetFileMesRes,
     GetSavedRes,
+    KKDownloadKeyRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
@@ -39,8 +40,8 @@ import {
     GetFileMesReq,
     GetNeedSaveReq,
     GetSaveReq,
+    KKDownloadKeyReq,
     RemindKKReq,
-    SavePartReq,
     UploadKeyReq
 } from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
@@ -186,7 +187,10 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     KKAddress: kkAddress,
                     ApAddress: userInfo.address
                 };
-                return alovaClientImpl.Post<SendSubKeyToKKRes>("/PostOnekeyReq", req);
+                console.log(req);
+                const res = await alovaClientImpl.Post<SendSubKeyToKKRes>("/PostOnekeyReq", req);
+                console.log(res);
+                return res;
             },
             async getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes> {
                 if (userInfo === null) throw "在未登录时获取kk列表";
@@ -292,7 +296,9 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         const userInfo = useAtomValue(userInfoAtom);
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
+                console.log(ApAddress,ApUserName);
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
+                console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
                 console.log("***", file);
@@ -364,15 +370,19 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
-    downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
+    downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes>;
 
     getRequestListAsync(): Promise<RequestListRes>;
 
+    /**
+     * @deprecated GetNeedSaveReq
+     */
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 
     getPermissionToBeKK(): Promise<ChangeKKRes>;
 
     getSavedSubKeyListAsync(): Promise<GetSavedRes>
+
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
@@ -386,6 +396,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                     KKAddress: userInfo.address
                 };
                 const res = await alovaClientImpl.Post<ArrayRes>("/GetSaveReq", req);
+                console.log(res);
                 return {
                     status: res.status,
                     message: res.message,
@@ -399,10 +410,15 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
             },
-            async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
+            async downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes> {
                 if (userInfo === null) throw "未登录时尝试获取子密钥";
-                const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};
-                return alovaClientImpl.Post<DownloadSubKeysRes>("/SavePartReq", req);
+
+                const req: KKDownloadKeyReq = {
+                    KKAddress: userInfo.address,
+                    ApAddress: apAddress,
+                    encryptPrivateKeys: encryptPrivateKeys
+                };
+                return alovaClientImpl.Post<KKDownloadKeyRes>("/KKDownloadKeyReq", req);
             },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";

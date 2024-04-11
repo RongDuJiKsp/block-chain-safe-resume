@@ -63,3 +63,14 @@ export interface GetSaveReq {
     KKAddress: string;
 }
 
+/**
+ * @interface KKDownloadKeyReq
+ * @property KKAddress KK用户地址
+ * @property ApAddress Ap用户地址
+ * @property encryptPrivateKeys kk私钥
+ */
+export interface KKDownloadKeyReq {
+    KKAddress: string
+    ApAddress: string
+    encryptPrivateKeys: string
+}

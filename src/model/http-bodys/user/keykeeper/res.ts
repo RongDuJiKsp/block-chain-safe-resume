@@ -50,3 +50,11 @@ export interface ChangeKKRes extends BaseRes {
 export interface GetSavedRes extends BaseRes {
     list: BasicInfo[];
 }
+/**
+ * @interface KKDownloadKeyRes
+ */
+export interface KKDownloadKeyRes extends BaseRes{
+    i: number
+    x: number
+    m: number
+}
