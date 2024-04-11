@@ -205,7 +205,7 @@ function GetResultComponent() {
         console.log(res);
         const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
         const PrivateKey = res.res.privateKeys;
-        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, res.res.X, res.res.M)]);
+        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, res.res.X, res.res.M, res.res.encryptPrivateKeys)]);
         FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
             message.success("下载成功！").then();
             setCanClose.setTrue();

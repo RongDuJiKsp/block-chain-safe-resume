@@ -20,6 +20,7 @@ export interface BaseRes {
 export interface RegisterRes extends BaseRes {
     address: string,
     privateKeys: string,
+    encryptPrivateKeys: string
     S: number,
     P: number,
     M: number[],

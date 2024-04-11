@@ -38,6 +38,10 @@ export default function ApplicationSend() {
 }
 
 function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
+    const [selectedInfo, setSelectInfo] = useState<BasicEncryptInfo | null>(null);
+    const clear: CallBackWithSideEffect = () => {
+        setSelectInfo(null);
+    };
     const tableColumn: ColumnsType<BasicEncryptInfo> = [
         {
             title: "用户名",
@@ -66,13 +70,14 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
     ];
 
     return <div className={"mx-28 my-3"}>
+        <UploadSubKeyModel clear={clear} data={selectedInfo}/>
         <Table<BasicEncryptInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                  pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
     </div>;
 }
 
-function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<BasicEncryptInfo>) {
+function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<BasicEncryptInfo | null>) {
     const {message} = App.useApp();
     const apServer = ApplicantWorkHooks.useMethod();
     const [conformLoading, conformLoadingAction] = useBoolean();
