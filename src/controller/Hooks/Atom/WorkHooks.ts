@@ -1,5 +1,5 @@
 import {useAtom, useAtomValue} from "jotai";
-import {BasicEncryptInfo, BasicUserState} from "../../../model/entity/user.ts";
+import {BasicEncryptInfo, BasicInfo, BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
@@ -24,6 +24,7 @@ import {
     ChangeKKRes,
     DownloadSubKeysRes,
     GetFileMesRes,
+    GetSavedRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
@@ -37,6 +38,7 @@ import {
     ChangeKKReq,
     GetFileMesReq,
     GetNeedSaveReq,
+    GetSaveReq,
     RemindKKReq,
     SavePartReq,
     UploadKeyReq
@@ -369,6 +371,8 @@ interface KeyKeeperWorkMethod {
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 
     getPermissionToBeKK(): Promise<ChangeKKRes>;
+
+    getSavedSubKeyListAsync(): Promise<GetSavedRes>
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
@@ -376,6 +380,18 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
     useMethod(): KeyKeeperWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async getSavedSubKeyListAsync(): Promise<GetSavedRes> {
+                if (userInfo === null) throw "未登录时尝试获取保管列表";
+                const req: GetSaveReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetSaveReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): BasicInfo => ({userName: val[0], address: val[1]})) : []
+                };
+            },
             async getPermissionToBeKK(): Promise<ChangeKKRes> {
                 if (userInfo === null) throw "未登录时尝试获取权限";
                 const req: ChangeKKReq = {

@@ -18,3 +18,7 @@ export interface BasicEncryptInfo {
     address:string;
     publicKey:string;
 }
+export interface BasicInfo{
+    userName:string;
+    address:string;
+}

@@ -35,6 +35,7 @@ export interface UploadKeyReq {
     x: number
     m: number
 }
+
 /**
  * @interface GetFileMesReq
  * @property ApAddress  ap用户地址
@@ -44,6 +45,7 @@ export interface GetFileMesReq {
     ApAddress: string;
     ReAddress: string;
 }
+
 /**
  * kk申请成功密钥保管人
  * @interface ChangeKKReq
@@ -52,3 +54,12 @@ export interface GetFileMesReq {
 export interface ChangeKKReq {
     KKAddress: string
 }
+
+/** kk查看已经保管的秘密份额
+ * @interface GetSaveReq
+ * @property KKAddress kk用户地址(登陆时已经返回)
+ */
+export interface GetSaveReq {
+    KKAddress: string;
+}
+

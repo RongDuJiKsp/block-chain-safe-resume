@@ -1,5 +1,6 @@
 import {BaseRes} from "../ress.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../entity/keykeeper.ts";
+import {BasicInfo} from "../../../entity/user.ts";
 
 //kk上传子密钥的响应体
 export interface UploadSubKeyRes extends BaseRes {
@@ -38,8 +39,14 @@ export interface GetFileMesRes extends BaseRes {
     fileType: string;
     fileHash: string;
 }
+
 /**
  * @interface ChangeKKRes kk成为合法的保管人
  */
-export interface ChangeKKRes extends BaseRes{
+export interface ChangeKKRes extends BaseRes {
+}
+
+//kk查看已经保管的秘密份额
+export interface GetSavedRes extends BaseRes {
+    list: BasicInfo[];
 }

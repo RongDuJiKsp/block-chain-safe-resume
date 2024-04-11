@@ -60,12 +60,6 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
             align: "center"
         },
         {
-            title: "剩余份额",
-            dataIndex: "amount",
-            width: "17%",
-            align: "center"
-        },
-        {
             title: "操作",
             width: "17%",
             align: "center",
