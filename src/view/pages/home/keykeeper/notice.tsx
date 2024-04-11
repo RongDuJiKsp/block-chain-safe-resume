@@ -75,7 +75,7 @@ function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[]
             }
         }
     ];
-    return <div>
+    return <div className={"mx-28 my-3"}>
         <UploadSubKeyModel data={selectedResume} clear={onClear}/>
         <Table<UploadSubKeyRequestInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                         pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
@@ -112,7 +112,7 @@ function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<UploadSubKe
                 <p>请确认当前选择的用户 用户名 : {data?.ApUserName}</p>
                 <p>请确认上传的密钥是否正确，上传错误的密钥将会导致积分惩罚！</p>
             </div>
-            <div>
+            <div >
                 <Form<UploadKeyReq> form={formRef} onFinish={onConform} labelCol={{span: 6}} preserve={false}>
                     <Form.Item<UploadKeyReq> label={"密钥位次"} name={"i"} rules={[{required: true}]}>
                         <InputNumber min={0} max={4}/>

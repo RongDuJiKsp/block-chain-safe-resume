@@ -10,6 +10,7 @@ import {BasicEncryptInfo} from "../../../entity/user.ts";
 export interface ResumeInfoRes extends BaseRes {
     putTime: number;
     downloadtimes: number;
+
 }
 
 //ap获取向ap请求响应的rc的列表

@@ -84,7 +84,7 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
             }
         }
     ];
-    return <div>
+    return <div className={"mx-28 my-3"}>
         <Spin spinning={isLoading} fullscreen delay={500}/>
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}

@@ -62,7 +62,7 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
         }
     ];
 
-    return <div>
+    return <div className={"mx-28 my-3"}>
         <Table<BasicEncryptInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                  pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />

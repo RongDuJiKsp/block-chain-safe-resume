@@ -79,7 +79,7 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: AccessibleSubKey
             }
         }
     ];
-    return <div>
+    return <div className={"mx-28 my-3"}>
         <GetPermissionToBeKK clear={setWithoutPermission.setFalse} data={withoutPermission}/>
         <GetAccessibleSubKey data={selectedInfo} clear={onClearSelected}/>
         <Table<AccessibleSubKeyInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
