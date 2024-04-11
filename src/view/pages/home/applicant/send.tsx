@@ -1,5 +1,5 @@
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
-import {App, Button, Spin, Table} from "antd";
+import {App, Button, Form, Input, InputNumber, Modal, Spin, Table} from "antd";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {useBoolean} from "ahooks";
 import {ReactNode, useEffect, useState} from "react";
@@ -7,6 +7,9 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ColumnsType} from "antd/es/table";
 import {BasicEncryptInfo} from "../../../../model/entity/user.ts";
 import {ColumnFilterItem} from "antd/es/table/interface";
+import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
+import {useForm} from "antd/es/form/Form";
+import {UploadKeyReq} from "../../../../model/http-bodys/user/keykeeper/req.ts";
 
 export default function ApplicationSend() {
     const userService = ApplicantWorkHooks.useMethod();
@@ -67,4 +70,58 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
                                  pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
     </div>;
+}
+
+function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<BasicEncryptInfo>) {
+    const {message} = App.useApp();
+    const apServer = ApplicantWorkHooks.useMethod();
+    const [conformLoading, conformLoadingAction] = useBoolean();
+    const [formRef] = useForm<UploadKeyReq>();
+    const onConform = (val: UploadKeyReq): void => {
+        if (data === null) return;
+        conformLoadingAction.setTrue();
+        apServer.sendSubKeyToKKAsync(String(val.x), String(val.m), String(val.i), data.publicKey, data.address).then(r => {
+            if (r.status) {
+                message.success("上传成功").then();
+                clear();
+            } else message.error("上传失败，原因为 " + r.message).then();
+        }).catch(e => {
+            console.error(e);
+            message.error("发生错误，错误为：" + e).then();
+        }).finally(conformLoadingAction.setFalse);
+    };
+
+
+    return <Modal open={data !== null} onCancel={clear} onOk={formRef.submit} destroyOnClose={true}
+                  confirmLoading={conformLoading}>
+        <div className={"my-6"}>
+            <div className={"flex flex-col gap-6 my-3"}>
+                <p>请在此为指定用户分发密钥</p>
+                <p>请确认当前选择的用户 用户名 : {data?.name}</p>
+            </div>
+            <div>
+                <Form<UploadKeyReq> form={formRef} onFinish={onConform} labelCol={{span: 6}} preserve={false}>
+                    <Form.Item<UploadKeyReq> label={"密钥位次"} name={"i"} rules={[{required: true}]}>
+                        <InputNumber min={0} max={4}/>
+                    </Form.Item>
+                    <div className={"w-2/3"}>
+                        <Form.Item<UploadKeyReq> label={"X Key"} name={"x"} rules={[{
+                            pattern: /[1-9]+/,
+                            message: "密钥未填写或不规范！",
+                            required: true
+                        }]}>
+                            <Input allowClear/>
+                        </Form.Item>
+                        <Form.Item<UploadKeyReq> label={"M Key"} name={"m"} rules={[{
+                            pattern: /[1-9]+/,
+                            message: "密钥未填写或不规范！",
+                            required: true
+                        }]}>
+                            <Input allowClear/>
+                        </Form.Item>
+                    </div>
+                </Form>
+            </div>
+        </div>
+    </Modal>;
 }
