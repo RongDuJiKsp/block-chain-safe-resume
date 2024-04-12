@@ -133,7 +133,9 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
                         <Form.Item name={"privateKey"}>
                             <Input.TextArea autoSize={{minRows:4,maxRows:6}} placeholder={"请在此黏贴私钥"}/>
                         </Form.Item>
-                        <button className={"button button-3d button-primary"}></button>
+                        <div className={"flex justify-center"}>
+                            <button className={"button button-3d button-primary "}>解析子密钥</button>
+                        </div>
                     </Form>
                 </div> :
                 <div className={"py-8"}>
