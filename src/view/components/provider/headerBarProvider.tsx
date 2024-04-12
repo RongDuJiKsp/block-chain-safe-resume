@@ -84,6 +84,10 @@ function DropDownOperations({group}: { group: UserGroup }) {
 
         });
     };
+    const onCopyStr = async (val: string) => {
+        await navigator.clipboard.writeText(val);
+        await message.success("复制成功！");
+    };
     const onChangeNick: CancelableOperateHooks = {
         onCancel: changeNickOpenAction.setFalse,
         onConform: () => form.submit()
@@ -108,11 +112,16 @@ function DropDownOperations({group}: { group: UserGroup }) {
     const dropDownItems: ItemType[] = [
         {
             key: "nick",
-            label: componentUtils.getIconVal("icon-nick", userInfo.nick)
+            label: componentUtils.getIconVal("icon-nick", userInfo.nick),
+            onClick: () => onCopyStr(userInfo.nick),
         },
         {
             key: "identity",
             label: componentUtils.getIconVal("icon-identity", userInfo.identity)
+        }, {
+            key: "address",
+            label: componentUtils.getIconVal("icon-address-book-fill", userInfo.address.substring(0, 10) + "..."),
+            onClick: () => onCopyStr(userInfo.address),
         },
         {
             key: "token",
@@ -149,7 +158,8 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <p className={"py-3"}>请确认你要退出登录？</p>
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
-            <div className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3 nav-button-bg-color-green"}>
+            <div
+                className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3 nav-button-bg-color-green"}>
                 <div className={"my-auto"}>
                     <span>{group.userHeader}</span>
                 </div>
