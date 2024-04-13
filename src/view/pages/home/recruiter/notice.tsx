@@ -19,7 +19,7 @@ export default function RecruiterNotice() {
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window"}>
         <div className={"basis-3/4  mx-11  pt-6 px-6 work-window-color basic-shadow-box"}>
-            <TableHeader title={"申请简历状态"} onFresh={changeAction}/>
+            <TableHeader title={"申请访问简历状态"} onFresh={changeAction}/>
             <Spin spinning={isLoading} delay={500}>
                 <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
             </Spin>

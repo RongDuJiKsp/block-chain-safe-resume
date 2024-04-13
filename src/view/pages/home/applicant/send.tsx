@@ -10,6 +10,7 @@ import {ColumnFilterItem} from "antd/es/table/interface";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {useForm} from "antd/es/form/Form";
 import {UploadKeyReq} from "../../../../model/http-bodys/user/keykeeper/req.ts";
+import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 
 export default function ApplicationSend() {
     const userService = ApplicantWorkHooks.useMethod();
@@ -38,9 +39,14 @@ export default function ApplicationSend() {
 }
 
 function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
+    const {message}=App.useApp();
     const [selectedInfo, setSelectInfo] = useState<BasicEncryptInfo | null>(null);
     const clear: CallBackWithSideEffect = () => {
         setSelectInfo(null);
+    };
+    const onDownloadPEM = (val: string, username: string) => {
+        message.success("正在下载公钥证书！").then();
+        FileSystemImpl.downloadToFileAsNameAsync(new Blob([val]), "public Key of " + username + ".pem").then();
     };
     const tableColumn: ColumnsType<BasicEncryptInfo> = [
         {
@@ -56,6 +62,15 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
             title: "地址",
             dataIndex: "address",
             align: "center"
+        },
+        {
+            dataIndex: "publicKey",
+            align: "center",
+            width: "18%",
+            title: "公钥",
+            render(val: string, item: BasicEncryptInfo) {
+                return <div onClick={() => onDownloadPEM(val, item.name)}>{val.substring(30, 46) + "..."}</div>;
+            }
         },
         {
             title: "操作",
@@ -100,9 +115,11 @@ function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<BasicEncryp
     return <Modal open={data !== null} onCancel={clear} onOk={formRef.submit} destroyOnClose={true}
                   confirmLoading={conformLoading}>
         <div className={"my-6"}>
-            <div className={"flex flex-col gap-6 my-3"}>
+            <div className={"flex flex-col gap-4 my-3"}>
+                <p>请确认当前选择的用户</p>
+                <p>用户名 : {data?.name}</p>
+                <p>公钥 : {data?.publicKey?.substring(30, 62) + "..."}</p>
                 <p>请在此为指定用户分发密钥</p>
-                <p>请确认当前选择的用户 用户名 : {data?.name}</p>
             </div>
             <div>
                 <Form<UploadKeyReq> form={formRef} onFinish={onConform} labelCol={{span: 6}} preserve={false}>

@@ -66,7 +66,7 @@ function LoginWindow() {
                 <Route path={"/admin"} element={<AdminLoginComponent/>}/>
             </Routes>
         </div>
-    </div>
+    </div>;
 }
 
 function LoginComponent() {
