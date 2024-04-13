@@ -31,7 +31,7 @@ function FileUploader() {
     };
     const onUploadFile = (): void => {
         if (!SKeyInputRef.current?.input?.value) {
-            message.error("S Key 不能为空！").then();
+            message.error("Safe Key 不能为空！").then();
             return;
         }
         const inputSKey = SKeyInputRef.current?.input?.value;
@@ -72,7 +72,7 @@ function FileUploader() {
             </Form.Item>
             <div>
                 <Popconfirm
-                    title={"避免额外的token消耗，请检查上传的文件是否选择正确！同时请检查输入的SafeKey是否正确！错误的SafeKey将使得简历无法解密！"}
+                    title={"请检查上传的文件和SafeKey是否选择正确！错误的SafeKey将使得简历无法解密！"}
                     onConfirm={onUploadFile}>
                     <button className={"button-primary button button-raised button-rounded button-glow"}>
                         {isLoading ?
