@@ -5,6 +5,8 @@
 .login-locations {
     height: 50vh;
     width: 35vw;
+    margin-top: 20vh;
+    margin-left: 60vw;
     @apply register-page-bg-color
 }
 

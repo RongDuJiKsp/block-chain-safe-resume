@@ -1,8 +1,5 @@
 import "./login.css";
-import projectTarget from "../../../assets/projectTarget.png";
-import projectIPFS from "../../../assets/projectIPFA.png";
-import projectOverView from "../../../assets/projectOverView.png";
-import {App, Carousel, Form, Input, Select} from "antd";
+import {App, Form, Input, Select} from "antd";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
@@ -28,46 +25,26 @@ const identityOption: DefaultOptionType[] = [
 
 
 function LoginPage() {
-    return <div className={"flex flex-col justify-around h-full-screen basis-1/2"}>
-        <div className={"flex flex-row mx-16 py-8"}>
-            <PicTureWindow/>
-            <LoginWindow/>
+    return <div>
+        <div
+            className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around  basic-shadow-box"}>
+            <div className={"text-right pr-5 basis-1/6 pt-2 dark-mode-text"}>
+                切换
+                {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
+                    <NavLink key={r[0]} to={r[1]}
+                             className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
+            </div>
+            <div className={"mx-7 basis-4/5"}>
+                <Routes>
+                    <Route path={"/user"} element={<LoginComponent/>}/>
+                    <Route path={"/admin"} element={<AdminLoginComponent/>}/>
+                </Routes>
+            </div>
         </div>
     </div>;
 }
 
 export default LoginPage;
-const pictrue = [projectIPFS, projectTarget, projectOverView];
-const contentStyle: React.CSSProperties = {
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-};
-function PicTureWindow() {
-    return <div>
-
-    </div>;
-}
-
-function LoginWindow() {
-    return <div
-        className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around  basic-shadow-box"}>
-        <div className={"text-right pr-5 basis-1/6 pt-2 dark-mode-text"}>
-            切换
-            {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
-                <NavLink key={r[0]} to={r[1]}
-                         className={({isActive}) => isActive ? "hidden" : ""}>{r[0]}</NavLink>)}
-        </div>
-        <div className={"mx-7 basis-4/5"}>
-            <Routes>
-                <Route path={"/user"} element={<LoginComponent/>}/>
-                <Route path={"/admin"} element={<AdminLoginComponent/>}/>
-            </Routes>
-        </div>
-    </div>;
-}
 
 function LoginComponent() {
     const navigate = useNavigate();
