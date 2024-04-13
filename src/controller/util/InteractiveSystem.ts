@@ -72,6 +72,15 @@ export const FileSystemImpl: UserFileSystem = {
     },
     base64ToAscii(base64: string): string {
         return new Buffer(base64, "base64").toString("utf-8");
+    },
+    writeTextToClipboard(text: string) {
+        const input = document.createElement('textarea');
+        input.innerHTML = text;
+        document.body.appendChild(input);
+        input.select();
+        const result = document.execCommand('copy');
+        document.body.removeChild(input);
+        return result;
     }
 
 

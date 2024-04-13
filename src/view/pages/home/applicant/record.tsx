@@ -22,6 +22,7 @@ export default function ApplicantRecord() {
     useEffect(() => {
         loadingAction.setTrue();
         userService.getResumeRequestHistoryListAsync().then(r => {
+            r.list.sort((a, b) => Number(a.downloadTime) - Number(b.downloadTime));
             if (r.status) setTableVal(r.list);
             else message.error("获取更新时发生失败，原因:" + r.message).then();
         }).catch(e => {
@@ -47,7 +48,7 @@ export default function ApplicantRecord() {
             </Spin>
         </div>
         <div className={"bg-white py-8 basic-shadow-box "}>
-            <ResumeInfoComponent info={resumeInfo}/>
+            <ResumeInfoComponent info={resumeInfo} firstInfo={tableVal.length ? tableVal[0] : null}/>
         </div>
     </div>;
 }
@@ -61,7 +62,10 @@ const tableColumn: ColumnsType<ResumeVisitHistoryInfo> = [
     {
         title: "下载时间",
         dataIndex: "downloadTime",
-        align: "center"
+        align: "center",
+        render(unixTime: string) {
+            return dayjs.unix(Number(unixTime)).format("YYYY-MM-DD HH:mm");
+        }
     },
 ];
 
@@ -75,7 +79,10 @@ function ResumeHistoryTable({tableVal}: { tableVal: ResumeVisitHistoryInfo[] }) 
 
 const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
 
-function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
+function ResumeInfoComponent({info, firstInfo}: {
+    info: ResumeInfoRes | null,
+    firstInfo: ResumeVisitHistoryInfo | null
+}) {
     console.log(info);
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
@@ -84,6 +91,6 @@ function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
                    className={"basis-1/5"}
                    value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "N/A"}/>
         <Statistic title={"最新访问时间"} prefix={componentUtils.getIcon("icon-keyhole")}
-                   value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "N/A"}/>
+                   value={firstInfo ? dayjs.unix(Number(firstInfo.downloadTime)).format("YYYY-MM-DD HH:mm") : "N/A"}/>
     </div>;
 }

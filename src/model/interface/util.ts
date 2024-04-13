@@ -17,6 +17,8 @@ export interface UserFileSystem {
 
     arrayBufferToFile(arrayBuffer: ArrayBuffer, fileName: string, fileType: string): MetaFile
 
+    writeTextToClipboard(text: string): boolean;
+
 }
 
 export type ConfigTable<List extends string | number, ValuesType> = {

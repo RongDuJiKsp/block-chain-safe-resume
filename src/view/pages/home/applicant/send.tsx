@@ -63,7 +63,7 @@ function ResumeHistoryTable({tableVal}: { tableVal: BasicEncryptInfo[] }) {
             align: "center",
             render(_, item: BasicEncryptInfo): ReactNode {
                 return <span>
-                    <Button onClick={() => setSelectInfo(item)}>Ok</Button>
+                    <Button onClick={() => setSelectInfo(item)}>授予份额</Button>
                 </span>;
             }
         }

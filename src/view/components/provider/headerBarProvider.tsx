@@ -12,6 +12,7 @@ import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 import {useForm} from "antd/es/form/Form";
 import {UserGroup} from "../../../model/entity/user.ts";
 import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
+import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -84,9 +85,10 @@ function DropDownOperations({group}: { group: UserGroup }) {
 
         });
     };
-    const onCopyStr = async (val: string) => {
-        await navigator.clipboard.writeText(val);
-        await message.success("复制成功！");
+    const onCopyStr = (val: string) => {
+        const res = FileSystemImpl.writeTextToClipboard(val);
+        if (res) message.success("复制成功").then();
+        else message.warning("复制失败").then();
     };
     const onChangeNick: CancelableOperateHooks = {
         onCancel: changeNickOpenAction.setFalse,
