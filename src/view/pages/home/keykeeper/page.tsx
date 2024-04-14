@@ -17,7 +17,7 @@ const headBarItems: ItemsAndPic[] = [
     {
         logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 32}),
         routerPath: KEYKEEPER_THIS_PATH + "/get",
-        text: "获取子密钥"
+        text: "获取秘密份额"
     }
 ];
 export default function KeyKeeperPage() {

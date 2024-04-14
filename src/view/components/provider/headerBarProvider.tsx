@@ -28,7 +28,6 @@ interface HeaderBarProps {
 
 interface ChangeNickFormProps {
     nick: string;
-    privateKey: string;
 }
 
 export default function HeaderBarProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
@@ -75,7 +74,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
     if (userInfo === null) throw "在用户未登录时展示用户信息";
 
     const onSubmit = (val: ChangeNickFormProps) => {
-        loginServer.changeUserNameAsync(val.nick, val.privateKey).then(r => {
+        loginServer.changeUserNameAsync(val.nick).then(r => {
             if (r.status) {
                 message.success("修改昵称成功").then();
                 changeNickOpenAction.setFalse();
@@ -146,9 +145,6 @@ function DropDownOperations({group}: { group: UserGroup }) {
                title={"更改用户昵称"}>
             <div className={"m-8"}>
                 <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
-                    <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"} rules={[{required: true}]}>
-                        <Input allowClear/>
-                    </Form.Item>
                     <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}
                                                     rules={[{min: 4, max: 12}, {required: true}]}>
                         <Input allowClear/>

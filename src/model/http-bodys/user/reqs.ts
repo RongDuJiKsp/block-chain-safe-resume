@@ -20,7 +20,7 @@ export interface ChangeNameReq {
     oldName: string;
     newName: string;
     identity: string;
-    privateKey: string;
+    address: string;
 }
 
 export interface GetTokenReq {

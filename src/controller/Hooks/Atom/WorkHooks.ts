@@ -22,7 +22,6 @@ import {
 import {
     AccessibleSubKeyListRes,
     ChangeKKRes,
-    DownloadSubKeysRes,
     GetFileMesRes,
     GetSavedRes,
     KKDownloadKeyRes,
@@ -90,7 +89,7 @@ interface UserWorkMethod {
 
     logout(): void;
 
-    changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes>;
+    changeUserNameAsync(newName: string): Promise<ChangeNameRes>;
 
     getTokenNumberAsync(): Promise<GetTokenRes>;
 }
@@ -113,13 +112,13 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 };
                 return alovaClientImpl.Post("/GetBalanceReq", req);
             },
-            async changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes> {
+            async changeUserNameAsync(newName: string): Promise<ChangeNameRes> {
                 if (info === null) throw "在未登录的情况下尝试修改用户名";
                 const request: ChangeNameReq = {
                     oldName: info.nick,
                     newName: newName,
                     identity: info.identity,
-                    privateKey: privateKey
+                    address: info.address
                 };
                 const response = await alovaClientImpl.Post<ChangeNameRes>("/ChangeNameReq", request);
                 if (response.status) {
@@ -178,7 +177,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
         const userInfo = useAtomValue(userInfoAtom);
         return {
             async sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey, kkAddress: string): Promise<SendSubKeyToKKRes> {
-                if (userInfo === null) throw "在未登录时分发kk密钥";
+                if (userInfo === null) throw "在未登录时分发kk秘密份额";
                 const req: PostOnekeyReq = {
                     i: Number(i),
                     x: Number(X),
@@ -296,7 +295,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         const userInfo = useAtomValue(userInfoAtom);
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
-                console.log(ApAddress,ApUserName);
+                console.log(ApAddress, ApUserName);
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
                 console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
@@ -411,7 +410,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
             },
             async downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes> {
-                if (userInfo === null) throw "未登录时尝试获取子密钥";
+                if (userInfo === null) throw "未登录时尝试获取秘密份额";
 
                 const req: KKDownloadKeyReq = {
                     KKAddress: userInfo.address,
@@ -457,7 +456,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
             },
             async uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
-                if (userInfo === null) throw "未登录时尝试上传子密钥";
+                if (userInfo === null) throw "未登录时尝试上传秘密份额";
                 const req: UploadKeyReq = {
                     ApUserName: ApUsername, i, x, m, KKAddress: userInfo.address
                 };

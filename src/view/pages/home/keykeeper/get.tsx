@@ -30,7 +30,7 @@ export default function KeyKeeperGetSubKey() {
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
         <div className={"work-window-color basis-3/4 px-8 py-4 basic-shadow-box"}>
-            <TableHeader title={"可保管子密钥"} onFresh={changeAction}/>
+            <TableHeader title={"可保管秘密份额"} onFresh={changeAction}/>
             <AccessibleSubKeyTableComponent tableVal={tableVal}/>
         </div>
     </div>;
@@ -93,7 +93,7 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
     const [canBeClose, canBeCloseAction] = useBoolean();
     const onDownloadSubKey: CallBackWithSideEffect = () => {
         if (!keyPair || !data) {
-            message.error("未获取到子密钥，请关闭浮窗后重试").then();
+            message.error("未获取到秘密份额，请关闭浮窗后重试").then();
             return;
         }
         if (!userInfo) {
@@ -124,7 +124,7 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         });
     };
     return <Modal open={data !== null}
-                  onCancel={canBeClose || keyPair === null ? clear : () => message.warning("不保存子密钥是不准退出的喵~").then()}
+                  onCancel={canBeClose || keyPair === null ? clear : () => message.warning("不保存秘密份额是不准退出的喵~").then()}
                   footer={null}>
         <div className={"my-5"}>
             {keyPair === null ?
@@ -134,14 +134,14 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
                             <Input.TextArea autoSize={{minRows:4,maxRows:6}} placeholder={"请在此黏贴私钥"}/>
                         </Form.Item>
                         <div className={"flex justify-center"}>
-                            <button className={"button button-3d button-primary "}>解析子密钥</button>
+                            <button className={"button button-3d button-primary "}>解析秘密份额</button>
                         </div>
                     </Form>
                 </div> :
                 <div className={"py-8"}>
-                    <p>请下载子密钥并且妥善保管，在需要上传子密钥时及时上传子密钥可以获得奖励，未妥善保管或上传错误将会获得处罚！</p>
+                    <p>请下载秘密份额并且妥善保管，在需要上传秘密份额时及时上传秘密份额可以获得奖励，未妥善保管或上传错误将会获得处罚！</p>
                     <div className={"flex justify-center my-3"}>
-                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载子密钥
+                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载秘密份额
                         </button>
                     </div>
                 </div>}
@@ -172,7 +172,7 @@ function GetPermissionToBeKK({data, clear}: ModelPropsWithInfoAndClear<boolean>)
     return <Modal open={!!data} footer={null} onCancel={clear}>
         <div className={"my-3"}>
             <p className={"my-3"}>
-                请点击按钮获取保管子密钥权限
+                请点击按钮获取保管秘密份额权限
                 系统将自动质押积分以获取权限
             </p>
             <Button type={"primary"} onClick={onGetPermission}>{isLoading ?
