@@ -19,7 +19,7 @@ export default function RecruiterNotice() {
     }, [flashFlag]);
     return <div className={"flex flex-col justify-center h-full-screen basic-window"}>
         <div className={"basis-3/4  mx-11  pt-6 px-6 work-window-color basic-shadow-box"}>
-            <TableHeader title={"申请简历状态"} onFresh={changeAction}/>
+            <TableHeader title={"申请访问简历状态"} onFresh={changeAction}/>
             <Spin spinning={isLoading} delay={500}>
                 <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
             </Spin>
@@ -84,7 +84,7 @@ function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: Conn
             }
         }
     ];
-    return <div>
+    return <div className={"mx-28 my-3"}>
         <Spin spinning={isLoading} fullscreen delay={500}/>
         <Table<ConnectingResumeInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                                      pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}

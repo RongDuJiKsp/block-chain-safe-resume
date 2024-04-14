@@ -40,3 +40,9 @@
 .shadow-float {
     box-shadow: 0 0 5px gray;
 }
+.nav-button-bg-color-blue{
+    background: linear-gradient(to left top, #4cdef1, #7bb1e3);
+}
+.nav-button-bg-color-green{
+    background: linear-gradient(to right bottom , #4cf1b7, #7bb1e3);
+}

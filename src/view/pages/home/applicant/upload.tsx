@@ -31,7 +31,7 @@ function FileUploader() {
     };
     const onUploadFile = (): void => {
         if (!SKeyInputRef.current?.input?.value) {
-            message.error("S Key 不能为空！").then();
+            message.error("Safe Key 不能为空！").then();
             return;
         }
         const inputSKey = SKeyInputRef.current?.input?.value;
@@ -64,7 +64,7 @@ function FileUploader() {
         </div>
         <div className={"h-5/6 basis-3/5 my-auto flex-col gap-12 flex justify-center px-[15%]"}>
             <Form.Item label={"S Key"}>
-                <Input ref={SKeyInputRef} placeholder={"请在此黏贴文件内分发的SKey"}/>
+                <Input ref={SKeyInputRef} placeholder={"请在此黏贴文件内分发的SafeKey"}/>
             </Form.Item>
             <Form.Item label={"Selected File Name"}>
                 <Input readOnly={true} onFocus={e => e.target.blur()}
@@ -72,7 +72,7 @@ function FileUploader() {
             </Form.Item>
             <div>
                 <Popconfirm
-                    title={"避免额外的token消耗，请检查上传的文件是否选择正确！同时请检查输入的SafeKey是否正确！错误的SafeKey将使得简历无法解密！"}
+                    title={"请检查上传的文件和SafeKey是否选择正确！错误的SafeKey将使得简历无法解密！"}
                     onConfirm={onUploadFile}>
                     <button className={"button-primary button button-raised button-rounded button-glow"}>
                         {isLoading ?

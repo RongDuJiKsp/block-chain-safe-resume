@@ -12,6 +12,7 @@ import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 import {useForm} from "antd/es/form/Form";
 import {UserGroup} from "../../../model/entity/user.ts";
 import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
+import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -27,7 +28,6 @@ interface HeaderBarProps {
 
 interface ChangeNickFormProps {
     nick: string;
-    privateKey: string;
 }
 
 export default function HeaderBarProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
@@ -53,7 +53,7 @@ function FunctionItems({items}: { items: ItemsAndPic[] }) {
     return <div className={"flex justify-end h-full gap-8"}>
         {items.map((value, index) => {
             return <NavLink to={value.routerPath} draggable={false}
-                            className={({isActive}) => isActive ? "active-nav" : "basis-nav"}
+                            className={({isActive}) => isActive ? "active-nav nav-button-bg-color-blue" : "basis-nav nav-button-bg-color-blue"}
                             key={"item-map" + index}>
                 {value.logo}
                 <div className={"text-center my-auto font-mono font-bold text-lg"}>{value.text}</div>
@@ -74,7 +74,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
     if (userInfo === null) throw "在用户未登录时展示用户信息";
 
     const onSubmit = (val: ChangeNickFormProps) => {
-        loginServer.changeUserNameAsync(val.nick, val.privateKey).then(r => {
+        loginServer.changeUserNameAsync(val.nick).then(r => {
             if (r.status) {
                 message.success("修改昵称成功").then();
                 changeNickOpenAction.setFalse();
@@ -83,6 +83,11 @@ function DropDownOperations({group}: { group: UserGroup }) {
             message.error(e.message).then();
 
         });
+    };
+    const onCopyStr = (val: string) => {
+        const res = FileSystemImpl.writeTextToClipboard(val);
+        if (res) message.success("复制成功").then();
+        else message.warning("复制失败").then();
     };
     const onChangeNick: CancelableOperateHooks = {
         onCancel: changeNickOpenAction.setFalse,
@@ -108,11 +113,16 @@ function DropDownOperations({group}: { group: UserGroup }) {
     const dropDownItems: ItemType[] = [
         {
             key: "nick",
-            label: componentUtils.getIconVal("icon-nick", userInfo.nick)
+            label: componentUtils.getIconVal("icon-nick", userInfo.nick),
+            onClick: () => onCopyStr(userInfo.nick),
         },
         {
             key: "identity",
             label: componentUtils.getIconVal("icon-identity", userInfo.identity)
+        }, {
+            key: "address",
+            label: componentUtils.getIconVal("icon-address-book-fill", userInfo.address.substring(0, 10) + "..."),
+            onClick: () => onCopyStr(userInfo.address),
         },
         {
             key: "token",
@@ -135,9 +145,6 @@ function DropDownOperations({group}: { group: UserGroup }) {
                title={"更改用户昵称"}>
             <div className={"m-8"}>
                 <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
-                    <Form.Item<ChangeNickFormProps> name={"privateKey"} label={"私钥"} rules={[{required: true}]}>
-                        <Input allowClear/>
-                    </Form.Item>
                     <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}
                                                     rules={[{min: 4, max: 12}, {required: true}]}>
                         <Input allowClear/>
@@ -149,7 +156,8 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <p className={"py-3"}>请确认你要退出登录？</p>
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
-            <div className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3"}>
+            <div
+                className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3 nav-button-bg-color-green"}>
                 <div className={"my-auto"}>
                     <span>{group.userHeader}</span>
                 </div>

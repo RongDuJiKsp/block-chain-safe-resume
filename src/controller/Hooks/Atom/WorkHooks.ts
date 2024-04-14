@@ -1,5 +1,5 @@
 import {useAtom, useAtomValue} from "jotai";
-import {BasicUserState} from "../../../model/entity/user.ts";
+import {BasicEncryptInfo, BasicInfo, BasicUserState} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
@@ -12,16 +12,19 @@ import {atomWithStorage} from "jotai/utils";
 import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
+    KKInfoForSendListRes,
     ResumeInfoRes,
     ResumeQuestListRes,
     ResumeRequestHistoryListRes,
+    SendSubKeyToKKRes,
     UploadRes
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
     ChangeKKRes,
-    DownloadSubKeysRes,
     GetFileMesRes,
+    GetSavedRes,
+    KKDownloadKeyRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
@@ -35,8 +38,9 @@ import {
     ChangeKKReq,
     GetFileMesReq,
     GetNeedSaveReq,
+    GetSaveReq,
+    KKDownloadKeyReq,
     RemindKKReq,
-    SavePartReq,
     UploadKeyReq
 } from "../../../model/http-bodys/user/keykeeper/req.ts";
 import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../model/entity/keykeeper.ts";
@@ -49,9 +53,11 @@ import {
 import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruiter.ts";
 import {
     ApAuthorizeReq,
+    GetAllKKReq,
     GetDownloadHisReq,
     GetMoreFileMesReq,
-    GetRequestReq
+    GetRequestReq,
+    PostOnekeyReq
 } from "../../../model/http-bodys/user/applicant/req.ts";
 import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
@@ -83,7 +89,7 @@ interface UserWorkMethod {
 
     logout(): void;
 
-    changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes>;
+    changeUserNameAsync(newName: string): Promise<ChangeNameRes>;
 
     getTokenNumberAsync(): Promise<GetTokenRes>;
 }
@@ -106,13 +112,13 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 };
                 return alovaClientImpl.Post("/GetBalanceReq", req);
             },
-            async changeUserNameAsync(newName: string, privateKey: string): Promise<ChangeNameRes> {
+            async changeUserNameAsync(newName: string): Promise<ChangeNameRes> {
                 if (info === null) throw "在未登录的情况下尝试修改用户名";
                 const request: ChangeNameReq = {
                     oldName: info.nick,
                     newName: newName,
                     identity: info.identity,
-                    privateKey: privateKey
+                    address: info.address
                 };
                 const response = await alovaClientImpl.Post<ChangeNameRes>("/ChangeNameReq", request);
                 if (response.status) {
@@ -160,12 +166,47 @@ interface ApplicantWorkMethod {
     giveOrDelayResumeLicensingAsync(ReAddress: string, status: number): Promise<GiveOrDelayResumeLicensingRes>;
 
     getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes>;
+
+    getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes>;
+
+    sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey: string, kkAddress: string): Promise<SendSubKeyToKKRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
     useMethod(): ApplicantWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey, kkAddress: string): Promise<SendSubKeyToKKRes> {
+                if (userInfo === null) throw "在未登录时分发kk秘密份额";
+                const req: PostOnekeyReq = {
+                    i: Number(i),
+                    x: Number(X),
+                    m: Number(M),
+                    publicKeys: kkPublicKey,
+                    KKAddress: kkAddress,
+                    ApAddress: userInfo.address
+                };
+                console.log(req);
+                const res = await alovaClientImpl.Post<SendSubKeyToKKRes>("/PostOnekeyReq", req);
+                console.log(res);
+                return res;
+            },
+            async getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes> {
+                if (userInfo === null) throw "在未登录时获取kk列表";
+                const req: GetAllKKReq = {
+                    ApAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetAllKKReq", req);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): BasicEncryptInfo => ({
+                        name: val[0],
+                        address: val[1],
+                        publicKey: val[2]
+                    })) : []
+                };
+            },
             async getResumeRequestHistoryListAsync(): Promise<ResumeRequestHistoryListRes> {
                 if (userInfo === null) throw "在未登录时获取简历历史记录信息";
                 const req: GetDownloadHisReq = {
@@ -254,10 +295,12 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
         const userInfo = useAtomValue(userInfoAtom);
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
+                console.log(ApAddress, ApUserName);
                 const chainMeta = await this.getFileMessageAsync(ApAddress);
+                console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
-                console.log("***",file);
+                console.log("***", file);
                 await FileSystemImpl.downloadMetaFileAsync(file);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
@@ -287,7 +330,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                     fileHash, ApUserName, ReUserName: userInfo.nick
                 };
                 const res = await alovaClientImpl.Post<DownloadRes>("/DownloadFileReq", req);
-                console.log("res:",res);
+                console.log("res:", res);
                 const file = FileSystemImpl.readBase64AsBlob(res.base64, type);
                 return await CryptoSystemImpl.decryptedFileAsync(new File([file], name, {type: type}), SafeKey);
             },
@@ -326,13 +369,19 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
-    downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes>;
+    downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes>;
 
     getRequestListAsync(): Promise<RequestListRes>;
 
+    /**
+     * @deprecated GetNeedSaveReq
+     */
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 
     getPermissionToBeKK(): Promise<ChangeKKRes>;
+
+    getSavedSubKeyListAsync(): Promise<GetSavedRes>
+
 }
 
 export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
@@ -340,6 +389,19 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
     useMethod(): KeyKeeperWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
         return {
+            async getSavedSubKeyListAsync(): Promise<GetSavedRes> {
+                if (userInfo === null) throw "未登录时尝试获取保管列表";
+                const req: GetSaveReq = {
+                    KKAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<ArrayRes>("/GetSaveReq", req);
+                console.log(res);
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: res.status ? res.list.map((val): BasicInfo => ({userName: val[0], address: val[1]})) : []
+                };
+            },
             async getPermissionToBeKK(): Promise<ChangeKKRes> {
                 if (userInfo === null) throw "未登录时尝试获取权限";
                 const req: ChangeKKReq = {
@@ -347,10 +409,15 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
             },
-            async downloadSubKeyAsync(apUserName: string, apAddress: string): Promise<DownloadSubKeysRes> {
-                if (userInfo === null) throw "未登录时尝试获取子密钥";
-                const req: SavePartReq = {KKAddress: userInfo.address, address: apAddress, userName: apUserName};
-                return alovaClientImpl.Post<DownloadSubKeysRes>("/SavePartReq", req);
+            async downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes> {
+                if (userInfo === null) throw "未登录时尝试获取秘密份额";
+
+                const req: KKDownloadKeyReq = {
+                    KKAddress: userInfo.address,
+                    ApAddress: apAddress,
+                    encryptPrivateKeys: encryptPrivateKeys
+                };
+                return alovaClientImpl.Post<KKDownloadKeyRes>("/KKDownloadKeyReq", req);
             },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";
@@ -389,7 +456,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
             },
             async uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes> {
-                if (userInfo === null) throw "未登录时尝试上传子密钥";
+                if (userInfo === null) throw "未登录时尝试上传秘密份额";
                 const req: UploadKeyReq = {
                     ApUserName: ApUsername, i, x, m, KKAddress: userInfo.address
                 };

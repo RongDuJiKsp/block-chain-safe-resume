@@ -1,9 +1,9 @@
-//获取kk能够保存的子密钥列表的请求
+//获取kk能够保存的秘密份额列表的请求
 export interface GetNeedSaveReq {
     KKAddress: string;
 }
 
-//获取kk保存的子密钥的请求
+//获取kk保存的秘密份额的请求
 export interface SavePartReq {
     userName: string;
     address: string;
@@ -35,6 +35,7 @@ export interface UploadKeyReq {
     x: number
     m: number
 }
+
 /**
  * @interface GetFileMesReq
  * @property ApAddress  ap用户地址
@@ -44,6 +45,7 @@ export interface GetFileMesReq {
     ApAddress: string;
     ReAddress: string;
 }
+
 /**
  * kk申请成功密钥保管人
  * @interface ChangeKKReq
@@ -51,4 +53,24 @@ export interface GetFileMesReq {
  */
 export interface ChangeKKReq {
     KKAddress: string
+}
+
+/** kk查看已经保管的秘密份额
+ * @interface GetSaveReq
+ * @property KKAddress kk用户地址(登陆时已经返回)
+ */
+export interface GetSaveReq {
+    KKAddress: string;
+}
+
+/**
+ * @interface KKDownloadKeyReq
+ * @property KKAddress KK用户地址
+ * @property ApAddress Ap用户地址
+ * @property encryptPrivateKeys kk私钥
+ */
+export interface KKDownloadKeyReq {
+    KKAddress: string
+    ApAddress: string
+    encryptPrivateKeys: string
 }

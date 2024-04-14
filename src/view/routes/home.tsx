@@ -6,6 +6,8 @@ import RecruiterRequire from "../pages/home/recruiter/require.tsx";
 import ApplicantUpload from "../pages/home/applicant/upload.tsx";
 import ApplicantRecord from "../pages/home/applicant/record.tsx";
 import KeyKeeperGetSubKey from "../pages/home/keykeeper/get.tsx";
+import ApplicantSend from "../pages/home/applicant/send.tsx";
+import HomePage from "../pages/home/public/home.tsx";
 
 export const APPLICANT_THIS_PATH: string = "/home/Applicant";
 
@@ -14,7 +16,9 @@ export function ApplicantRoutes() {
         <Route path={"/status"} element={<ApplicantStatus/>}/>
         <Route path={"/upload"} element={<ApplicantUpload/>}/>
         <Route path={"/record"} element={<ApplicantRecord/>}/>
-        <Route path={"/*"} element={<Navigate to={APPLICANT_THIS_PATH + "/status"}/>}/>
+        <Route path={"/send"} element={<ApplicantSend/>}/>
+        <Route path={"/home"} element={<HomePage/>}/>
+        <Route path={"/*"} element={<Navigate to={APPLICANT_THIS_PATH + "/home"}/>}/>
     </Routes>;
 }
 
@@ -24,7 +28,8 @@ export function RecruiterRoutes() {
     return <Routes>
         <Route path={"/notice"} element={<RecruiterNotice/>}/>
         <Route path={"/require"} element={<RecruiterRequire/>}/>
-        <Route path={"/*"} element={<Navigate to={RECRUITER_THIS_PATH + "/notice"}/>}/>
+        <Route path={"/home"} element={<HomePage/>}/>
+        <Route path={"/*"} element={<Navigate to={RECRUITER_THIS_PATH + "/home"}/>}/>
     </Routes>;
 }
 
@@ -34,6 +39,7 @@ export function KeyKeeperRoutes() {
     return <Routes>
         <Route path={"/notice"} element={<KeyKeeperNotice/>}/>
         <Route path={"/get"} element={<KeyKeeperGetSubKey/>}/>
-        <Route path={"/*"} element={<Navigate to={KEYKEEPER_THIS_PATH + "/notice"}/>}/>
+        <Route path={"/home"} element={<HomePage/>}/>
+        <Route path={"/*"} element={<Navigate to={KEYKEEPER_THIS_PATH + "/home"}/>}/>
     </Routes>;
 }

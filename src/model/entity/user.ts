@@ -13,4 +13,12 @@ export interface BasicUserState {
     identity: UserIdentityEnum;
     address: string;
 }
-
+export interface BasicEncryptInfo {
+    name:string;
+    address:string;
+    publicKey:string;
+}
+export interface BasicInfo{
+    userName:string;
+    address:string;
+}

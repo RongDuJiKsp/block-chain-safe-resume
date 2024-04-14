@@ -1,14 +1,10 @@
-import {App, Button, Popconfirm, Spin, Statistic, Table, Tag} from "antd";
+import {App, Button, Popconfirm, Spin, Table, Tag} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {componentUtils} from "../../../../controller/util/component.tsx";
-import CountUp from "react-countup";
 import React, {ReactNode, useEffect, useState} from "react";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
-import {ResumeInfoRes} from "../../../../model/http-bodys/user/applicant/res.ts";
-import dayjs from "dayjs";
 import {useBoolean} from "ahooks";
 
 
@@ -16,18 +12,11 @@ export default function ApplicantStatus() {
     const userService = ApplicantWorkHooks.useMethod();
     const {message} = App.useApp();
     const [flashFlag, changeAction] = useSwapBoolean();
-    const [resumeInfo, setResumeInfo] = useState<ResumeInfoRes | null>(null);
+
     const [tableInfo, setTableInfo] = useState<ResumeLicenseRequestInfo[]>([]);
     const [isLoading, loadingAction] = useBoolean();
     useEffect(() => {
         loadingAction.setTrue();
-        userService.getResumeInfoAsync().then(r => {
-            if (r.status) setResumeInfo(r);
-            else message.error("获取更新时发生失败，原因:" + r.message).then();
-        }).catch(e => {
-            console.error(e);
-            message.error(e.toString()).then();
-        });
         userService.getResumeRequestListAsync().then(r => {
             if (r.status) setTableInfo(r.list);
             else message.error("获取更新时发生失败，原因:" + r.message).then();
@@ -39,27 +28,10 @@ export default function ApplicantStatus() {
     return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6  "}>
         <div className={"bg-white basic-shadow-box px-6 py-4 basis-3/4"}>
             <TableHeader title={"访问请求"} onFresh={changeAction}/>
-           <Spin delay={500} spinning={isLoading}>
-               <ResumeRequestComponent tableVal={tableInfo}/>
-           </Spin>
+            <Spin delay={500} spinning={isLoading}>
+                <ResumeRequestComponent tableVal={tableInfo}/>
+            </Spin>
         </div>
-        <div className={" bg-white py-8 basic-shadow-box "}>
-            <ResumeInfoComponent info={resumeInfo}/>
-        </div>
-
-    </div>;
-}
-const numberCountUpFormatter = (value: string | number) => <CountUp end={Number(value)} separator=","/>;
-
-function ResumeInfoComponent({info}: { info: ResumeInfoRes | null }) {
-    console.log(info);
-    return <div className={"flex justify-around"}>
-        <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
-                   value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
-        <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")} className={"basis-1/5"}
-                   value={info && info.putTime ?dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm"):"加载中..."}/>
-        <Statistic title={"待处理请求"} prefix={componentUtils.getIcon("icon-money-finance-buyer")}
-                   value={0} suffix={"条"}/>
     </div>;
 }
 
@@ -116,11 +88,9 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
 
 
     ];
-    return <div>
-        <div className={"mx-28 my-3"}>
-            <Table<ResumeLicenseRequestInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
-                                             pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}/>
-        </div>
+    return <div className={"mx-28 my-3"}>
+        <Table<ResumeLicenseRequestInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
+                                         pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}/>
     </div>;
 }
 

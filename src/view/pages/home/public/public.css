@@ -1,0 +1,17 @@
+.bg-blue-half {
+    background-color: rgba(111, 170, 224, 0.4);
+}
+
+.border-skew {
+    transform: skew(45deg);
+}
+
+.border-de-skew {
+    transform: skew(-45deg);
+}
+
+.show-window-border {
+    border-style: solid;
+    border-width: 1px 0 1px 1px;
+    border-color: rgba(147, 197, 253, 1);
+}
