@@ -1,7 +1,7 @@
 import {FileAddOutlined, LoadingOutlined} from "@ant-design/icons";
 import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
-import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 
 export default function ApplicantUpload() {

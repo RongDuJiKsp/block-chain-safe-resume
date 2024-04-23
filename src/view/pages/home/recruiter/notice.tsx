@@ -4,7 +4,7 @@ import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts
 import {ReactNode, useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
-import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {RecruiterWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 
 

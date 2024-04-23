@@ -1,7 +1,7 @@
 import {Navigate, Route, Routes} from "react-router-dom";
 import RegisterPage from "../pages/account/register.tsx";
 import LoginPage from "../pages/account/login.tsx";
-import {UserWorkHooks} from "../../controller/Hooks/Atom/WorkHooks.ts";
+import {UserWorkHooks} from "../../controller/Hooks/Store/WorkHooks.ts";
 import {UserIdentityEnum} from "../../model/Enum/WorkEnum.ts";
 import ApplicantPage from "../pages/home/applicant/page.tsx";
 import RecruiterPage from "../pages/home/recruiter/page.tsx";

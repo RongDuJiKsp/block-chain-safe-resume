@@ -3,7 +3,7 @@ import {ColumnsType} from "antd/es/table";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import React, {useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
-import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {ResumeVisitHistoryInfo} from "../../../../model/entity/applicant.ts";
 import {useBoolean} from "ahooks";
 import CountUp from "react-countup";

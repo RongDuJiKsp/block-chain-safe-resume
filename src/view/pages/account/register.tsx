@@ -8,7 +8,7 @@ import {StepInformation} from "../../../model/interface/util.ts";
 import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 import {useBoolean} from "ahooks";
 import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";

@@ -1,4 +1,4 @@
-import {ApplicantWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {App, Button, Form, Input, InputNumber, Modal, Spin, Table} from "antd";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {useBoolean} from "ahooks";

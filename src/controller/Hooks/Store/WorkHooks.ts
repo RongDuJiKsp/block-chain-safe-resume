@@ -63,7 +63,7 @@ import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/e
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
-export const alovaClientImpl = createAlova({
+ const alovaClientImpl = createAlova({
     statesHook: ReactHook,
     requestAdapter: GlobalFetch(),
     responded: (response) => {
@@ -83,7 +83,6 @@ interface UserWorkValue {
 }
 
 interface UserWorkMethod {
-    registerAsync(identity: UserIdentityEnum): Promise<RegisterRes>;
 
     loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<LoginRes>;
 
@@ -144,14 +143,6 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
                 setInfo(info);
                 return res;
             },
-            async registerAsync(identity: UserIdentityEnum): Promise<RegisterRes> {
-                const reqBody: RegisterReq = {
-                    identity
-                };
-                const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", reqBody);
-                if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);
-                return res;
-            }
         };
     }
 };
