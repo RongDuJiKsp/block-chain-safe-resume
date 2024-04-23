@@ -1,62 +1,21 @@
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.backends import default_backend
+import base64
+
+import rsa
 
 # 生成私钥
-private_key = rsa.generate_private_key(
-    public_exponent=65537,
-    key_size=1024,
-    backend=default_backend()
-)
-
-# 生成公钥
-public_key = private_key.public_key()
-
-# 将私钥转换为PEM格式
-pem_private_key = private_key.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption()
-)
-
-print("Private Key:")
-print(pem_private_key.decode())
-
-# 将公钥转换为PEM格式
-pem_public_key = public_key.public_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PublicFormat.SubjectPublicKeyInfo
-)
-
-print("Public Key:")
-print(pem_public_key.decode())
-
-# 准备一些明文数据
-num='123456789'
-message =num.encode()
-
-# 使用公钥进行加密
-ciphertext = public_key.encrypt(
-    message,
-    padding.OAEP(
-        mgf=padding.MGF1(algorithm=hashes.SHA256()),
-        algorithm=hashes.SHA256(),
-        label=None
-    )
-)
-
-print("Ciphertext:", ciphertext)
-
-# 使用私钥进行解密
-plaintext = private_key.decrypt(
-    ciphertext,
-    padding.OAEP(
-        mgf=padding.MGF1(algorithm=hashes.SHA256()),
-        algorithm=hashes.SHA256(),
-        label=None
-    )
-)
-
-print("Plaintext:", plaintext)
+encryptPrivateKeys='''
+-----BEGIN RSA PRIVATE KEY-----
+MIGsAgEAAiEA0CNf+7+JR5AjW3e3LIts7TuOARAXQz/xo0WVp2DZ1YUCAwEAAQIh
+AIc3dBPIyxaCvXWewJFfwjczOwrQLbDzUsWfMGm9rtnBAhIA8YaVsot5HZn+A/Tp
+9U0PdkcCEADcnJGN4bjJC9JqB86RX9MCEgC2tEB5l9g+9EabZ6Gz1l9j8QIPJwOx
+YgwXJ8blcUbsKx1tAhEUWqy0lVDmHcSUmG2PlLjkIQ==
+-----END RSA PRIVATE KEY-----
+'''
+private_key = rsa.PrivateKey.load_pkcs1(encryptPrivateKeys.encode())
+x = base64.b64decode('zrGuhX66TV5IZBswU9loQxSErGbEplD53oznfYlUIno=')
+print(x)
+m = base64.b64decode('CqsAbOQJ2l1go7+VlOF80H/XLG1Jtj/x2AKw6MQHHfI=')
+print(m)
+messageX = rsa.decrypt(x, private_key)
+messageM = rsa.decrypt(m, private_key)
+print(messageX)

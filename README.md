@@ -12,18 +12,19 @@
  }
 ```
 
-
-
 #### 1.注册
 
 ```
  /**
  * @interface RegisterReq 注册的请求体
  * @property userName 用户名
+ * @property password 密码
  * @property identity 用户身份(Applicant、Recruiter、KeyKeeper)
  */
   interface RegisterReq {
     identity: string
+    userName: string
+    password: string
  }
 
 
@@ -31,7 +32,6 @@
  * @interface RegisterRes 注册的响应体
  * @extends BaseRes
  * @property {string} address 用户对应address
- * @property {string} privateKeys 用户注册的私钥
  * @property {number} S 用户注册得到的 S Key
  * @property {number} P 用户注册得到的 P Key
  * @property {number[]} M 用户注册得到的子密钥M
@@ -39,7 +39,6 @@
  */
   interface RegisterRes extends BaseRes {
     address: string,
-    privateKeys: string,
    	encryptPrivateKeys: string
     S: number,
     P: number,
@@ -54,15 +53,15 @@
 
 ```
 /**
-* 登录用户不需要输入用户昵称，数据库将用户地址和用户昵称对应，
-* 用户登录时用用户私钥计算用户地址，将地址和昵称一并返回
-* webase计算私钥传入的用户昵称暂时使用时间戳 这个字段会被弃用
+ * @property userName 用户名
+ * @property password 密码
+ * @property identity 用户身份(Applicant、Recruiter、KeyKeeper)
 */
 interface LoginReq {
-    privateKeys: string;
-    identity: UserIdentityEnum;
-}
-
+    identity: string
+    userName: string
+    password: string
+ }
 /**
  * @interface LoginRes 登录接口
  * @extends BaseRes
@@ -86,13 +85,13 @@ interface LoginReq {
  * @property oldName 用户将要改的名字
  * @property newName 用户的新名字
  * @property identity 用户身份信息
- * @property privateKey 用户的私钥 在后端计算为用户的地址然后读写数据库更改昵称
+ * @property address 用户地址
  */
  interface ChangeNickReq {
     oldName: string;
     newName: string;
     identity: string;
-    privateKey: string;
+    address: string;
  }
 
  /**
@@ -642,9 +641,9 @@ interface PostOnekeyRes extends BaseRe{
  * @interface KKDownloadKeyRes
  */
 interface KKDownloadKeyRes extends BaseRe{
-    i: int
-    x: int
-    m: int
+    i: string
+    x: string
+    m: string
 }
 ```
 

@@ -18,7 +18,6 @@ def RegisterReq():
         'status': 0,
         'message': '',
         'address': '',
-        'privateKeys': '',
         'S': '',
         'P': '',
         'M': '',
@@ -28,7 +27,7 @@ def RegisterReq():
         if verifyIdentity(data['identity']):
             return register(data, user)
         else:
-            user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+            user['message'] = "身份证号格式错误"
             return json.dumps(user)
     except Exception as e:
         user['message'] = "{}".format(str(e))
@@ -45,10 +44,10 @@ def LoginReq():
         'address':''
     }
     try:
-        if data['privateKeys'] is None or data['identity'] is None:
+        if data['identity'] is None:
             login['message'] = "参数不完整"
             return json.dumps(login)
-        return verifyprivateKeys(data['privateKeys'],data['identity'],login)
+        return verifyprivateKeys(data['userName'],data['password'],data['identity'],login)
     except Exception as e:
         login['message'] = "{}".format(str(e))
         return json.dumps(login)
@@ -62,7 +61,7 @@ def ChangeNameReq():
         'newName': '',
     }
     try:
-        if data['oldName'] is None or data['privateKey'] is None or data['newName'] is None or data['identity'] is None:
+        if data['oldName'] is None or data['address'] is None or data['newName'] is None or data['identity'] is None:
             change['message'] = "参数不完整"
             return json.dumps(change)
         return ChangeName(data,change)
@@ -410,6 +409,19 @@ def KKDownloadKeyReq():
         ApAddress = data['ApAddress']
         encryptPrivateKeys=data['encryptPrivateKeys']
         return KKDownloadKey(KKAddress,ApAddress,encryptPrivateKeys,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+@app.route('/aaaaaaa', methods=["POST"])
+def aaaaaaa():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApAddress = data['ApAddress']
+        return aaaaaa(ApAddress,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)

@@ -170,7 +170,7 @@ def getNeed():
 
             start = time.time()
             result = ChineseSurplus(k1, m, t, P)
-            print("k1:"+str(k1)+" m:"+str(m)+" t:"+str(t)+" r:"+str(r)+" P:"+str(P))
+            print("k1:"+str(k1)+" m:"+str(m)+" t:"+str(t)+" P:"+str(P))
             print(str(result))
             end = time.time()
 
@@ -182,3 +182,8 @@ def getNeed():
 
 if __name__ == '__main__':
     getNeed()
+    X=[93774978, 62125132, 868847544]
+    M=[114171059, 253153877, 1178696527]
+    t=3
+    P=486757
+    print(ChineseSurplus(X, M, t, P))

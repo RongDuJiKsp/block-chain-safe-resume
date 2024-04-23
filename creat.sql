@@ -10,18 +10,21 @@ CREATE DATABASE IF NOT EXISTS safe_resume;
 USE safe_resume;
 CREATE TABLE Applicant (
     userName VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 CREATE TABLE Recruiter (
     userName VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(255) NOT NULL,
     P VARCHAR(255) NOT NULL
 );
 CREATE TABLE KeyKeeper (
     userName VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     publicKeys VARCHAR(2048) NOT NULL,
     P VARCHAR(255) NOT NULL
@@ -75,7 +78,7 @@ CREATE TABLE needKEY(
 CREATE TABLE APKKsaveKey(
     ApAddress VARCHAR(255) NOT NULL,
     KKAddress VARCHAR(255) NOT NULL,
-    i BIGINT NOT NULL,
+    i VARCHAR(255) NOT NULL,
     x VARCHAR(255) NOT NULL,
     m VARCHAR(255) NOT NULL
 );
