@@ -172,7 +172,6 @@ function GetResultComponent() {
             message.warning("不保存密钥是不准退出的喵~").then();
             return;
         }
-        setTimeout(() => stepDispatch("reset"), 50);
         registerServer.reset();
         navigate("/", {replace: true});
     };
