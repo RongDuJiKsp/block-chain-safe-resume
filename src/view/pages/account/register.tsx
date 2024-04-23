@@ -1,18 +1,17 @@
 import "./register.css";
 import {App, Result, Steps} from "antd";
-import React, {createContext, Dispatch, SetStateAction, useContext, useState} from "react";
+import React from "react";
 import {StepProps} from "antd/es/steps";
 import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
-import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
-import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 import {useBoolean} from "ahooks";
-import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 import {motion} from "framer-motion";
+import {UserRegisterHook} from "../../../controller/Hooks/Store/RegisterHooks.ts";
+import {atomWithReducer} from "jotai/utils";
+import {StepCounterAction, StepCounterReducer} from "../../../controller/Hooks/Reducer/Counter.ts";
+import {useAtomValue, useSetAtom} from "jotai";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -20,22 +19,6 @@ function getDescriptionWithStep(targetStep: number, currentStep: number, descrip
     else if (currentStep === targetStep) return description;
     else return "已完成";
 }
-
-
-interface StateManager {
-    nextStep?: () => void;
-    lastStep?: () => void;
-    reStart?: () => void;
-    resSetter?: Dispatch<SetStateAction<RegisterResult | undefined>>
-    res?: RegisterResult
-}
-
-interface RegisterResult {
-    res: RegisterRes;
-    identity: UserIdentityEnum
-}
-
-const RegisterInfoSetterContext = createContext<StateManager>({});
 
 
 const StepElements: StepInformation[] = [
@@ -52,10 +35,10 @@ const StepElements: StepInformation[] = [
         element: <GetResultComponent/>
     }
 ];
+const RegisterStepCountAtom = atomWithReducer<number, StepCounterAction>(0, StepCounterReducer);
 
 function RegisterPage() {
-    const [currentStep, setCurrentStep] = useState<number>(0);
-    const [registerRes, setRegisterRes] = useState<RegisterResult>();
+    const currentStep = useAtomValue(RegisterStepCountAtom);
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
             title: val.title,
@@ -63,15 +46,7 @@ function RegisterPage() {
             icon: currentStep === index ? <LoadingOutlined/> : val.noFocusIcon,
         };
     });
-    const setNextStep = () => {
-        setCurrentStep(r => r + 1);
-    };
-    const setLastStep = () => {
-        setCurrentStep(r => r - 1);
-    };
-    const reStart = () => {
-        setCurrentStep(0);
-    };
+
     return <div className={"overflow-hidden register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
@@ -80,16 +55,8 @@ function RegisterPage() {
                 </div>
             </div>
             <div className={"basis-2/3"}>
-                <RegisterInfoSetterContext.Provider value={{
-                    nextStep: setNextStep,
-                    lastStep: setLastStep,
-                    reStart: reStart,
-                    res: registerRes,
-                    resSetter: setRegisterRes
-                }}>
-                    {StepElements.map((val, index) => currentStep === index &&
-                        <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
-                </RegisterInfoSetterContext.Provider>
+                {StepElements.map((val, index) => currentStep === index &&
+                    <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
             </div>
         </div>
     </div>;
@@ -120,21 +87,19 @@ const texts: InfoContext[] = [
 ];
 
 function SelectIdentityComponent() {
-    const registerInfoHandle = useContext(RegisterInfoSetterContext);
-    const registerServer = UserWorkHooks.useMethod();
     const {message} = App.useApp();
-    const [selectedIdentity, setSelectedIdentity] = useState<UserIdentityEnum>(UserIdentityEnum.None);
+    const {selectedIdentity} = UserRegisterHook.useValue();
+    const registerServer = UserRegisterHook.useMethod();
+    const stepDispatch = useSetAtom(RegisterStepCountAtom);
     const onNextClick = (): void => {
         if (selectedIdentity === UserIdentityEnum.None) {
             message.error("You can't continue with None").then();
             return;
         }
-        registerServer.registerAsync(selectedIdentity).then(r => {
-            console.log(r);
+        registerServer.registerWithDataAndStoreAsync().then(r => {
             if (r.status) {
-                registerInfoHandle.resSetter?.call(null, {identity: selectedIdentity, res: r});
                 message.success("注册成功").then();
-                registerInfoHandle.nextStep?.call(null);
+                stepDispatch("next");
             } else {
                 message.error(r.message).then();
             }
@@ -149,7 +114,7 @@ function SelectIdentityComponent() {
                 {texts.map((unit, index) => (
                     <div key={"text-info-of" + index}
                          className={unit.key === selectedIdentity ? "basic-green-shadow-box bg-better-write max-w-[42%] h-fit " : "basic-shadow-box bg-better-write max-w-[42%] h-fit"}>
-                        <ShowIdentityAndSelect onClick={() => setSelectedIdentity(unit.key)}
+                        <ShowIdentityAndSelect onClick={() => registerServer.selectUserIdentity(unit.key)}
                                                isSelected={unit.key === selectedIdentity} info={unit}/>
                     </div>
                 ))}
@@ -187,28 +152,18 @@ function ShowIdentityAndSelect({onClick, info}: ShowingIdentityParam) {
 }
 
 function GetResultComponent() {
-    const {res} = useContext(RegisterInfoSetterContext);
     const {message} = App.useApp();
+    const {registered, message: msg} = UserRegisterHook.useValue();
+    const registerServer = UserRegisterHook.useMethod();
+    const stepDispatch = useSetAtom(RegisterStepCountAtom);
     const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
-        if (!res?.res) {
-            message.error("注册时发生异常，请检查网络后重试！").then();
+        registerServer.callFileDownloadWithData().then(() => {
+            message.success("文件下载成功！").then();
             setCanClose.setTrue();
-            return;
-        }
-        if (!res.res.status) {
-            message.error("注册时发生异常！ " + res.res.message).then();
-            setCanClose.setTrue();
-            return;
-        }
-        console.log(res);
-        const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
-        const PrivateKey = res.res.privateKeys;
-        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, res.res.X, res.res.M, res.res.encryptPrivateKeys)]);
-        FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
-            message.success("下载成功！").then();
-            setCanClose.setTrue();
+        }).catch(e => {
+            message.error("文件下载失败，原因" + e).then();
         });
     };
     const onReturnPage = () => {
@@ -216,22 +171,24 @@ function GetResultComponent() {
             message.warning("不保存密钥是不准退出的喵~").then();
             return;
         }
+        setTimeout(() => stepDispatch("reset"), 50);
+        registerServer.reset();
         navigate("/", {replace: true});
     };
     return <div className={"h-full  flex flex-col justify-around showing-in"}>
         <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
-            <Result status={res?.res.status ? "success" : "error"}
-                    title={res?.res.status ? "注册成功" : "注册失败，请重试"}
+            <Result status={registered ? "success" : "error"}
+                    title={registered ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>
                              <button className={"button button-3d button-action"} onClick={onDownload}
-                                     style={{display: res?.res.status ? "inline-block" : "none"}}>
+                                     style={{display: registered ? "inline-block" : "none"}}>
                                  保存key
                              </button>
                              <button className={"button button-3d button-primary"} onClick={onReturnPage}>
                               返回登录
                             </button>
                              </span>}
-                    subTitle={res?.res.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.res.message}/>
+                    subTitle={registered ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + msg}/>
         </div>
     </div>;
 }
