@@ -1,6 +1,6 @@
 import "./register.css";
 import {App, Result, Steps} from "antd";
-import React from "react";
+import React, {createContext, useContext, useReducer} from "react";
 import {StepProps} from "antd/es/steps";
 import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
@@ -9,9 +9,8 @@ import {useNavigate} from "react-router-dom";
 import {useBoolean} from "ahooks";
 import {motion} from "framer-motion";
 import {UserRegisterHook} from "../../../controller/Hooks/Store/RegisterHooks.ts";
-import {atomWithReducer} from "jotai/utils";
-import {StepCounterAction, StepCounterReducer} from "../../../controller/Hooks/Reducer/Counter.ts";
-import {useAtomValue, useSetAtom} from "jotai";
+import {StepCounterAction} from "../../../model/interface/reduces.ts";
+import {StepCounterReducerImpl} from "../../../controller/Hooks/Reducer/Counter.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -35,10 +34,10 @@ const StepElements: StepInformation[] = [
         element: <GetResultComponent/>
     }
 ];
-const RegisterStepCountAtom = atomWithReducer<number, StepCounterAction>(0, StepCounterReducer);
+const RegisterStepCountContext = createContext<React.Dispatch<StepCounterAction>>(() => 0);
 
 function RegisterPage() {
-    const currentStep = useAtomValue(RegisterStepCountAtom);
+    const [currentStep, currentStepDispatch] = useReducer(StepCounterReducerImpl, 0);
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
             title: val.title,
@@ -55,8 +54,10 @@ function RegisterPage() {
                 </div>
             </div>
             <div className={"basis-2/3"}>
-                {StepElements.map((val, index) => currentStep === index &&
-                    <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
+                <RegisterStepCountContext.Provider value={currentStepDispatch}>
+                    {StepElements.map((val, index) => currentStep === index &&
+                        <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
+                </RegisterStepCountContext.Provider>
             </div>
         </div>
     </div>;
@@ -90,7 +91,7 @@ function SelectIdentityComponent() {
     const {message} = App.useApp();
     const {selectedIdentity} = UserRegisterHook.useValue();
     const registerServer = UserRegisterHook.useMethod();
-    const stepDispatch = useSetAtom(RegisterStepCountAtom);
+    const stepDispatch = useContext(RegisterStepCountContext);
     const onNextClick = (): void => {
         if (selectedIdentity === UserIdentityEnum.None) {
             message.error("You can't continue with None").then();
@@ -155,7 +156,7 @@ function GetResultComponent() {
     const {message} = App.useApp();
     const {registered, message: msg} = UserRegisterHook.useValue();
     const registerServer = UserRegisterHook.useMethod();
-    const stepDispatch = useSetAtom(RegisterStepCountAtom);
+    const stepDispatch = useContext(RegisterStepCountContext);
     const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
