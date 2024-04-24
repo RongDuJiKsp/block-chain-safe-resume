@@ -65,7 +65,7 @@ function AuditTableComponent({tableVal}: { tableVal: AuditResumeInfo[] }) {
     const tableColumn: ColumnsType<AuditResumeInfo> = [
         {
             title: "用户名",
-            dataIndex: "ApUserName",
+            dataIndex: "userName",
             width: "36%",
             align: "center",
         },
