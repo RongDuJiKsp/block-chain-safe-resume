@@ -38,7 +38,6 @@ export default function KeyKeeperGetSubKey() {
 
 function AccessibleSubKeyTableComponent({tableVal}: { tableVal: BasicInfo[] }) {
     const [selectedInfo, setSelectedInfo] = useState<BasicInfo | null>(null);
-    const [withoutPermission, setWithoutPermission] = useBoolean();
     const onAccept = (info: BasicInfo) => {
         setSelectedInfo(info);
     };
@@ -69,15 +68,10 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: BasicInfo[] }) {
         }
     ];
     return <div className={"mx-28 my-3"}>
-        <GetPermissionToBeKK clear={setWithoutPermission.setFalse} data={withoutPermission}/>
         <GetAccessibleSubKey data={selectedInfo} clear={onClearSelected}/>
         <Table<BasicInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                           pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
-        <div className={"mt-7"}>提示未成为合法的密钥保管人？
-            <span onClick={setWithoutPermission.setTrue}
-                  className={"text-gray-400 underline underline-offset-4"}>点击这里申请成为保管人</span>
-        </div>
     </div>;
 }
 
@@ -146,36 +140,3 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
     </Modal>;
 }
 
-function GetPermissionToBeKK({data, clear}: ModelPropsWithInfoAndClear<boolean>) {
-    const kkUserServer = KeyKeeperWorkHook.useMethod();
-    const [isLoading, setLoading] = useBoolean();
-    const {message} = App.useApp();
-    const onGetPermission: CallBackWithSideEffect = () => {
-        setLoading.setTrue();
-        kkUserServer.getPermissionToBeKK().then(r => {
-            console.log(r);
-            if (r.status) {
-                message.success("操作成功！").then();
-                clear();
-            } else {
-                message.error("发生错误:" + r.message).then();
-            }
-        }).catch(e => {
-            message.error("发生错误:" + e.toString()).then();
-        }).finally(() => {
-            setLoading.setFalse();
-        });
-    };
-    return <Modal open={!!data} footer={null} onCancel={clear}>
-        <div className={"my-3"}>
-            <p className={"my-3"}>
-                请点击按钮获取保管秘密份额权限
-                系统将自动质押积分以获取权限
-            </p>
-            <Button type={"primary"} onClick={onGetPermission}>{isLoading ?
-                <span><LoadingOutlined/>&thinsp;获取中&thinsp;... </span> :
-                <span>&ensp;获取权限&ensp;</span>
-            }</Button>
-        </div>
-    </Modal>;
-}
