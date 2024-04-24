@@ -5,6 +5,7 @@
 # @Date    : 2024/3/17 8:40
 # @介绍    :
 import base64
+import io
 import json
 from settings import Configs
 from asmuth_bloom import *
@@ -13,7 +14,7 @@ import requests
 from eth_abi import decode
 import hashlib
 import rsa
-
+from PyPDF2 import PdfReader, PdfWriter
 
 global config
 config = Configs()
@@ -51,8 +52,6 @@ def getTableName(identity):
         return 'Applicant'
     elif identity == 'Recruiter':
         return 'Recruiter'
-    elif identity == 'KeyKeeper':
-        return 'KeyKeeper'
     else:
         return 'error'
 
@@ -215,6 +214,19 @@ def apiBalance(address,base):
     base['balance'] = int(reslut[0])
     return base
 
+def add_watermark(input_pdf_stream, output_pdf_stream, watermark_pdf_path):
+    watermark = PdfReader(watermark_pdf_path)
+    watermark_page = watermark.pages[0]
+
+    pdf = PdfReader(input_pdf_stream)
+    pdf_writer = PdfWriter()
+
+    for page in pdf.pages:
+        page.merge_page(watermark_page)
+        pdf_writer.add_page(page)
+
+    pdf_writer.write(output_pdf_stream)
+
 def getFuckS(ApAddress):
     I=[]
     X=[]
@@ -263,7 +275,7 @@ def register(data, user):
     # T==S
     table_name = getTableName(data['identity'])
     if table_name == 'error':
-        user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter,KeyKeeper)"
+        user['message'] = "identity不合法(支持的身份类型:Applicant,Recruiter)"
         return json.dumps(user)
     userName = data['userName']
     password = data['password']
@@ -285,24 +297,28 @@ def register(data, user):
             cur.execute(condition, (userName,password, key["address"], key['publicKey'], need['P']))
             condition = f"insert into NeedSave(userName,address,remainingAmount) values(%s,%s,5);"
             cur.execute(condition, (userName, key["address"]))
+            kkadd=["0xb045a2b2919de75a5bf89bbcd1e57ae3b4c469ff","0xc40dc21473ff6176583df3bed1669422ae0eef0b","0x1dedc512ca27fa9b97cf8409505ecf248b21bace"]
+            for i in range(0,3):
+                condition = f"insert into APKKsaveKey(ApAddress,KKAddress,i,x,m) values(%s,%s,%s,%s,%s);"
+                cur.execute(condition, (key["address"],kkadd[i],i,need['X'][i],need['M'][i]))
             user['address'] = key["address"]
             # user['privateKeys'] = key['privateKey']
-            user['S'] = need['S']
-            user['P'] = need['P']
-            user['M'] = need['M']
-            user['X'] = need['X']
-            user['encryptPrivateKeys']=''
+            # user['S'] = need['S']
+            # user['P'] = need['P']
+            # user['M'] = need['M']
+            # user['X'] = need['X']
+            # user['encryptPrivateKeys']=''
             return json.dumps(user)
-        elif(table_name=='KeyKeeper'):
-            public_key, private_key = RSAKeyGen()
-            condition = f"insert into {table_name}(userName,password,address,publicKeys,P) values(%s,%s,%s,%s,%s);"
-            cur.execute(condition, (userName, password,key["address"], public_key, '222'))
-            user['status'] = 1
-            user['address'] = key["address"]
-            # user['privateKeys'] = key['privateKey']
-            user['encryptPrivateKeys'] = private_key
-            return json.dumps(user)
-        else:
+        # elif(table_name=='KeyKeeper'):
+        #     public_key, private_key = RSAKeyGen()
+        #     condition = f"insert into {table_name}(userName,password,address,publicKeys,P) values(%s,%s,%s,%s,%s);"
+        #     cur.execute(condition, (userName, password,key["address"], public_key, '222'))
+        #     user['status'] = 1
+        #     user['address'] = key["address"]
+        #     # user['privateKeys'] = key['privateKey']
+        #     user['encryptPrivateKeys'] = private_key
+        #     return json.dumps(user)
+        elif table_name=='Recruiter':
             condition = f"insert into {table_name}(userName,password,address,publicKeys,P) values(%s,%s,%s,%s);"
             cur.execute(condition, (userName,password, key["address"], key['publicKey'], '222'))
             user['status'] = 1
@@ -317,6 +333,19 @@ def register(data, user):
 
 
 def uploadIpfs(file,userName, address, upload):
+    condition = f'select COUNT(KKUserName) from Authentication where ApAddress=%s'
+    cur.execute(condition, (address))
+    result = cur.fetchone()
+    count = result[0]
+    if count < 3:
+        upload['status'] = 0
+        upload['message'] = '简历信息还未获得认证'
+        return json.dumps(upload)
+
+    # 假设 output_stream 是一个 BytesIO 对象，包含了你的 PDF 数据
+    # with open('output.pdf', 'wb') as f:
+    #     f.write(output_stream.getvalue())
+
     files = {
         'file': (file.filename, file)
     }
@@ -611,31 +640,41 @@ def PostOnekey(KKAddress,ApAddress,publicKeys,i,x,m,base):
     base['message'] = '上传成功'
     return json.dumps(base)
 
-def KKDownloadKey(KKAddress,ApAddress,encryptPrivateKeys,base):
-    base=apiReturnsubkey(ApAddress, KKAddress, base)
-    if(base['status']==0):
-        return json.dumps(base)
+def KKDownloadKey(KKAddress,ApAddress,file,base):
+    # base=apiReturnsubkey(ApAddress, KKAddress, base)
+    # if(base['status']==0):
+    #     return json.dumps(base)
     condition = f'select i,x,m from APKKsaveKey where KKAddress=%s and ApAddress=%s;'
     cur.execute(condition,(KKAddress,ApAddress))
     result = cur.fetchone()
     if result:
-        private_key = rsa.PrivateKey.load_pkcs1(encryptPrivateKeys.encode())
-        x = base64.b64decode(result[1].encode())
-        m = base64.b64decode(result[2].encode())
-        messageX = rsa.decrypt(x, private_key)
-        messageM = rsa.decrypt(m, private_key)
         base['status'] = 1
         base['i'] = result[0]
-        base['x'] = messageX.decode()
-        base['m'] = messageM.decode()
+        base['x'] = result[1]
+        base['m'] = result[2]
         return json.dumps(base)
     else:
         base['status'] = 0
         base['message'] = '没有找到对应的数据'
         return json.dumps(base)
 
-def aaaaaa(ApAddress,base):
-    config.aleadySave[ApAddress]={}
+def Authentication(ApAddress,KKAddress,base):
+    condition = f'insert into Authentication(ApAddress,KKUserName) values(%s,%s);'
+    cur.execute(condition, (ApAddress,KKAddress))
+    base['status'] = 1
+    base['message'] = '认证成功'
+    return json.dumps(base)
+def getAuthentication(ApAddress,base):
+    condition = f'select COUNT(KKUserName) from Authentication where ApAddress=%s;'
+    cur.execute(condition, (ApAddress))
+    result = cur.fetchone()
+    base['num'] = result[0]
+
+    condition = f'select KKUserName from Authentication where ApAddress=%s;'
+    cur.execute(condition,(ApAddress))
+    result = cur.fetchall()
+    base['status'] = 1
+    base['list'] = result
     return json.dumps(base)
 
 if __name__ == '__main__':

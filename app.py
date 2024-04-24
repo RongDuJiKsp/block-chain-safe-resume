@@ -27,7 +27,7 @@ def RegisterReq():
         if verifyIdentity(data['identity']):
             return register(data, user)
         else:
-            user['message'] = "身份证号格式错误"
+            user['message'] = "身份格式错误"
             return json.dumps(user)
     except Exception as e:
         user['message'] = "{}".format(str(e))
@@ -44,9 +44,6 @@ def LoginReq():
         'address':''
     }
     try:
-        if data['identity'] is None:
-            login['message'] = "参数不完整"
-            return json.dumps(login)
         return verifyprivateKeys(data['userName'],data['password'],data['identity'],login)
     except Exception as e:
         login['message'] = "{}".format(str(e))
@@ -399,21 +396,24 @@ def PostOnekeyReq():
 
 @app.route('/KKDownloadKeyReq', methods=["POST"])
 def KKDownloadKeyReq():
-    data = request.get_json()
     base = {
         'status': 0,
         'message': '',
     }
     try:
-        KKAddress = data['KKAddress']
-        ApAddress = data['ApAddress']
-        encryptPrivateKeys=data['encryptPrivateKeys']
-        return KKDownloadKey(KKAddress,ApAddress,encryptPrivateKeys,base)
+        if 'file' not in request.files:
+            return json.dumps(base)
+        # 前端上传文件,后端处理给webase
+        file = request.files['file']
+        KKAddress = request.args.get('KKAddress')
+        ApAddress = request.args.get('ApAddress')
+        return KKDownloadKey(KKAddress,ApAddress,file,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)
-@app.route('/aaaaaaa', methods=["POST"])
-def aaaaaaa():
+
+@app.route('/AuthenticationReq', methods=["POST"])
+def AuthenticationReq():
     data = request.get_json()
     base = {
         'status': 0,
@@ -421,7 +421,22 @@ def aaaaaaa():
     }
     try:
         ApAddress = data['ApAddress']
-        return aaaaaa(ApAddress,base)
+        KKUserName = data['KKUserName']
+        return Authentication(ApAddress,KKUserName,base)
+    except Exception as e:
+        base['message'] = "{}".format(str(e))
+        return json.dumps(base)
+
+@app.route('/getAuthenticationReq', methods=["POST"])
+def getAuthenticationReq():
+    data = request.get_json()
+    base = {
+        'status': 0,
+        'message': '',
+    }
+    try:
+        ApAddress = data['ApAddress']
+        return getAuthentication(ApAddress,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)

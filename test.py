@@ -1,21 +1,26 @@
-import base64
+from charm.toolbox.pairinggroup import PairingGroup, GT
+from ABE.ac17 import AC17CPABE
 
-import rsa
+# instantiate a bilinear pairing map
+pairing_group = PairingGroup('MNT224')
 
-# 生成私钥
-encryptPrivateKeys='''
------BEGIN RSA PRIVATE KEY-----
-MIGsAgEAAiEA0CNf+7+JR5AjW3e3LIts7TuOARAXQz/xo0WVp2DZ1YUCAwEAAQIh
-AIc3dBPIyxaCvXWewJFfwjczOwrQLbDzUsWfMGm9rtnBAhIA8YaVsot5HZn+A/Tp
-9U0PdkcCEADcnJGN4bjJC9JqB86RX9MCEgC2tEB5l9g+9EabZ6Gz1l9j8QIPJwOx
-YgwXJ8blcUbsKx1tAhEUWqy0lVDmHcSUmG2PlLjkIQ==
------END RSA PRIVATE KEY-----
-'''
-private_key = rsa.PrivateKey.load_pkcs1(encryptPrivateKeys.encode())
-x = base64.b64decode('zrGuhX66TV5IZBswU9loQxSErGbEplD53oznfYlUIno=')
-print(x)
-m = base64.b64decode('CqsAbOQJ2l1go7+VlOF80H/XLG1Jtj/x2AKw6MQHHfI=')
-print(m)
-messageX = rsa.decrypt(x, private_key)
-messageM = rsa.decrypt(m, private_key)
-print(messageX)
+# AC17 CP-ABE under DLIN (2-linear)
+cpabe = AC17CPABE(pairing_group, 2)
+
+# choose a random message
+msg = pairing_group.random(GT)
+
+# 加密
+policy_str = '(ONE OR TWO OR THREE)'
+ctxt = cpabe.encrypt('公钥替代', msg, policy_str)
+
+
+# decryption
+rec_msg1 = cpabe.decrypt('公钥替代', ctxt, ed_key)
+rec_msg2 = cpabe.decrypt('公钥替代', ctxt, hu_key)
+rec_msg3 = cpabe.decrypt('公钥替代', ctxt, bk_key)
+
+print('yuanshimsg:'+msg)
+print('yuanshimsg:'+rec_msg1)
+print('yuanshimsg:'+rec_msg2)
+print('yuanshimsg:'+rec_msg3)

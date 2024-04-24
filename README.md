@@ -626,24 +626,89 @@ interface PostOnekeyRes extends BaseRe{
 
 ```
  /**
- * @interface KKDownloadKeyReq
- * @property KKAddress KK用户地址
- * @property ApAddress Ap用户地址
- * @property encryptPrivateKeys kk私钥
- */
-  interface KKDownloadKeyReq {
-    KKAddress: string
-    ApAddress: string
-    encryptPrivateKeys: string
- }
-
- /**
  * @interface KKDownloadKeyRes
  */
 interface KKDownloadKeyRes extends BaseRe{
     i: string
     x: string
     m: string
+}
+```
+
+上传密钥示例
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+<h2>File Upload</h2>
+<input type="file" id="fileToUpload">
+<button onclick="uploadFile()">Upload</button>
+<script>
+function uploadFile() {
+    var input = document.getElementById('fileToUpload');
+    var file = input.files[0];
+    var formData = new FormData();
+    formData.append('file', file);
+    var KKAddress = '0xb045a2b2919de75a5bf89bbcd1e57ae3b4c469ff'
+    var ApAddress = '0x3bb3accd9557824fbce4d998ed2bda0915160663';  //address示例
+    fetch('http://127.0.0.1:5100/KKDownloadKeyReq?KKAddress=' + KKAddress+'&ApAddress='+ApAddress, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log(data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+</script>
+</body>
+</html>
+```
+
+#### 25、KK认证
+
+```
+/**
+* @interface AuthenticationReq
+* @property ApAddress ap用户地址
+* @property KKUserName kk用户名
+*/
+  interface AuthenticationReq {
+  	ApAddress: string
+  	KKUserName: string
+ }
+
+/**
+* @interface AuthenticationRes
+*/
+interface AuthenticationRes extends BaseRe{
+}
+```
+
+#### 26、ap查看认证情况
+
+```
+/**
+* @interface getAuthenticationReq
+* @property ApAddress ap用户地址
+
+*/
+  interface getAuthenticationReq {
+  	ApAddress: string
+ }
+
+/**
+* @interface getAuthenticationRes
+* @property num 已认证kk数量
+* @property list kk用户名
+*/
+interface getAuthenticationRes extends BaseRe{
+	num:int
+	list:[]
 }
 ```
 
