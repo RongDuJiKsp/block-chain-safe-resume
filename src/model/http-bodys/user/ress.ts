@@ -14,8 +14,6 @@ export interface BaseRes {
  * @property {string} privateKeys 用户注册的私钥
  * @property {number} S 用户注册得到的 S Key
  * @property {number} P 用户注册得到的 P Key
- * @property {number[]} M 用户注册得到的秘密份额M
- * @property {number[]} X 用户注册得到的秘密份额X
  */
 export interface RegisterRes extends BaseRes {
     address: string,
@@ -23,8 +21,6 @@ export interface RegisterRes extends BaseRes {
     encryptPrivateKeys: string
     S: number,
     P: number,
-    M: number[],
-    X: number[],
 }
 
 /**

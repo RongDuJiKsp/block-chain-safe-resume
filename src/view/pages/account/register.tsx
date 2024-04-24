@@ -1,8 +1,8 @@
 import "./register.css";
-import {App, Result, Steps} from "antd";
-import React, {createContext, useContext, useReducer} from "react";
+import {App, Form, Input, Result, Steps} from "antd";
+import React, {createContext, ReactNode, useContext, useReducer} from "react";
 import {StepProps} from "antd/es/steps";
-import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
+import {CheckCircleOutlined, ContactsOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
 import {useNavigate} from "react-router-dom";
@@ -26,6 +26,12 @@ const StepElements: StepInformation[] = [
         focusDescription: "选择您的注册身份",
         noFocusIcon: <IdcardOutlined/>,
         element: <SelectIdentityComponent/>
+    },
+    {
+        title: "Input Information",
+        focusDescription: "输入用户名和密码",
+        noFocusIcon: <ContactsOutlined/>,
+        element: <InputInformationComponent/>
     },
     {
         title: "Check Result",
@@ -97,16 +103,7 @@ function SelectIdentityComponent() {
             message.error("You can't continue with None").then();
             return;
         }
-        registerServer.registerWithDataAndStoreAsync().then(r => {
-            if (r.status) {
-                message.success("注册成功").then();
-                stepDispatch("next");
-            } else {
-                message.error(r.message).then();
-            }
-        }).catch(e => {
-            message.error(e.message).then();
-        });
+        stepDispatch("next");
     };
 
     return <div className={"h-full flex flex-col justify-center"}>
@@ -152,11 +149,64 @@ function ShowIdentityAndSelect({onClick, info}: ShowingIdentityParam) {
     </motion.div>;
 }
 
+interface FormInput {
+    name: string;
+    pwd: string;
+    pwdAgain: string;
+}
+
+function InputInformationComponent(): ReactNode {
+    const registerServer = UserRegisterHook.useMethod();
+    const {message} = App.useApp();
+    const stepDispatch = useContext(RegisterStepCountContext);
+    const onClickNext = (value: FormInput) => {
+        registerServer.registerWithDataAndStoreAsync(value.name, value.pwd).then(r => {
+            if (r.status) {
+                message.success("注册成功").then();
+                stepDispatch("next");
+            } else {
+                message.error(r.message).then();
+            }
+        }).catch(e => {
+            message.error(e.message).then();
+        });
+    };
+
+
+    return <div className={"h-full flex flex-col justify-around showing-in"}>
+        <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
+            <Form<FormInput> className={"mx-[27%] mt-[14%]"} onFinish={onClickNext}>
+                <Form.Item<FormInput> name={"name"} label={"用户名"} labelCol={{span: 6}}
+                                      rules={[{min: 4, max: 12}, {required: true}]}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item<FormInput> name={"pwd"} label={"密码"} labelCol={{span: 6}}
+                                      rules={[{min: 4, max: 12}, {required: true}, {pattern: /[0-9a-zA-Z]+/}]}>
+                    <Input.Password/>
+                </Form.Item>
+                <Form.Item<FormInput> name={"pwdAgain"} label={"确认密码"} labelCol={{span: 6}} dependencies={['pwd']}
+                                      rules={[{required: true}, ({getFieldValue}) => ({
+                                          async validator(_, value: string) {
+                                              if (getFieldValue("pwd") === value) return;
+                                              else throw Error("两次输入的密码不一致！");
+                                          }
+                                      })]}>
+                    <Input.Password/>
+                </Form.Item>
+                <Form.Item>
+                    <button type="submit"
+                            className={"button button-primary button-pill button-raised ml-[40%]"}>下一步
+                    </button>
+                </Form.Item>
+            </Form>
+        </div>
+    </div>;
+}
+
 function GetResultComponent() {
     const {message} = App.useApp();
     const {registered, message: msg} = UserRegisterHook.useValue();
     const registerServer = UserRegisterHook.useMethod();
-    const stepDispatch = useContext(RegisterStepCountContext);
     const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
@@ -175,7 +225,7 @@ function GetResultComponent() {
         registerServer.reset();
         navigate("/", {replace: true});
     };
-    return <div className={"h-full  flex flex-col justify-around showing-in"}>
+    return <div className={"h-full flex flex-col justify-around showing-in"}>
         <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
             <Result status={registered ? "success" : "error"}
                     title={registered ? "注册成功" : "注册失败，请重试"}

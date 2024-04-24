@@ -1,5 +1,4 @@
 import {atom, useAtom, useAtomValue} from "jotai";
-import {RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
@@ -10,6 +9,7 @@ import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS} from "../../../config/net.config.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 import {FileTempleHandleImpl} from "../../util/output.ts";
+import {RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
 
 const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -20,9 +20,10 @@ const alovaClientImpl = createAlova({
     baseURL: SERVER_URLS.backendUrl
 });
 
-
 const initialRegisterData: RegisterReq = {
-    identity: UserIdentityEnum.None
+    identity: UserIdentityEnum.None,
+    userName: "",
+    password: ""
 };
 const RegisterDataAtom = atom<RegisterReq>(initialRegisterData);
 const ReceivedRegisterResAtom = atom<RegisterRes | null>(null);
@@ -37,9 +38,8 @@ interface UserRegisterMethod {
 
     selectUserIdentity(identity: UserIdentityEnum): void;
 
-    writePassword(password: string): void;
 
-    registerWithDataAndStoreAsync(): Promise<RegisterRes>;
+    registerWithDataAndStoreAsync(username: string, password: string): Promise<RegisterRes>;
 
     callFileDownloadWithData(): Promise<void>;
 
@@ -63,13 +63,16 @@ export const UserRegisterHook: AtomHooks<UserRegisterValue, UserRegisterMethod> 
             selectUserIdentity(identity: UserIdentityEnum): void {
                 setRegisterData(r => ({...r, identity}));
             },
-            writePassword(password: string): void {
-                console.log(password);
-                //TODO 改东西
-            },
-            async registerWithDataAndStoreAsync(): Promise<RegisterRes> {
-                console.log(registerData);
-                const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", registerData);
+            async registerWithDataAndStoreAsync(username: string, password: string): Promise<RegisterRes> {
+                const req: RegisterReq = {
+                    identity: registerData.identity,
+                    userName: username,
+                    password: password
+                };
+                setRegisterData(req);
+                console.log(req);
+                const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", req);
+                console.log(res);
                 if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);
                 setReceivedRegisterRes(res);
                 return res;
@@ -78,8 +81,12 @@ export const UserRegisterHook: AtomHooks<UserRegisterValue, UserRegisterMethod> 
                 if (receivedRegisterRes === null) throw Error("在调用时未收到信息");
                 const SKey = registerData.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(receivedRegisterRes.S)) : "";
                 const PrivateKey = receivedRegisterRes.privateKeys;
-                const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, receivedRegisterRes.X, receivedRegisterRes.M, receivedRegisterRes.encryptPrivateKeys)]);
-                await FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${receivedRegisterRes.address.substring(0, 7)}... of ${registerData.identity}`, "key");
+                const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
+                await FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${receivedRegisterRes.address.substring(0, 7)}... of ${registerData}`, "key");
+                if (registerData.identity === UserIdentityEnum.KeyKeeper) {
+                    const downloadFile = new Blob([receivedRegisterRes.encryptPrivateKeys]);
+                    await FileSystemImpl.downloadToFileAsNameAsync(downloadFile, "key of" + registerData.userName + ".key");
+                }
             },
             reset() {
                 setRegisterData(initialRegisterData);
