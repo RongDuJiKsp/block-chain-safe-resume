@@ -5,11 +5,11 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {ChangeNameReq, GetTokenReq, LoginReq, RegisterReq} from "../../../model/http-bodys/user/reqs.ts";
+import {ChangeNameReq, GetTokenReq, LoginReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes, RegisterRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     KKInfoForSendListRes,
@@ -24,7 +24,9 @@ import {
     ChangeKKRes,
     GetFileMesRes,
     GetSavedRes,
+    KKAcceptOrDelayRes,
     KKDownloadKeyRes,
+    KKGetToBeAuditedRes,
     RequestListRes,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
@@ -63,7 +65,7 @@ import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/e
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
- const alovaClientImpl = createAlova({
+const alovaClientImpl = createAlova({
     statesHook: ReactHook,
     requestAdapter: GlobalFetch(),
     responded: (response) => {
@@ -84,7 +86,7 @@ interface UserWorkValue {
 
 interface UserWorkMethod {
 
-    loginAsync(privateKeys: string, identity: UserIdentityEnum): Promise<LoginRes>;
+    loginAsync(username: string, pwd: string, identity: UserIdentityEnum): Promise<LoginRes>;
 
     logout(): void;
 
@@ -128,11 +130,12 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
             logout(): void {
                 setInfo(null);
             },
-            async loginAsync(privateKey: string, identity: UserIdentityEnum): Promise<LoginRes> {
+            async loginAsync(username: string, pwd: string, identity: UserIdentityEnum): Promise<LoginRes> {
 
                 const reqBody: LoginReq = {
                     identity,
-                    privateKeys: privateKey,
+                    userName: username,
+                    password: pwd,
                 };
                 const res = await alovaClientImpl.Post<LoginRes>("/LoginReq", reqBody);
                 console.log("login User", res);
@@ -362,16 +365,24 @@ interface KeyKeeperWorkMethod {
 
     downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes>;
 
+    acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes>;
+
     getRequestListAsync(): Promise<RequestListRes>;
 
     /**
-     * @deprecated GetNeedSaveReq
+     * @deprecated 改掉了
      */
     getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes>;
 
+    /**
+     * @deprecated 改掉了
+     */
     getPermissionToBeKK(): Promise<ChangeKKRes>;
 
-    getSavedSubKeyListAsync(): Promise<GetSavedRes>
+    getSavedSubKeyListAsync(): Promise<GetSavedRes>;
+
+    getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes>;
+
 
 }
 
@@ -452,6 +463,19 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                     ApUserName: ApUsername, i, x, m, KKAddress: userInfo.address
                 };
                 return alovaClientImpl.Post("/UploadKeyReq", req);
+            },
+            async getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes> {
+                return {
+                    status: 1,
+                    message: "3",
+                    list: []
+                };
+            },
+            async acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes> {
+                return {
+                    status: 1,
+                    message: "ok",
+                };
             }
 
         };

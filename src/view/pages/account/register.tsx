@@ -85,11 +85,6 @@ const texts: InfoContext[] = [
         key: UserIdentityEnum.Recruiter,
         title: "Recruiter",
         message: "Recruiter是企业HR用户,可向Applicant用户发出授权请求,等待对应Ap同意授权,并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者 的未经篡改的完整简历信息"
-    },
-    {
-        key: UserIdentityEnum.KeyKeeper,
-        title: "Key keeper",
-        message: "Key keeper是密钥保管人用户,在上交积分质押成为合法Kk后,可通过安全通道接 收Applicant密钥的秘密份额进行托管,在对应Applicant发出授权操作后上交智能 合约,使合约正常合成密钥,从而正常响应授权请求。同时,Kk通过积极托管行为可 获得积分奖励。"
     }
 ];
 

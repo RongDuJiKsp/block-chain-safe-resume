@@ -1,5 +1,5 @@
 import {BaseRes} from "../ress.ts";
-import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../entity/keykeeper.ts";
+import {AccessibleSubKeyInfo, AuditResumeInfo, UploadSubKeyRequestInfo} from "../../../entity/keykeeper.ts";
 import {BasicInfo} from "../../../entity/user.ts";
 
 //kk上传秘密份额的响应体
@@ -50,11 +50,21 @@ export interface ChangeKKRes extends BaseRes {
 export interface GetSavedRes extends BaseRes {
     list: BasicInfo[];
 }
+
 /**
  * @interface KKDownloadKeyRes
  */
-export interface KKDownloadKeyRes extends BaseRes{
+export interface KKDownloadKeyRes extends BaseRes {
     i: number
     x: number
     m: number
+}
+
+//kk获取待审核简历
+export interface KKGetToBeAuditedRes extends BaseRes {
+    list: AuditResumeInfo[]
+}
+//kk允许或者打回简历
+export interface KKAcceptOrDelayRes extends BaseRes{
+
 }

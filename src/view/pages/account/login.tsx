@@ -6,14 +6,15 @@ import {componentUtils} from "../../../controller/util/component.tsx";
 import {Link, NavLink, Route, Routes, useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
-import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined} from "@ant-design/icons";
+import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined} from "@ant-design/icons";
 import {useEffect} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 
 
 type LoginFormType = {
-    keyword: string,
-    identity: UserIdentityEnum
+    username: string;
+    pwd: string,
+    identity: UserIdentityEnum,
     remember: boolean,
 }
 
@@ -58,12 +59,12 @@ function LoginComponent() {
             message.error("身份不能为None！").then();
             return;
         }
-        if (!val.keyword || !val.identity) {
+        if (!val.pwd || !val.identity || !val.username) {
             message.error("请填写完整！！").then();
             return;
         }
         loadingAction.setTrue();
-        workMethod.loginAsync(val.keyword, val.identity).then(r => {
+        workMethod.loginAsync(val.username, val.pwd, val.identity).then(r => {
             if (r.status) {
                 message.success("登录成功,正在跳转！").then();
                 navigate("/home/login");
@@ -83,14 +84,19 @@ function LoginComponent() {
     return <div className={"flex flex-col justify-around h-full dark-mode-text"}>
         <div className={"text-center text-2xl font-bold"}>欢迎来到SafeCV Zone平台</div>
         <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
-            <Form.Item<LoginFormType> name={"keyword"} colon={false}
-                                      rules={[{pattern: /[a-f0-9]+/, message: "存在非法字符或为空"}]}
+            <Form.Item<LoginFormType> name={"username"} colon={false}
+                                      rules={[{min: 4, max: 12},]}
+                                      label={<UserOutlined className={"text-white"} style={{fontSize: 26}}/>}>
+                <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
+            </Form.Item>
+            <Form.Item<LoginFormType> name={"pwd"} colon={false}
+                                      rules={[{min: 4, max: 12}, {pattern: /[0-9a-zA-Z]+/}]}
                                       label={<KeyOutlined className={"text-white"} style={{fontSize: 26}}/>}>
-                <Input allowClear size={"large"} style={{borderRadius: 30}}/>
+                <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} colon={false}
                                       label={<IdcardOutlined className={"text-white"} style={{fontSize: 26}}/>}>
-                <Select placeholder={"请选择你的身份"} options={identityOption} size={"large"}/>
+                <Select placeholder={"请选择你的身份"} options={identityOption} size={"middle"}/>
             </Form.Item>
             <div className={"flex justify-center"}>
                 <ArrayPointerInButton title={
@@ -112,7 +118,7 @@ function AdminLoginComponent() {
     return <div className={"flex flex-col justify-around h-full"}>
         <div className={"text-center text-2xl  font-bold "}>欢迎来到安全简历部署管理系统</div>
         <Form>
-            <Form.Item<LoginFormType> name={"keyword"} label={"钥匙"}>
+            <Form.Item<LoginFormType> name={"pwd"} label={"钥匙"}>
                 <Input/>
             </Form.Item>
         </Form>
