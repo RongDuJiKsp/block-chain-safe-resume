@@ -14,10 +14,6 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon("icon-cloudupload-fill", {fontSize: 26}),
         routerPath: APPLICANT_THIS_PATH + "/upload",
         text: "简历上传"
-    }, {
-        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 26}),
-        routerPath: APPLICANT_THIS_PATH + "/send",
-        text: "份额分发"
     },
     {
         logo: componentUtils.getIcon("icon-key1", {fontSize: 26}),
