@@ -16,8 +16,6 @@ export interface BaseRes {
  * @property {number} P 用户注册得到的 P Key
  */
 export interface RegisterRes extends BaseRes {
-    address: string,
-    privateKeys: string,
     encryptPrivateKeys: string
     S: number,
     P: number,

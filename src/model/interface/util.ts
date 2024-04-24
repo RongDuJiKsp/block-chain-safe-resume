@@ -43,7 +43,7 @@ export interface StepInformation {
 }
 
 export interface GetFileTemplate {
-    getRegisterKey(privateKey: string, SKey: string, ): string;
+    getRegisterKey(SKey: string,userName:string ): string;
 
     getKeyKeeperSubKey(X: string, M: string, NO: string, apName: string, kkName: string): string;
 

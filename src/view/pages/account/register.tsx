@@ -219,7 +219,7 @@ function GetResultComponent() {
     };
     const onReturnPage = () => {
         if (!canClose) {
-            message.warning("不保存密钥是不准退出的喵~").then();
+            message.warning("请保存注册回执").then();
             return;
         }
         registerServer.reset();
@@ -232,13 +232,13 @@ function GetResultComponent() {
                     extra={<span className={"flex justify-center gap-14"}>
                              <button className={"button button-3d button-action"} onClick={onDownload}
                                      style={{display: registered ? "inline-block" : "none"}}>
-                                 保存key
+                                 保存回执
                              </button>
                              <button className={"button button-3d button-primary"} onClick={onReturnPage}>
                               返回登录
                             </button>
                              </span>}
-                    subTitle={registered ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + msg}/>
+                    subTitle={registered ? "按下下载按钮获取注册回执" : "原因：" + msg}/>
         </div>
     </div>;
 }

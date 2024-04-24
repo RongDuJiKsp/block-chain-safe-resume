@@ -73,19 +73,17 @@ export const UserRegisterHook: AtomHooks<UserRegisterValue, UserRegisterMethod> 
                 console.log(req);
                 const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", req);
                 console.log(res);
-                if (res.status) res.privateKeys = FileSystemImpl.base64ToAscii(res.privateKeys);
                 setReceivedRegisterRes(res);
                 return res;
             },
             async callFileDownloadWithData() {
                 if (receivedRegisterRes === null) throw Error("在调用时未收到信息");
                 const SKey = registerData.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(receivedRegisterRes.S)) : "";
-                const PrivateKey = receivedRegisterRes.privateKeys;
-                const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey)]);
-                await FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${receivedRegisterRes.address.substring(0, 7)}... of ${registerData}`, "key");
+                const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(SKey, registerData.userName)]);
+                await FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${registerData.userName}... of ${registerData.identity}`, "txt");
                 if (registerData.identity === UserIdentityEnum.KeyKeeper) {
-                    const downloadFile = new Blob([receivedRegisterRes.encryptPrivateKeys]);
-                    await FileSystemImpl.downloadToFileAsNameAsync(downloadFile, "key of" + registerData.userName + ".key");
+                    const downloadKey = new Blob([receivedRegisterRes.encryptPrivateKeys]);
+                    await FileSystemImpl.downloadToFileAsNameAsync(downloadKey, "key of" + registerData.userName + ".pem");
                 }
             },
             reset() {
