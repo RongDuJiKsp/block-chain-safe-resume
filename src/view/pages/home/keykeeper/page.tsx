@@ -5,17 +5,17 @@ import {KEYKEEPER_THIS_PATH, KeyKeeperRoutes} from "../../../routes/home.tsx";
 
 const ThisUserGroup: UserGroup = {
     userIdentity: "KeyKeeper",
-    userHeader: componentUtils.getIcon("icon-key", {fontSize: 28})
+    userHeader: componentUtils.getIcon("icon-key", {fontSize: 26})
 };
 
 const headBarItems: ItemsAndPic[] = [
     {
-        logo: componentUtils.getIcon("icon-money-finance-buyer", {fontSize: 32}),
+        logo: componentUtils.getIcon("icon-money-finance-buyer", {fontSize: 26}),
         routerPath: KEYKEEPER_THIS_PATH + "/notice",
         text: "上传请求"
     },
     {
-        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 32}),
+        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 26}),
         routerPath: KEYKEEPER_THIS_PATH + "/get",
         text: "获取秘密份额"
     }
