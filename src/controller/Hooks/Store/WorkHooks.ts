@@ -444,9 +444,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 const req: RemindKKReq = {
                     KKAddress: userInfo.address
                 };
-                console.log(req);
                 const res = await alovaClientImpl.Post<ArrayRes>("/RemindKKReq", req);
-                console.log(res);
                 return {
                     status: res.status,
                     message: res.message,
@@ -465,14 +463,14 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return alovaClientImpl.Post("/UploadKeyReq", req);
             },
             async getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes> {
-                return {
+                return {//TODO:接口联调
                     status: 1,
                     message: "3",
                     list: []
                 };
             },
             async acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes> {
-                return {
+                return {//TODO 接口联调
                     status: 1,
                     message: "ok",
                 };
