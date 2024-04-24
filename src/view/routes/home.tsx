@@ -39,7 +39,7 @@ export function KeyKeeperRoutes() {
         <Route path={"/notice"} element={<KeyKeeperNotice/>}/>
         <Route path={"/get"} element={<KeyKeeperGetSubKey/>}/>
         <Route path={"/home"} element={<HomePage/>}/>
-        <Route path={"/audit"} element={<KeyKeeperAuditPage/>}/>
+        {/*<Route path={"/audit"} element={<KeyKeeperAuditPage/>}/>*/}
         <Route path={"/*"} element={<Navigate to={KEYKEEPER_THIS_PATH + "/home"}/>}/>
     </Routes>;
 }

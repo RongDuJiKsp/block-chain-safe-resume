@@ -90,9 +90,6 @@ function ResumeInfoComponent({info, firstInfo}: {
         <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
                    className={"basis-1/5"}
                    value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "N/A"}/>
-        <Statistic title={"简历状态"}
-                   prefix={<Tooltip title={"恭喜，简历已通过"}>{componentUtils.getIcon("icon-status")}</Tooltip>}
-                   value={"已通过"}/>
         <Statistic title={"最新访问时间"} prefix={componentUtils.getIcon("icon-keyhole")}
                    value={firstInfo ? dayjs.unix(Number(firstInfo.downloadTime)).format("YYYY-MM-DD HH:mm") : "N/A"}/>
 

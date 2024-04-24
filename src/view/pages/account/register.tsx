@@ -172,7 +172,7 @@ function InputInformationComponent(): ReactNode {
         <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
             <Form<FormInput> className={"mx-[27%] mt-[14%]"} onFinish={onClickNext}>
                 <Form.Item<FormInput> name={"name"} label={"用户名"} labelCol={{span: 6}}
-                                      rules={[{min: 4, max: 12}, {required: true}]}>
+                                      rules={[{min: 3, max: 12}, {required: true}]}>
                     <Input/>
                 </Form.Item>
                 <Form.Item<FormInput> name={"pwd"} label={"密码"} labelCol={{span: 6}}

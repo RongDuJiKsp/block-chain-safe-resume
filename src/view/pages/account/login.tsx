@@ -85,14 +85,14 @@ function LoginComponent() {
         <div className={"text-center text-2xl font-bold"}>欢迎来到SafeCV Zone平台</div>
         <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
             <Form.Item<LoginFormType> name={"username"} colon={false}
-                                      rules={[{min: 4, max: 12},]}
+                                      rules={[{min: 3, max: 12},]}
                                       label={<UserOutlined className={"text-white"} style={{fontSize: 26}}/>}>
                 <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"pwd"} colon={false}
                                       rules={[{min: 4, max: 12}, {pattern: /[0-9a-zA-Z]+/}]}
                                       label={<KeyOutlined className={"text-white"} style={{fontSize: 26}}/>}>
-                <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
+                <Input.Password allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} colon={false}
                                       label={<IdcardOutlined className={"text-white"} style={{fontSize: 26}}/>}>
