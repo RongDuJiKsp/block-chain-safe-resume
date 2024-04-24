@@ -50,7 +50,7 @@ export default function HeaderBarProvider({children, items, group}: PropsWithChi
 }
 
 function FunctionItems({items}: { items: ItemsAndPic[] }) {
-    return <div className={"flex justify-end h-full gap-8"}>
+    return <div className={"flex justify-end h-full gap-7"}>
         {items.map((value, index) => {
             return <NavLink to={value.routerPath} draggable={false}
                             className={({isActive}) => isActive ? "active-nav nav-button-bg-color-blue" : "basis-nav nav-button-bg-color-blue"}
