@@ -146,7 +146,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <div className={"m-8"}>
                 <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
                     <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}
-                                                    rules={[{min: 4, max: 12}, {required: true}]}>
+                                                    rules={[{min: 3, max: 12}, {required: true}]}>
                         <Input allowClear/>
                     </Form.Item>
                 </Form>

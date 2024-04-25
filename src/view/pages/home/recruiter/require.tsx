@@ -41,7 +41,7 @@ function SendRequire() {
         <FindLikeInfo/>
         <Form<RecAuthorizeReq> onFinish={onSubmit}>
             <Form.Item<RecAuthorizeReq> label={"请求用户的名称"} name={"ApUserName"}
-                                        rules={[{min: 4, max: 12, message: "名称不合法"},
+                                        rules={[{min: 3, max: 12, message: "名称不合法"},
                                             {required: true, message: "请填写昵称"}]}>
                 <Input/>
             </Form.Item>

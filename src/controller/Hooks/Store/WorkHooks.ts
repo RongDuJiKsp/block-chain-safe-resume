@@ -41,7 +41,6 @@ import {
     GetFileMesReq,
     GetNeedSaveReq,
     GetSaveReq,
-    KKDownloadKeyReq,
     RemindKKReq,
     UploadKeyReq
 } from "../../../model/http-bodys/user/keykeeper/req.ts";
@@ -363,7 +362,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
-    downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes>;
+    downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes>;
 
     acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes>;
 
@@ -411,15 +410,12 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
             },
-            async downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes> {
+            async downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes> {
+                console.log(encryptPrivateKeyFile);
                 if (userInfo === null) throw "未登录时尝试获取秘密份额";
-
-                const req: KKDownloadKeyReq = {
-                    KKAddress: userInfo.address,
-                    ApAddress: apAddress,
-                    encryptPrivateKeys: encryptPrivateKeys
-                };
-                return alovaClientImpl.Post<KKDownloadKeyRes>("/KKDownloadKeyReq", req);
+                const formData = new FormData();
+                formData.append("file", encryptPrivateKeyFile);
+                return alovaClientImpl.Post<KKDownloadKeyRes>(`/KKDownloadKeyReq?KKAddress=${userInfo.address}&ApAddress=${apAddress}`,formData);
             },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";
@@ -470,6 +466,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
             },
             async acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes> {
+                console.log(state, result, username);
                 return {//TODO 接口联调
                     status: 1,
                     message: "ok",
