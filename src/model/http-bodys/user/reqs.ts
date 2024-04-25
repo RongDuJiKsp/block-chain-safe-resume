@@ -1,11 +1,14 @@
 import {UserIdentityEnum} from "../../Enum/WorkEnum.ts";
 
 export interface RegisterReq {
-    identity: UserIdentityEnum
+    identity: UserIdentityEnum;
+    userName: string;
+    password: string;
 }
 
 export interface LoginReq {
-    privateKeys: string;
+    userName: string
+    password: string
     identity: UserIdentityEnum;
 }
 

@@ -1,18 +1,16 @@
 import "./register.css";
-import {App, Result, Steps} from "antd";
-import React, {createContext, Dispatch, SetStateAction, useContext, useState} from "react";
+import {App, Form, Input, Result, Steps} from "antd";
+import React, {createContext, ReactNode, useContext, useReducer} from "react";
 import {StepProps} from "antd/es/steps";
-import {CheckCircleOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
+import {CheckCircleOutlined, ContactsOutlined, IdcardOutlined, LoadingOutlined,} from "@ant-design/icons";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {StepInformation} from "../../../model/interface/util.ts";
-import {RegisterRes} from "../../../model/http-bodys/user/ress.ts";
-import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import {useNavigate} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
-import {FileTempleHandleImpl} from "../../../controller/util/output.ts";
 import {useBoolean} from "ahooks";
-import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 import {motion} from "framer-motion";
+import {UserRegisterHook} from "../../../controller/Hooks/Store/RegisterHooks.ts";
+import {StepCounterAction} from "../../../model/interface/reduces.ts";
+import {StepCounterReducerImpl} from "../../../controller/Hooks/Reducer/Counter.ts";
 
 
 function getDescriptionWithStep(targetStep: number, currentStep: number, description: string): string {
@@ -20,22 +18,6 @@ function getDescriptionWithStep(targetStep: number, currentStep: number, descrip
     else if (currentStep === targetStep) return description;
     else return "已完成";
 }
-
-
-interface StateManager {
-    nextStep?: () => void;
-    lastStep?: () => void;
-    reStart?: () => void;
-    resSetter?: Dispatch<SetStateAction<RegisterResult | undefined>>
-    res?: RegisterResult
-}
-
-interface RegisterResult {
-    res: RegisterRes;
-    identity: UserIdentityEnum
-}
-
-const RegisterInfoSetterContext = createContext<StateManager>({});
 
 
 const StepElements: StepInformation[] = [
@@ -46,16 +28,22 @@ const StepElements: StepInformation[] = [
         element: <SelectIdentityComponent/>
     },
     {
+        title: "Input Information",
+        focusDescription: "输入用户名和密码",
+        noFocusIcon: <ContactsOutlined/>,
+        element: <InputInformationComponent/>
+    },
+    {
         title: "Check Result",
         focusDescription: "注册完成，请查看注册结果",
         noFocusIcon: <CheckCircleOutlined/>,
         element: <GetResultComponent/>
     }
 ];
+const RegisterStepCountContext = createContext<React.Dispatch<StepCounterAction>>(() => 0);
 
 function RegisterPage() {
-    const [currentStep, setCurrentStep] = useState<number>(0);
-    const [registerRes, setRegisterRes] = useState<RegisterResult>();
+    const [currentStep, currentStepDispatch] = useReducer(StepCounterReducerImpl, 0);
     const stepItems: StepProps[] = StepElements.map((val, index): StepProps => {
         return {
             title: val.title,
@@ -63,15 +51,7 @@ function RegisterPage() {
             icon: currentStep === index ? <LoadingOutlined/> : val.noFocusIcon,
         };
     });
-    const setNextStep = () => {
-        setCurrentStep(r => r + 1);
-    };
-    const setLastStep = () => {
-        setCurrentStep(r => r - 1);
-    };
-    const reStart = () => {
-        setCurrentStep(0);
-    };
+
     return <div className={"overflow-hidden register-page-bg-color login-full-anima"}>
         <div className={"login-full-context-anima login-full-container flex justify-around"}>
             <div className={"basis-1/5"}>
@@ -80,16 +60,10 @@ function RegisterPage() {
                 </div>
             </div>
             <div className={"basis-2/3"}>
-                <RegisterInfoSetterContext.Provider value={{
-                    nextStep: setNextStep,
-                    lastStep: setLastStep,
-                    reStart: reStart,
-                    res: registerRes,
-                    resSetter: setRegisterRes
-                }}>
+                <RegisterStepCountContext.Provider value={currentStepDispatch}>
                     {StepElements.map((val, index) => currentStep === index &&
                         <div key={"register-page-" + index} className={"h-full"}>{val.element}</div>)}
-                </RegisterInfoSetterContext.Provider>
+                </RegisterStepCountContext.Provider>
             </div>
         </div>
     </div>;
@@ -111,36 +85,20 @@ const texts: InfoContext[] = [
         key: UserIdentityEnum.Recruiter,
         title: "Recruiter",
         message: "Recruiter是企业HR用户,可向Applicant用户发出授权请求,等待对应Ap同意授权,并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者 的未经篡改的完整简历信息"
-    },
-    {
-        key: UserIdentityEnum.KeyKeeper,
-        title: "Key keeper",
-        message: "Key keeper是密钥保管人用户,在上交积分质押成为合法Kk后,可通过安全通道接 收Applicant密钥的秘密份额进行托管,在对应Applicant发出授权操作后上交智能 合约,使合约正常合成密钥,从而正常响应授权请求。同时,Kk通过积极托管行为可 获得积分奖励。"
     }
 ];
 
 function SelectIdentityComponent() {
-    const registerInfoHandle = useContext(RegisterInfoSetterContext);
-    const registerServer = UserWorkHooks.useMethod();
     const {message} = App.useApp();
-    const [selectedIdentity, setSelectedIdentity] = useState<UserIdentityEnum>(UserIdentityEnum.None);
+    const {selectedIdentity} = UserRegisterHook.useValue();
+    const registerServer = UserRegisterHook.useMethod();
+    const stepDispatch = useContext(RegisterStepCountContext);
     const onNextClick = (): void => {
         if (selectedIdentity === UserIdentityEnum.None) {
             message.error("You can't continue with None").then();
             return;
         }
-        registerServer.registerAsync(selectedIdentity).then(r => {
-            console.log(r);
-            if (r.status) {
-                registerInfoHandle.resSetter?.call(null, {identity: selectedIdentity, res: r});
-                message.success("注册成功").then();
-                registerInfoHandle.nextStep?.call(null);
-            } else {
-                message.error(r.message).then();
-            }
-        }).catch(e => {
-            message.error(e.message).then();
-        });
+        stepDispatch("next");
     };
 
     return <div className={"h-full flex flex-col justify-center"}>
@@ -149,7 +107,7 @@ function SelectIdentityComponent() {
                 {texts.map((unit, index) => (
                     <div key={"text-info-of" + index}
                          className={unit.key === selectedIdentity ? "basic-green-shadow-box bg-better-write max-w-[42%] h-fit " : "basic-shadow-box bg-better-write max-w-[42%] h-fit"}>
-                        <ShowIdentityAndSelect onClick={() => setSelectedIdentity(unit.key)}
+                        <ShowIdentityAndSelect onClick={() => registerServer.selectUserIdentity(unit.key)}
                                                isSelected={unit.key === selectedIdentity} info={unit}/>
                     </div>
                 ))}
@@ -186,52 +144,96 @@ function ShowIdentityAndSelect({onClick, info}: ShowingIdentityParam) {
     </motion.div>;
 }
 
-function GetResultComponent() {
-    const {res} = useContext(RegisterInfoSetterContext);
+interface FormInput {
+    name: string;
+    pwd: string;
+    pwdAgain: string;
+}
+
+function InputInformationComponent(): ReactNode {
+    const registerServer = UserRegisterHook.useMethod();
     const {message} = App.useApp();
+    const stepDispatch = useContext(RegisterStepCountContext);
+    const onClickNext = (value: FormInput) => {
+        registerServer.registerWithDataAndStoreAsync(value.name, value.pwd).then(r => {
+            if (r.status) {
+                message.success("注册成功").then();
+                stepDispatch("next");
+            } else {
+                message.error(r.message).then();
+            }
+        }).catch(e => {
+            message.error(e.message).then();
+        });
+    };
+
+
+    return <div className={"h-full flex flex-col justify-around showing-in"}>
+        <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
+            <Form<FormInput> className={"mx-[27%] mt-[14%]"} onFinish={onClickNext}>
+                <Form.Item<FormInput> name={"name"} label={"用户名"} labelCol={{span: 6}}
+                                      rules={[{min: 4, max: 12}, {required: true}]}>
+                    <Input/>
+                </Form.Item>
+                <Form.Item<FormInput> name={"pwd"} label={"密码"} labelCol={{span: 6}}
+                                      rules={[{min: 4, max: 12}, {required: true}, {pattern: /[0-9a-zA-Z]+/}]}>
+                    <Input.Password/>
+                </Form.Item>
+                <Form.Item<FormInput> name={"pwdAgain"} label={"确认密码"} labelCol={{span: 6}} dependencies={['pwd']}
+                                      rules={[{required: true}, ({getFieldValue}) => ({
+                                          async validator(_, value: string) {
+                                              if (getFieldValue("pwd") === value) return;
+                                              else throw Error("两次输入的密码不一致！");
+                                          }
+                                      })]}>
+                    <Input.Password/>
+                </Form.Item>
+                <Form.Item>
+                    <button type="submit"
+                            className={"button button-primary button-pill button-raised ml-[40%]"}>下一步
+                    </button>
+                </Form.Item>
+            </Form>
+        </div>
+    </div>;
+}
+
+function GetResultComponent() {
+    const {message} = App.useApp();
+    const {registered, message: msg} = UserRegisterHook.useValue();
+    const registerServer = UserRegisterHook.useMethod();
     const [canClose, setCanClose] = useBoolean();
     const navigate = useNavigate();
     const onDownload = () => {
-        if (!res?.res) {
-            message.error("注册时发生异常，请检查网络后重试！").then();
+        registerServer.callFileDownloadWithData().then(() => {
+            message.success("文件下载成功！").then();
             setCanClose.setTrue();
-            return;
-        }
-        if (!res.res.status) {
-            message.error("注册时发生异常！ " + res.res.message).then();
-            setCanClose.setTrue();
-            return;
-        }
-        console.log(res);
-        const SKey = res.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(res.res.S)) : "";
-        const PrivateKey = res.res.privateKeys;
-        const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(PrivateKey, SKey, res.res.X, res.res.M, res.res.encryptPrivateKeys)]);
-        FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${res.res.address.substring(0, 7)}... of ${res.identity}`, "key").then(() => {
-            message.success("下载成功！").then();
-            setCanClose.setTrue();
+        }).catch(e => {
+            message.error("文件下载失败，原因" + e).then();
         });
     };
     const onReturnPage = () => {
         if (!canClose) {
-            message.warning("不保存密钥是不准退出的喵~").then();
+            message.warning("请保存注册回执").then();
             return;
         }
+        registerServer.reset();
         navigate("/", {replace: true});
     };
-    return <div className={"h-full  flex flex-col justify-around showing-in"}>
+    return <div className={"h-full flex flex-col justify-around showing-in"}>
         <div className={"border-2 border-purple-300 bg-better-write basis-2/3"}>
-            <Result status={res?.res.status ? "success" : "error"}
-                    title={res?.res.status ? "注册成功" : "注册失败，请重试"}
+            <Result status={registered ? "success" : "error"}
+                    title={registered ? "注册成功" : "注册失败，请重试"}
                     extra={<span className={"flex justify-center gap-14"}>
                              <button className={"button button-3d button-action"} onClick={onDownload}
-                                     style={{display: res?.res.status ? "inline-block" : "none"}}>
-                                 保存key
+                                     style={{display: registered ? "inline-block" : "none"}}>
+                                 保存回执
                              </button>
                              <button className={"button button-3d button-primary"} onClick={onReturnPage}>
                               返回登录
                             </button>
                              </span>}
-                    subTitle={res?.res.status ? "请牢记你的key，此key无法找回！请按下下载按钮保存key" : "原因：" + res?.res.message}/>
+                    subTitle={registered ? "按下下载按钮获取注册回执" : "原因：" + msg}/>
         </div>
     </div>;
 }

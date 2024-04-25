@@ -3,6 +3,23 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
+    async readFileAsTextAsync(file: MetaFile) {
+        return new Promise<string>((resolve, reject) => {
+            const fileReader = new FileReader();
+            fileReader.onload = (ev): void => {
+                const reader = ev.target;
+                if (reader === null || reader.result === null) {
+                    reject("Null Error");
+                    return;
+                }
+                resolve(reader.result as string);
+            };
+            fileReader.onerror = (ev) => {
+                reject(ev.target?.error);
+            };
+            fileReader.readAsText(file);
+        });
+    },
     async downloadMetaFileAsync(file: MetaFile): Promise<void> {
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');

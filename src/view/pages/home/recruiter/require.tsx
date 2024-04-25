@@ -5,7 +5,7 @@ import {LoadingOutlined, SearchOutlined} from "@ant-design/icons";
 import Search from "antd/es/input/Search";
 import {ReactNode, useState} from "react";
 import {ColumnsType} from "antd/es/table";
-import {RecruiterWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {RecruiterWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {ApSearchInfo} from "../../../../model/entity/recruiter.ts";
 import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";

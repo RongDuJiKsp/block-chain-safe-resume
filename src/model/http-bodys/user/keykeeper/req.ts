@@ -74,3 +74,4 @@ export interface KKDownloadKeyReq {
     ApAddress: string
     encryptPrivateKeys: string
 }
+

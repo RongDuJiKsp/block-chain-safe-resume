@@ -1,3 +1,5 @@
+
+
 export interface AtomHooks<Values, Methods> {
     /**
      *  调用后提供状态
@@ -13,6 +15,7 @@ export interface AtomHooks<Values, Methods> {
      */
     useMethod(): Methods;
 }
+
 
 export interface CancelableOperateHooks {
     onConform(): void;

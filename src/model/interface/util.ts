@@ -19,6 +19,8 @@ export interface UserFileSystem {
 
     writeTextToClipboard(text: string): boolean;
 
+    readFileAsTextAsync(file: MetaFile): Promise<string>;
+
 }
 
 export type ConfigTable<List extends string | number, ValuesType> = {
@@ -43,7 +45,7 @@ export interface StepInformation {
 }
 
 export interface GetFileTemplate {
-    getRegisterKey(privateKey: string, SKey: string, X: number[], M: number[], kkEncryptPrivateKey: string): string;
+    getRegisterKey(SKey: string, userName: string): string;
 
     getKeyKeeperSubKey(X: string, M: string, NO: string, apName: string, kkName: string): string;
 

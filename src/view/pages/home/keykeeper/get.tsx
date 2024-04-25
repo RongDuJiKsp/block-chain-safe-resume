@@ -1,9 +1,9 @@
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
-import {ReactNode, useEffect, useState} from "react";
+import React, {ReactNode, useEffect, useState} from "react";
 import TableHeader from "../../../components/comp/tableHeader.tsx";
-import {App, Button, Form, Input, Modal, Table} from "antd";
+import {App, Button, Modal, Table} from "antd";
 import {ColumnsType} from "antd/es/table";
-import {KeyKeeperWorkHook, UserWorkHooks} from "../../../../controller/Hooks/Atom/WorkHooks.ts";
+import {KeyKeeperWorkHook, UserWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {KKDownloadKeyRes} from "../../../../model/http-bodys/user/keykeeper/res.ts";
 import {LoadingOutlined} from "@ant-design/icons";
@@ -38,7 +38,6 @@ export default function KeyKeeperGetSubKey() {
 
 function AccessibleSubKeyTableComponent({tableVal}: { tableVal: BasicInfo[] }) {
     const [selectedInfo, setSelectedInfo] = useState<BasicInfo | null>(null);
-    const [withoutPermission, setWithoutPermission] = useBoolean();
     const onAccept = (info: BasicInfo) => {
         setSelectedInfo(info);
     };
@@ -69,21 +68,13 @@ function AccessibleSubKeyTableComponent({tableVal}: { tableVal: BasicInfo[] }) {
         }
     ];
     return <div className={"mx-28 my-3"}>
-        <GetPermissionToBeKK clear={setWithoutPermission.setFalse} data={withoutPermission}/>
         <GetAccessibleSubKey data={selectedInfo} clear={onClearSelected}/>
         <Table<BasicInfo> columns={tableColumn} dataSource={tableVal} bordered={true} size={"small"}
                           pagination={{pageSize: 5, showQuickJumper: true, hideOnSinglePage: true}}
         />
-        <div className={"mt-7"}>提示未成为合法的密钥保管人？
-            <span onClick={setWithoutPermission.setTrue}
-                  className={"text-gray-400 underline underline-offset-4"}>点击这里申请成为保管人</span>
-        </div>
     </div>;
 }
 
-interface UploadForm {
-    privateKey: string
-}
 
 function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo>) {
     const {message} = App.useApp();
@@ -91,6 +82,7 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
     const {userInfo} = UserWorkHooks.useValue();
     const [keyPair, setKeyPair] = useState<KKDownloadKeyRes | null>(null);
     const [canBeClose, canBeCloseAction] = useBoolean();
+    const [selectedFiles, setSelectFiles] = useState<File[]>([]);
     const onDownloadSubKey: CallBackWithSideEffect = () => {
         if (!keyPair || !data) {
             message.error("未获取到秘密份额，请关闭浮窗后重试").then();
@@ -106,14 +98,17 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         });
 
     };
-    const onFinish = (mData: UploadForm) => {
-        console.log(mData);
+    const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        if (event.target.files === null) return;
+        setSelectFiles(Array.from(event.target.files));
+        event.target.value = "";
+    };
+    const onFinish = async () => {
         if (data === null) {
             message.error("登录状态异常，请退出后重试！").then();
             return;
         }
-        kkUserServer.downloadSubKeyAsync(mData.privateKey, data.address).then(r => {
-            console.log(r);
+        kkUserServer.downloadSubKeyAsync(await FileSystemImpl.readFileAsTextAsync(selectedFiles[0]), data.address).then(r => {
             if (r.status) {
                 setKeyPair(r);
             } else {
@@ -129,14 +124,10 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         <div className={"my-5"}>
             {keyPair === null ?
                 <div>
-                    <Form<UploadForm> onFinish={onFinish}>
-                        <Form.Item name={"privateKey"}>
-                            <Input.TextArea autoSize={{minRows:4,maxRows:6}} placeholder={"请在此黏贴私钥"}/>
-                        </Form.Item>
-                        <div className={"flex justify-center"}>
-                            <button className={"button button-3d button-primary "}>解析秘密份额</button>
-                        </div>
-                    </Form>
+                    <input type="file" onChange={onSelectFile}/>
+                    <div className={"flex justify-center"} onClick={onFinish}>
+                        <button className={"button button-3d button-primary "}>解析秘密份额</button>
+                    </div>
                 </div> :
                 <div className={"py-8"}>
                     <p>请下载秘密份额并且妥善保管，在需要上传秘密份额时及时上传秘密份额可以获得奖励，未妥善保管或上传错误将会获得处罚！</p>
@@ -149,36 +140,3 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
     </Modal>;
 }
 
-function GetPermissionToBeKK({data, clear}: ModelPropsWithInfoAndClear<boolean>) {
-    const kkUserServer = KeyKeeperWorkHook.useMethod();
-    const [isLoading, setLoading] = useBoolean();
-    const {message} = App.useApp();
-    const onGetPermission: CallBackWithSideEffect = () => {
-        setLoading.setTrue();
-        kkUserServer.getPermissionToBeKK().then(r => {
-            console.log(r);
-            if (r.status) {
-                message.success("操作成功！").then();
-                clear();
-            } else {
-                message.error("发生错误:" + r.message).then();
-            }
-        }).catch(e => {
-            message.error("发生错误:" + e.toString()).then();
-        }).finally(() => {
-            setLoading.setFalse();
-        });
-    };
-    return <Modal open={!!data} footer={null} onCancel={clear}>
-        <div className={"my-3"}>
-            <p className={"my-3"}>
-                请点击按钮获取保管秘密份额权限
-                系统将自动质押积分以获取权限
-            </p>
-            <Button type={"primary"} onClick={onGetPermission}>{isLoading ?
-                <span><LoadingOutlined/>&thinsp;获取中&thinsp;... </span> :
-                <span>&ensp;获取权限&ensp;</span>
-            }</Button>
-        </div>
-    </Modal>;
-}

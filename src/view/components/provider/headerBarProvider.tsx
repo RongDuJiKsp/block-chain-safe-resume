@@ -6,7 +6,7 @@ import {App, Dropdown, Form, Input, Modal} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {NavLink} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Atom/WorkHooks.ts";
+import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
 import {useForm} from "antd/es/form/Form";
@@ -50,7 +50,7 @@ export default function HeaderBarProvider({children, items, group}: PropsWithChi
 }
 
 function FunctionItems({items}: { items: ItemsAndPic[] }) {
-    return <div className={"flex justify-end h-full gap-8"}>
+    return <div className={"flex justify-end h-full gap-7"}>
         {items.map((value, index) => {
             return <NavLink to={value.routerPath} draggable={false}
                             className={({isActive}) => isActive ? "active-nav nav-button-bg-color-blue" : "basis-nav nav-button-bg-color-blue"}
