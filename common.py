@@ -5,7 +5,6 @@
 # @Date    : 2024/3/17 8:40
 # @介绍    :
 import base64
-import io
 import json
 from settings import Configs
 from asmuth_bloom import *
@@ -13,8 +12,8 @@ import pymysql
 import requests
 from eth_abi import decode
 import hashlib
-import rsa
-from PyPDF2 import PdfReader, PdfWriter
+from charm.toolbox.pairinggroup import PairingGroup, GT
+from ABE.ac17 import AC17CPABE
 
 global config
 config = Configs()
@@ -52,6 +51,8 @@ def getTableName(identity):
         return 'Applicant'
     elif identity == 'Recruiter':
         return 'Recruiter'
+    elif identity == 'KeyKeeper':
+        return 'KeyKeeper'
     else:
         return 'error'
 
@@ -214,19 +215,6 @@ def apiBalance(address,base):
     base['balance'] = int(reslut[0])
     return base
 
-def add_watermark(input_pdf_stream, output_pdf_stream, watermark_pdf_path):
-    watermark = PdfReader(watermark_pdf_path)
-    watermark_page = watermark.pages[0]
-
-    pdf = PdfReader(input_pdf_stream)
-    pdf_writer = PdfWriter()
-
-    for page in pdf.pages:
-        page.merge_page(watermark_page)
-        pdf_writer.add_page(page)
-
-    pdf_writer.write(output_pdf_stream)
-
 def getFuckS(ApAddress):
     I=[]
     X=[]
@@ -264,7 +252,7 @@ def verifyprivateKeys(userName,password, identity, login):
         login['status'] = 1
         login['message'] = "登录成功"
         login['userName'] = result[0]
-        login['address'] = result[1]
+        login['address'] = result[2]
         return json.dumps(login)
     else:
         return json.dumps(login)
@@ -299,6 +287,8 @@ def register(data, user):
             cur.execute(condition, (userName, key["address"]))
             kkadd=["0xb045a2b2919de75a5bf89bbcd1e57ae3b4c469ff","0xc40dc21473ff6176583df3bed1669422ae0eef0b","0x1dedc512ca27fa9b97cf8409505ecf248b21bace"]
             for i in range(0,3):
+                condition = f"insert into KKAlreadySave(ApUserName,ApAddress,KKAddress) values(%s,%s,%s);"
+                cur.execute(condition, (userName,key["address"],kkadd[i]))
                 condition = f"insert into APKKsaveKey(ApAddress,KKAddress,i,x,m) values(%s,%s,%s,%s,%s);"
                 cur.execute(condition, (key["address"],kkadd[i],i,need['X'][i],need['M'][i]))
             user['address'] = key["address"]
@@ -333,14 +323,14 @@ def register(data, user):
 
 
 def uploadIpfs(file,userName, address, upload):
-    condition = f'select COUNT(KKUserName) from Authentication where ApAddress=%s'
-    cur.execute(condition, (address))
-    result = cur.fetchone()
-    count = result[0]
-    if count < 3:
-        upload['status'] = 0
-        upload['message'] = '简历信息还未获得认证'
-        return json.dumps(upload)
+    # condition = f'select COUNT(KKUserName) from Authentication where ApAddress=%s'
+    # cur.execute(condition, (address))
+    # result = cur.fetchone()
+    # count = result[0]
+    # if count < 3:
+    #     upload['status'] = 0
+    #     upload['message'] = '简历信息还未获得认证'
+    #     return json.dumps(upload)
 
     # 假设 output_stream 是一个 BytesIO 对象，包含了你的 PDF 数据
     # with open('output.pdf', 'wb') as f:
