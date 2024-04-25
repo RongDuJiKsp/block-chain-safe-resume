@@ -422,7 +422,8 @@ def AuthenticationReq():
     try:
         ApAddress = data['ApAddress']
         KKUserName = data['KKUserName']
-        return Authentication(ApAddress,KKUserName,base)
+        ok=data['ok']
+        return Authentication(ApAddress,KKUserName,ok,base)
     except Exception as e:
         base['message'] = "{}".format(str(e))
         return json.dumps(base)

@@ -88,19 +88,20 @@ CREATE TABLE APKKsaveKey(
 
 CREATE TABLE Authentication(
     ApAddress VARCHAR(255) NOT NULL,
-    KKUserName VARCHAR(255) NOT NULL
+    KKUserName VARCHAR(255) NOT NULL,
+    ok BIGINT NOT NULL
 );
 
 
-insert into KeyKeeper(userName,password,address,publicKeys,P) values('kkone','123456','0xb045a2b2919de75a5bf89bbcd1e57ae3b4c469ff','-----BEGIN RSA PUBLIC KEY-----
+insert into KeyKeeper(userName,password,address,publicKeys,P) values('MOE','123456','0xb045a2b2919de75a5bf89bbcd1e57ae3b4c469ff','-----BEGIN RSA PUBLIC KEY-----
 MCgCIQCNrIv2x6ZjpnfmKWOaFBFnlY3Z2Usti0SfMCrX85oOYwIDAQAB
 -----END RSA PUBLIC KEY-----
 ','222');
-insert into KeyKeeper(userName,password,address,publicKeys,P) values('kktwo','123456','0xc40dc21473ff6176583df3bed1669422ae0eef0b','-----BEGIN RSA PUBLIC KEY-----
+insert into KeyKeeper(userName,password,address,publicKeys,P) values('HRD','123456','0xc40dc21473ff6176583df3bed1669422ae0eef0b','-----BEGIN RSA PUBLIC KEY-----
 MCgCIQCNrIv2x6ZjpnfmKWOaFBFnlY3Z2Usti0SfMCrX85oOYwIDAQAB
 -----END RSA PUBLIC KEY-----
 ','222');
-insert into KeyKeeper(userName,password,address,publicKeys,P) values('kkthree','123456','0x1dedc512ca27fa9b97cf8409505ecf248b21bace','-----BEGIN RSA PUBLIC KEY-----
+insert into KeyKeeper(userName,password,address,publicKeys,P) values('BCC','123456','0x1dedc512ca27fa9b97cf8409505ecf248b21bace','-----BEGIN RSA PUBLIC KEY-----
 MCgCIQCNrIv2x6ZjpnfmKWOaFBFnlY3Z2Usti0SfMCrX85oOYwIDAQAB
 -----END RSA PUBLIC KEY-----
 ','222');

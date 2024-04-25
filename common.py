@@ -12,8 +12,8 @@ import pymysql
 import requests
 from eth_abi import decode
 import hashlib
-from charm.toolbox.pairinggroup import PairingGroup, GT
-from ABE.ac17 import AC17CPABE
+# from charm.toolbox.pairinggroup import PairingGroup, GT
+# from ABE.ac17 import AC17CPABE
 
 global config
 config = Configs()
@@ -335,6 +335,10 @@ def uploadIpfs(file,userName, address, upload):
     # 假设 output_stream 是一个 BytesIO 对象，包含了你的 PDF 数据
     # with open('output.pdf', 'wb') as f:
     #     f.write(output_stream.getvalue())
+    # 删除Authentication表中所有用户地址是address的数据
+
+    condition = f'DELETE FROM Authentication where ApAddress=%s;'
+    cur.execute(condition, (address))
 
     files = {
         'file': (file.filename, file)
@@ -648,23 +652,33 @@ def KKDownloadKey(KKAddress,ApAddress,file,base):
         base['message'] = '没有找到对应的数据'
         return json.dumps(base)
 
-def Authentication(ApAddress,KKAddress,base):
-    condition = f'insert into Authentication(ApAddress,KKUserName) values(%s,%s);'
-    cur.execute(condition, (ApAddress,KKAddress))
+def Authentication(ApAddress,KKAddress,ok,base):
+    list=['1','0']
+    if ok not in list:
+        return json.dumps({'status': 0, 'message': '参数错误'})
+
+    condition = f'insert into Authentication(ApAddress,KKUserName,ok) values(%s,%s,%s);'
+    cur.execute(condition, (ApAddress,KKAddress,ok))
     base['status'] = 1
-    base['message'] = '认证成功'
+    base['message'] = '认证信息更新成功'
     return json.dumps(base)
 def getAuthentication(ApAddress,base):
-    condition = f'select COUNT(KKUserName) from Authentication where ApAddress=%s;'
-    cur.execute(condition, (ApAddress))
-    result = cur.fetchone()
-    base['num'] = result[0]
-
-    condition = f'select KKUserName from Authentication where ApAddress=%s;'
-    cur.execute(condition,(ApAddress))
-    result = cur.fetchall()
     base['status'] = 1
-    base['list'] = result
+    condition = f'select KKUserName from Authentication where ApAddress=%s and ok="1";'
+    cur.execute(condition, (ApAddress))
+    result = cur.fetchall()
+    base['yes'] = result
+
+    condition = f'select KKUserName from Authentication where ApAddress=%s and ok="0";'
+    cur.execute(condition, (ApAddress))
+    result = cur.fetchall()
+    base['no'] = result
+
+    condition = f'select userName from KeyKeeper where userName not in(select KKUserName from Authentication where ApAddress=%s);'
+    cur.execute(condition, (ApAddress))
+    result = cur.fetchall()
+    base['wait'] = result
+
     return json.dumps(base)
 
 if __name__ == '__main__':

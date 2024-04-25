@@ -47,8 +47,6 @@
  }
 ```
 
-示例:`{"identity":"Applicant"}`
-
 #### 2.登录
 
 ```
@@ -365,9 +363,9 @@ function uploadFile() {
     var file = input.files[0];
     var formData = new FormData();
     formData.append('file', file);
-    var userName = 'dIvPOeE6RW2r'
-    var address = '0xa5b2718b5111c89d6d464ca3d1aef041a1334905';  //address示例
-    fetch('http://127.0.0.1:5000/UploadReq?address=' + address+'&userName='+userName, {
+    var userName = 'ltmthink'
+    var address = '0x71904be2466368b967c4dccb935c15b8db8b896a';  //address示例
+    fetch('http://127.0.0.1:5100/UploadReq?address=' + address+'&userName='+userName, {
         method: 'POST',
         body: formData
     })
@@ -676,10 +674,12 @@ function uploadFile() {
 * @interface AuthenticationReq
 * @property ApAddress ap用户地址
 * @property KKUserName kk用户名
+* @property ok 背调机构是否同意认证(1同意，2不同意)
 */
   interface AuthenticationReq {
   	ApAddress: string
   	KKUserName: string
+  	ok: string
  }
 
 /**
@@ -689,7 +689,7 @@ interface AuthenticationRes extends BaseRe{
 }
 ```
 
-#### 26、ap查看认证情况
+#### 26、查看认证情况(可以由ap查看，也可以由kk查看)
 
 ```
 /**
@@ -703,12 +703,14 @@ interface AuthenticationRes extends BaseRe{
 
 /**
 * @interface getAuthenticationRes
-* @property num 已认证kk数量
-* @property list kk用户名
+* @property yes 背调认证通过的机构
+* @property no 背调认证不通过的机构列表
+* @property wait 等待背调机构列表
 */
 interface getAuthenticationRes extends BaseRe{
-	num:int
-	list:[]
+	yes:[]
+	no:[]
+	wait:[]
 }
 ```
 
