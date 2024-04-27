@@ -80,6 +80,15 @@ const alovaClientImpl = createAlova({
     },
     baseURL: SERVER_URLS.backendUrl
 });
+const alovaClientJavaImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    responded: (response) => {
+        return response.json();
+    },
+    baseURL: SERVER_URLS.backendUrl
+});
+
 
 
 const userInfoAtom = atomWithStorage<BasicUserState | null>(STORAGE_KEY_CONFIG.userState, null, new BasisSyncStorage<BasicUserState | null>(), {

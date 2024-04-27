@@ -69,16 +69,6 @@ function AuditTableComponent({tableVal}: { tableVal: AuditResumeInfo[] }) {
             align: "center",
         },
         {
-            title: "时间",
-            dataIndex: "time",
-            align: "center",
-            render(val: number): ReactNode {
-                return <span>
-                   {dayjs.unix(val).format("YYYY-MM-DD HH:mm:ss dddd")}
-                </span>;
-            }
-        },
-        {
             title: "操作",
             width: "17%",
             align: "center",
