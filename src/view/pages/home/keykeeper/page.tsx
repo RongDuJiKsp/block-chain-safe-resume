@@ -19,11 +19,11 @@ const headBarItems: ItemsAndPic[] = [
         routerPath: KEYKEEPER_THIS_PATH + "/get",
         text: "获取份额"
     },
-    // {
-    //     logo: componentUtils.getIcon("icon-iconrequirement", {fontSize: 26}),
-    //     routerPath: KEYKEEPER_THIS_PATH + "/audit",
-    //     text: "审核简历"
-    // }
+    {
+        logo: componentUtils.getIcon("icon-iconrequirement", {fontSize: 26}),
+        routerPath: KEYKEEPER_THIS_PATH + "/audit",
+        text: "审核简历"
+    }
 ];
 export default function KeyKeeperPage() {
 

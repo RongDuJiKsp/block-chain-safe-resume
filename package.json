@@ -23,7 +23,6 @@
     "jotai": "^2.7.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
-    "pdf-lib": "^1.17.1",
     "react": "^18.2.0",
     "react-countup": "^6.5.3",
     "react-dom": "^18.2.0",
