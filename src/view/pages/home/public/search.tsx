@@ -1,9 +1,8 @@
 import React from "react";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 export default function SearchPage() {
-    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-4 "}>
-        <div className={"bg-white  px-6 py-4 basis-3/4 basic-shadow-box"}>
-            查找页面
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        查找页面
+    </MainContainerProvider>
 }
