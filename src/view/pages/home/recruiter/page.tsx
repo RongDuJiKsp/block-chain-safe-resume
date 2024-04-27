@@ -1,7 +1,7 @@
 import LayOutProvider, {ItemsAndPic} from "../../../components/provider/layOutProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
-import {RECRUITER_THIS_PATH, RecruiterRoutes} from "../../../routes/home.tsx";
+import {APPLICANT_THIS_PATH, RECRUITER_THIS_PATH, RecruiterRoutes} from "../../../routes/home.tsx";
 
 const ThisUserGroup: UserGroup = {
     userIdentity: "Recruiter",
@@ -18,6 +18,10 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 26}),
         routerPath: RECRUITER_THIS_PATH + "/require",
         text: "请求授权"
+    }, {
+        logo: componentUtils.getIcon('icon-transfer1'),
+        routerPath: RECRUITER_THIS_PATH + '/search',
+        text: "用户查找"
     }
 ];
 export default function RecruiterPage() {

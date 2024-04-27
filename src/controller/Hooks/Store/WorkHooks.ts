@@ -11,6 +11,8 @@ import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts"
 import {atomWithStorage} from "jotai/utils";
 import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
 import {
+    GetAuthenticationRes,
+    GetAuthenticationStringRes,
     GiveOrDelayResumeLicensingRes,
     KKInfoForSendListRes,
     ResumeInfoRes,
@@ -55,12 +57,18 @@ import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruite
 import {
     ApAuthorizeReq,
     GetAllKKReq,
+    GetAuthenticationReq,
     GetDownloadHisReq,
     GetMoreFileMesReq,
     GetRequestReq,
     PostOnekeyReq
 } from "../../../model/http-bodys/user/applicant/req.ts";
-import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
+import {
+    CheckingSelfResumeStatus,
+    CheckingSelfResumeStatusEnum,
+    ResumeLicenseRequestInfo,
+    ResumeVisitHistoryInfo
+} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
@@ -163,6 +171,8 @@ interface ApplicantWorkMethod {
     getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes>;
 
     sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey: string, kkAddress: string): Promise<SendSubKeyToKKRes>;
+
+    getCheckingSelfResumeStatusList(): Promise<GetAuthenticationRes>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
@@ -260,7 +270,24 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                         userName: userInfo.nick
                     }
                 });
+            },
+            async getCheckingSelfResumeStatusList(): Promise<GetAuthenticationRes> {
+                if (userInfo === null) throw "在未登录时查询简历状态";
+                const req: GetAuthenticationReq = {
+                    ApAddress: userInfo.address
+                };
+                const res = await alovaClientImpl.Post<GetAuthenticationStringRes>("/getAuthenticationRes", req);
+                const statuses: CheckingSelfResumeStatus[] = [];
+                res.no.forEach(r => statuses.push({kkName: r, status: CheckingSelfResumeStatusEnum.Err}));
+                res.yes.forEach(r => statuses.push({kkName: r, status: CheckingSelfResumeStatusEnum.Ok}));
+                res.wait.forEach(r => statuses.push({kkName: r, status: CheckingSelfResumeStatusEnum.Checking}));
+                return {
+                    status: res.status,
+                    message: res.message,
+                    list: statuses
+                };
             }
+
         };
     },
     useValue(): null {

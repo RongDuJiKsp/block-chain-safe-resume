@@ -23,6 +23,10 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon('icon-trust'),
         routerPath: APPLICANT_THIS_PATH + '/checking',
         text: "审核状态"
+    }, {
+        logo: componentUtils.getIcon('icon-transfer1'),
+        routerPath: APPLICANT_THIS_PATH + '/search',
+        text: "用户查找"
     }
 ];
 const ThisUserGroup: UserGroup = {

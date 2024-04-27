@@ -8,3 +8,10 @@ export interface ResumeVisitHistoryInfo {
     ReUserName: string;
     downloadTime: string;
 }
+export  enum CheckingSelfResumeStatusEnum{
+    Checking,Ok,Err
+}
+export interface CheckingSelfResumeStatus{
+    kkName:string;
+    status:CheckingSelfResumeStatusEnum;
+}
