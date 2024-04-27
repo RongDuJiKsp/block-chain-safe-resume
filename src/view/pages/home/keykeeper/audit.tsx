@@ -10,6 +10,7 @@ import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {useBoolean} from "ahooks";
 import {LoadingOutlined} from "@ant-design/icons";
 import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 export default function KeyKeeperAuditPage(): ReactNode {
     const kkUserServer = KeyKeeperWorkHook.useMethod();
@@ -26,12 +27,10 @@ export default function KeyKeeperAuditPage(): ReactNode {
             }
         });
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
-        <div className={"work-window-color basis-3/4 px-8 py-4 basic-shadow-box"}>
-            <TableHeader title={"可保管秘密份额"} onFresh={changeAction}/>
-            <AuditTableComponent tableVal={tableVal}/>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <TableHeader title={"待审核简历"} onFresh={changeAction}/>
+        <AuditTableComponent tableVal={tableVal}/>
+    </MainContainerProvider>;
 }
 
 function AuditTableComponent({tableVal}: { tableVal: AuditResumeInfo[] }) {

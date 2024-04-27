@@ -6,6 +6,7 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ConnectingResumeInfo} from "../../../../model/entity/recruiter.ts";
 import {RecruiterWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 
 export default function RecruiterNotice() {
@@ -17,14 +18,12 @@ export default function RecruiterNotice() {
     useEffect(() => {
         userService.getResumeStatusListAsync().then(r => setTableVal(r.list)).catch(e => message.success(e.toString()).then()).finally(loadingAction.setFalse);
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center h-full-screen basic-window"}>
-        <div className={"basis-3/4  mx-11  pt-6 px-6 work-window-color basic-shadow-box"}>
-            <TableHeader title={"申请访问简历状态"} onFresh={changeAction}/>
-            <Spin spinning={isLoading} delay={500}>
-                <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
-            </Spin>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <TableHeader title={"申请访问简历状态"} onFresh={changeAction}/>
+        <Spin spinning={isLoading} delay={500}>
+            <RecruiterHavingHandlesStatusTableComponent tableVal={tableVal}/>
+        </Spin>
+    </MainContainerProvider>;
 }
 
 function RecruiterHavingHandlesStatusTableComponent({tableVal}: { tableVal: ConnectingResumeInfo[] }) {

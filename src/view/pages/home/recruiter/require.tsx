@@ -9,14 +9,13 @@ import {RecruiterWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.t
 import {ApSearchInfo} from "../../../../model/entity/recruiter.ts";
 import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 export default function RecruiterRequire() {
 
-    return <div className={"flex flex-col gap-14 justify-center basic-window h-full-screen"}>
-        <div className={"basis-3/5  mx-44 px-24 py-12  work-window-color basic-shadow-box"}>
-            <SendRequire/>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <SendRequire/>
+    </MainContainerProvider>;
 }
 
 function SendRequire() {
@@ -37,7 +36,7 @@ function SendRequire() {
             message.error("发生错误，错误为" + e).then();
         });
     };
-    return <div className={"px-36"}>
+    return <div className={"px-64 py-16"}>
         <FindLikeInfo/>
         <Form<RecAuthorizeReq> onFinish={onSubmit}>
             <Form.Item<RecAuthorizeReq> label={"请求用户的名称"} name={"ApUserName"}

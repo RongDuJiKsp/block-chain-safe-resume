@@ -24,7 +24,7 @@ const headBarItems: ItemsAndPic[] = [
         routerPath: KEYKEEPER_THIS_PATH + "/audit",
         text: "审核简历"
     }, {
-        logo: componentUtils.getIcon('icon-transfer1'),
+        logo: componentUtils.getIcon('icon-transfer1',{fontSize: 26}),
         routerPath: KEYKEEPER_THIS_PATH + '/search',
         text: "用户查找"
     }
