@@ -3,13 +3,12 @@ import React, {useRef, useState} from "react";
 import {App as APP, Form, Input, InputRef, Popconfirm} from "antd";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 export default function ApplicantUpload() {
-    return <div className={"h-full-screen flex flex-col justify-center basic-window  "}>
-        <div className={"basis-3/5 basic-shadow-box bg-white"}>
-            <FileUploader/>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <FileUploader/>
+    </MainContainerProvider>;
 }
 
 

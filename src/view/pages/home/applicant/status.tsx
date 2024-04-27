@@ -6,6 +6,7 @@ import TableHeader from "../../../components/comp/tableHeader.tsx";
 import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {ResumeLicenseRequestInfo} from "../../../../model/entity/applicant.ts";
 import {useBoolean} from "ahooks";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 
 export default function ApplicantStatus() {
@@ -25,14 +26,12 @@ export default function ApplicantStatus() {
             message.error(e.toString()).then();
         }).finally(loadingAction.setFalse);
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center h-full-screen basic-window gap-6  "}>
-        <div className={"bg-white basic-shadow-box px-6 py-4 basis-3/4"}>
-            <TableHeader title={"访问请求"} onFresh={changeAction}/>
-            <Spin delay={500} spinning={isLoading}>
-                <ResumeRequestComponent tableVal={tableInfo}/>
-            </Spin>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <TableHeader title={"访问请求"} onFresh={changeAction}/>
+        <Spin delay={500} spinning={isLoading}>
+            <ResumeRequestComponent tableVal={tableInfo}/>
+        </Spin>
+    </MainContainerProvider>;
 }
 
 
