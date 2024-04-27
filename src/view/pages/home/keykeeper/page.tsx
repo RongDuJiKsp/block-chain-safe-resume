@@ -1,4 +1,4 @@
-import HeaderBarProvider, {ItemsAndPic} from "../../../components/provider/headerBarProvider.tsx";
+import LayOutProvider, {ItemsAndPic} from "../../../components/provider/layOutProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
 import {KEYKEEPER_THIS_PATH, KeyKeeperRoutes} from "../../../routes/home.tsx";
@@ -27,9 +27,9 @@ const headBarItems: ItemsAndPic[] = [
 ];
 export default function KeyKeeperPage() {
 
-    return <HeaderBarProvider items={headBarItems} group={ThisUserGroup}>
+    return <LayOutProvider items={headBarItems} group={ThisUserGroup}>
         <div className={"window-color-back"}>
             <KeyKeeperRoutes/>
         </div>
-    </HeaderBarProvider>;
+    </LayOutProvider>;
 }

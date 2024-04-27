@@ -63,10 +63,10 @@ function FileUploader() {
             </div>
         </div>
         <div className={"h-5/6 basis-3/5 my-auto flex-col gap-12 flex justify-center px-[15%]"}>
-            <Form.Item label={"S Key"}>
+            <Form.Item label={"安全密钥"}>
                 <Input ref={SKeyInputRef} placeholder={"请在此黏贴文件内分发的SafeKey"}/>
             </Form.Item>
-            <Form.Item label={"Selected File Name"}>
+            <Form.Item label={"选择文件"}>
                 <Input readOnly={true} onFocus={e => e.target.blur()}
                        value={(selectedFiles.length && selectedFiles[0].type !== "") ? selectedFiles[0].name : "未选择文件"}/>
             </Form.Item>
