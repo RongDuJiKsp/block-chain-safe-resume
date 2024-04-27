@@ -5,26 +5,26 @@ import {KEYKEEPER_THIS_PATH, KeyKeeperRoutes} from "../../../routes/home.tsx";
 
 const ThisUserGroup: UserGroup = {
     userIdentity: "KeyKeeper",
-    userHeader: componentUtils.getIcon("icon-key", {fontSize: 26})
+    userHeader: componentUtils.getIcon("icon-key", {fontSize: 18})
 };
 
 const headBarItems: ItemsAndPic[] = [
     {
-        logo: componentUtils.getIcon("icon-money-finance-buyer", {fontSize: 26}),
+        logo: componentUtils.getIcon("icon-money-finance-buyer", {fontSize: 18}),
         routerPath: KEYKEEPER_THIS_PATH + "/notice",
         text: "上传请求"
     },
     {
-        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 26}),
+        logo: componentUtils.getIcon("icon-visitor-authorization", {fontSize: 18}),
         routerPath: KEYKEEPER_THIS_PATH + "/get",
         text: "获取份额"
     },
     {
-        logo: componentUtils.getIcon("icon-iconrequirement", {fontSize: 26}),
+        logo: componentUtils.getIcon("icon-iconrequirement", {fontSize: 18}),
         routerPath: KEYKEEPER_THIS_PATH + "/audit",
         text: "审核简历"
     }, {
-        logo: componentUtils.getIcon('icon-transfer1',{fontSize: 26}),
+        logo: componentUtils.getIcon('icon-transfer1',{fontSize: 18}),
         routerPath: KEYKEEPER_THIS_PATH + '/search',
         text: "用户查找"
     }

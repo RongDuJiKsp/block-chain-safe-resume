@@ -163,7 +163,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <div
                 className={"rounded-full shadow-float h-full  px-3 nav-button-bg-color-green flex flex-col justify-center"}>
                 <div className={"flex justify-center"}>
-                    <div className={"pt-1"}>
+                    <div>
                         {group.userHeader}
                     </div>
                     <div className={"align-middle"}>
