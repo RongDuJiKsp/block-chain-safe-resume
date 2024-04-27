@@ -11,7 +11,7 @@ export interface BaseRes {
 /**
  * @interface RegisterRes 注册的响应体
  * @extends BaseRes
- * @property {string} privateKeys 用户注册的私钥
+ * @property {string} encryptPrivateKeys 用户注册的私钥
  * @property {number} S 用户注册得到的 S Key
  * @property {number} P 用户注册得到的 P Key
  */

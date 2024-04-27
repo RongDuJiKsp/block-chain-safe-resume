@@ -19,6 +19,10 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon("icon-key1"),
         routerPath: APPLICANT_THIS_PATH + "/record",
         text: "简历记录"
+    }, {
+        logo: componentUtils.getIcon('icon-trust'),
+        routerPath: APPLICANT_THIS_PATH + '/checking',
+        text: "审核状态"
     }
 ];
 const ThisUserGroup: UserGroup = {

@@ -83,7 +83,7 @@ function ResumeInfoComponent({info, firstInfo}: {
     info: ResumeInfoRes | null,
     firstInfo: ResumeVisitHistoryInfo | null
 }) {
-    console.log(info);//TODO:接口联调 显示简历状态
+    console.log(info);
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>

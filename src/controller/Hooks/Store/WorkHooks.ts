@@ -364,6 +364,7 @@ interface KeyKeeperWorkMethod {
 
     downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes>;
 
+    //state 0 is delay state 1 is accepted
     acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes>;
 
     getRequestListAsync(): Promise<RequestListRes>;
@@ -415,7 +416,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 if (userInfo === null) throw "未登录时尝试获取秘密份额";
                 const formData = new FormData();
                 formData.append("file", encryptPrivateKeyFile);
-                return alovaClientImpl.Post<KKDownloadKeyRes>(`/KKDownloadKeyReq?KKAddress=${userInfo.address}&ApAddress=${apAddress}`,formData);
+                return alovaClientImpl.Post<KKDownloadKeyRes>(`/KKDownloadKeyReq?KKAddress=${userInfo.address}&ApAddress=${apAddress}`, formData);
             },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";
