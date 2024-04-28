@@ -27,6 +27,10 @@ const headBarItems: ItemsAndPic[] = [
         logo: componentUtils.getIcon('icon-transfer1', {fontSize: 18}),
         routerPath: APPLICANT_THIS_PATH + '/search',
         text: "用户查找"
+    }, {
+        logo: componentUtils.getIcon('icon-suyuan', {fontSize: 18}),
+        routerPath: APPLICANT_THIS_PATH + '/readwater',
+        text: "水印溯源"
     }
 ];
 const ThisUserGroup: UserGroup = {
