@@ -40,7 +40,7 @@ public class CheckRecord implements Serializable {
      */
     @TableField(value = "is_approve")
     @Schema(name = "isApprove", description = "审核是否通过")
-    private Integer isApprove;
+    private Boolean isApprove;
 
     /**
      * 审核不通过原因

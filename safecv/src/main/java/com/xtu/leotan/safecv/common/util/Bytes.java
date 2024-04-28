@@ -1,4 +1,4 @@
-package com.xtu.leotan.safecv.util;
+package com.xtu.leotan.safecv.common.util;
 
 public class Bytes {
 

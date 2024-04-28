@@ -17,7 +17,7 @@ public interface CheckService {
      * @param reason         审核理由
      * @return 审核记录
      */
-    Res<CheckRecord> check(String resumeUsername, String checkUsername, Boolean isApprove, String reason);
+    CheckRecord check(String resumeUsername, String checkUsername, Boolean isApprove, String reason);
 
 
     /**
@@ -26,7 +26,7 @@ public interface CheckService {
      * @param resumeUsername 简历用户名
      * @return 审核记录列表
      */
-    Res<List<CheckRecord>> getByUser(String resumeUsername);
+    List<CheckRecord> getByUser(String resumeUsername);
 
 
     /**
@@ -36,7 +36,7 @@ public interface CheckService {
      * @return 审核记录列表
      */
 
-    Res<List<CheckRecord>> getByKK(String checkUsername);
+    List<CheckRecord> getByKK(String checkUsername);
 
 
     /**
@@ -46,7 +46,7 @@ public interface CheckService {
      * @return 是否通过
      */
 
-    Res<Boolean> isApprove(String resumeUsername);
+    Boolean isApprove(String resumeUsername);
 
 
     /**
@@ -55,7 +55,7 @@ public interface CheckService {
      * @param checkUsername 审核用户名
      * @return 未审核的所有简历
      */
-    Res<List<ResumeForm>> getUnCheckResume(String checkUsername);
+    List<ResumeForm> getUnCheckResume(String checkUsername);
 
 
 }

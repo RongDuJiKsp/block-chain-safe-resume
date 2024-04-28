@@ -1,6 +1,6 @@
 package com.xtu.leotan.safecv.watermark;
 
-import com.xtu.leotan.safecv.util.Bytes;
+import com.xtu.leotan.safecv.common.util.Bytes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
