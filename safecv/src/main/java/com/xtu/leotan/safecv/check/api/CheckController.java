@@ -2,6 +2,7 @@ package com.xtu.leotan.safecv.check.api;
 
 import com.xtu.leotan.safecv.check.domain.CheckRecord;
 import com.xtu.leotan.safecv.check.domain.ResumeForm;
+import com.xtu.leotan.safecv.check.service.impl.CheckServiceImpl;
 import com.xtu.leotan.safecv.common.mvc.Res;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,36 +10,47 @@ import java.util.List;
 
 @RestController
 @RequestMapping("check")
-public class CheckController implements CheckApi{
+public class CheckController implements CheckApi {
 
+
+    private final CheckServiceImpl checkServiceImpl;
+
+    public CheckController(CheckServiceImpl checkServiceImpl) {
+        this.checkServiceImpl = checkServiceImpl;
+    }
 
     @Override
     @PostMapping("/{resumeUsername}")
     public Res<CheckRecord> check(@PathVariable String resumeUsername, String checkUsername, Boolean isApprove, String reason) {
-        return null;
+        CheckRecord check = checkServiceImpl.check(resumeUsername, checkUsername, isApprove, reason);
+        return Res.success(check);
     }
 
     @Override
     @GetMapping("user")
     public Res<List<CheckRecord>> getByUser(String resumeUsername) {
-        return null;
+        List<CheckRecord> byUser = checkServiceImpl.getByUser(resumeUsername);
+        return Res.success(byUser);
     }
 
     @Override
     @GetMapping("kk")
     public Res<List<CheckRecord>> getByKK(String checkUsername) {
-        return null;
+        List<CheckRecord> byKK = checkServiceImpl.getByKK(checkUsername);
+        return Res.success(byKK);
     }
 
     @Override
     @GetMapping("status")
     public Res<Boolean> isApprove(String resumeUsername) {
-        return null;
+        Boolean approve = checkServiceImpl.isApprove(resumeUsername);
+        return Res.success(approve);
     }
 
     @Override
     @GetMapping("uncheck")
     public Res<List<ResumeForm>> getUnCheckResume(String checkUsername) {
-        return null;
+        List<ResumeForm> unCheckResume = checkServiceImpl.getUnCheckResume(checkUsername);
+        return Res.success(unCheckResume);
     }
 }
