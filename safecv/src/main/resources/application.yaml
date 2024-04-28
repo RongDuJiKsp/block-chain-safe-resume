@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    username: root
+    password: SZYjsw142590
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://47.97.255.9:3306/safe_resume
