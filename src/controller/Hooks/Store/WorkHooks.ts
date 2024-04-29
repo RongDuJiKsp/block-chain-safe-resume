@@ -516,14 +516,14 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
 };
 
 interface UserWithNoneStatusWorkMethod {
-    findUserNameByAddress(username: string): Promise<JavaServerRes<string>>;
+    findUserNameByAddress(address: string): Promise<JavaServerRes<string>>;
 }
 
 export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
     useMethod(): UserWithNoneStatusWorkMethod {
         return {
-            async findUserNameByAddress(username: string): Promise<JavaServerRes<string>> {
-                return alovaClientJavaImpl.Get<JavaServerRes<string>>(`/applicant/${username}`);
+            async findUserNameByAddress(address: string): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Get<JavaServerRes<string>>(`/applicant/${address}`);
             }
         };
     }
