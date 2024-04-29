@@ -5,7 +5,6 @@ import {App, Button, Form, Input, Modal, Table} from "antd";
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {AuditResumeInfo} from "../../../../model/entity/keykeeper.ts";
 import {ColumnsType} from "antd/es/table";
-import dayjs from "dayjs";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {useBoolean} from "ahooks";
 import {LoadingOutlined} from "@ant-design/icons";
@@ -38,8 +37,8 @@ function AuditTableComponent({tableVal}: { tableVal: AuditResumeInfo[] }) {
     const {message} = App.useApp();
     const [selectedToDelay, setSelectedToDelay] = useState<AuditResumeInfo | null>(null);
     const onAccept = (item: AuditResumeInfo) => {
-        kkUserServer.acceptOrDelayResumeAsync(1, "", item.userName).then(r => {
-            if (r.status) message.success("操作成功！").then();
+        kkUserServer.acceptOrDelayResumeAsync(true, "", item.userName).then(r => {
+            if (r.success) message.success("操作成功！").then();
             else message.error("操作失败，原因" + r.message).then();
         }).catch(e => {
             message.error("操作失败，原因" + e).then();
@@ -101,8 +100,8 @@ function DelayWithResultModel({data, clear}: ModelPropsWithInfoAndClear<AuditRes
         if (data === null) throw Error("怪了");
         if (isLoading) return;
         setLoading.setTrue();
-        kkUserServer.acceptOrDelayResumeAsync(0, msg, data.userName).then(r => {
-            if (r.status) {
+        kkUserServer.acceptOrDelayResumeAsync(false, msg, data.userName).then(r => {
+            if (r.success) {
                 message.success("打回成功！").then();
                 clear();
             } else message.error("打回失败，原因：" + r.message).then();
