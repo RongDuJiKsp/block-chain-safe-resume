@@ -25,7 +25,6 @@ import {
     GetFileMesRes,
     GetSavedRes,
     KKDownloadKeyRes,
-    KKGetToBeAuditedRes,
     RequestListRes,
     ToBeAuditedResume,
     UploadSubKeyRes
@@ -83,6 +82,14 @@ const alovaClientJavaImpl = createAlova({
         return response.json();
     },
     baseURL: SERVER_URLS.javaBackendUrl
+});
+const alovaClientJavaFileImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    baseURL: SERVER_URLS.javaBackendUrl + "/files",
+    responded: (response) => {
+        return response.blob();
+    }
 });
 const alovaClientWeBaseImpl = createAlova({
     statesHook: ReactHook,
@@ -410,6 +417,8 @@ interface KeyKeeperWorkMethod {
 
     getToBeAuditedListAsync(): Promise<JavaServerRes<ToBeAuditedResume[]>>;
 
+    downloadToBeAuthoredResume(apName: string): Promise<MetaFile>;
+
 
 }
 
@@ -498,6 +507,11 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                     code: 0, data: "", success: false,//TODO 接口联调
                     message: "ok"
                 };
+            },
+            async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
+                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/${apName}`);
+                console.log(downloadResFile);
+                return downloadResFile;
             }
 
         };

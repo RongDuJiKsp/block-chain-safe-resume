@@ -9,6 +9,7 @@ import {useBoolean} from "ahooks";
 import {LoadingOutlined} from "@ant-design/icons";
 import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 import {ToBeAuditedResume} from "../../../../model/http-bodys/user/keykeeper/res.ts";
+import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 
 export default function KeyKeeperAuditPage(): ReactNode {
     const kkUserServer = KeyKeeperWorkHook.useMethod();
@@ -51,6 +52,10 @@ function AuditTableComponent({tableVal}: { tableVal: ToBeAuditedResume[] }) {
         setSelectedToDelay(null);
     };
     const onDownload = (item: ToBeAuditedResume) => {
+        console.log(item);
+        kkUserServer.downloadToBeAuthoredResume(item.username).then(r => {
+            FileSystemImpl.downloadMetaFileAsync(r).then();
+        });
 
     };
     const tableColumn: ColumnsType<ToBeAuditedResume> = [
