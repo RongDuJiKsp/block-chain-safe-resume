@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("check")
+@CrossOrigin
 public class CheckController implements CheckApi {
 
 

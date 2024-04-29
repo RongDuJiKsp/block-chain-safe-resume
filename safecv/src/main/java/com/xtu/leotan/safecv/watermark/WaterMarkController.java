@@ -4,9 +4,7 @@ package com.xtu.leotan.safecv.watermark;
 import com.xtu.leotan.safecv.common.mvc.Res;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +13,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/watermark")
 @Slf4j
+@CrossOrigin
 public class WaterMarkController implements WaterMarkApi {
 
     private final FileWaterMarker fileWaterMarker;

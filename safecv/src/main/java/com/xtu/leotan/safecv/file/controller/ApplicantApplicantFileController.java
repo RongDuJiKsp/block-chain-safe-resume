@@ -14,6 +14,7 @@ import java.nio.file.Path;
 
 @RestController
 @RequestMapping("files")
+@CrossOrigin
 public class ApplicantApplicantFileController implements ApplicantFileApi {
 
     private boolean usernameExists(String apUsername) {
