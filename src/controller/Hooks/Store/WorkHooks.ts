@@ -54,7 +54,6 @@ import {ApSearchInfo, ConnectingResumeInfo} from "../../../model/entity/recruite
 import {
     ApAuthorizeReq,
     GetAllKKReq,
-    GetAuthenticationReq,
     GetDownloadHisReq,
     GetMoreFileMesReq,
     GetRequestReq,
@@ -177,7 +176,7 @@ interface ApplicantWorkMethod {
 
     sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey: string, kkAddress: string): Promise<SendSubKeyToKKRes>;
 
-    getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus>>;
+    getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus[]>>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
@@ -276,12 +275,9 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                     }
                 });
             },
-            async getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus>> {
+            async getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus[]>> {
                 if (userInfo === null) throw "在未登录时查询简历状态";
-                const req: GetAuthenticationReq = {
-                    ApAddress: userInfo.address
-                };
-                return alovaClientImpl.Post<JavaServerRes<CheckingSelfResumeStatus>>("/getAuthenticationRes", req);
+                return alovaClientJavaImpl.Get<JavaServerRes<CheckingSelfResumeStatus[]>>(`/check/user?resumeUsername=${userInfo.nick}`);
             }
 
         };
