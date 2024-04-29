@@ -10,6 +10,10 @@ spring:
       max-file-size: 20MB
       max-request-size: 20MB
 
+
 ipfs:
   multiaddr: /ip4/47.97.255.9/tcp/6001
+webase:
+  url: http://47.97.255.9:5001/WeBASE-Node-Manager/transaction/transInfo/
+
 

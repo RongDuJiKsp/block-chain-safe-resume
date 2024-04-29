@@ -1,4 +1,7 @@
 package com.xtu.leotan.safecv.applicant.mapper;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.ResultMap;
 
 import com.xtu.leotan.safecv.applicant.domain.Applicant;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -16,6 +19,9 @@ public interface ApplicantMapper extends BaseMapper<Applicant> {
 
     @Select("select * from Applicant where username = #{username}")
     Applicant getByUsername(String username);
+
+    @Select("select * from Applicant where address = #{address}")
+    Applicant getByAddress(@Param("address") String address);
 }
 
 
