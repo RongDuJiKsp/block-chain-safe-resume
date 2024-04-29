@@ -269,9 +269,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
             async encryptedAndUpdateResumeAsync(file: MetaFile, S: string): Promise<JavaServerRes<string>> {
                 if (userInfo === null) throw "在未登录时上传简历";
                 const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(file, S);
-                const formData = new FormData();
-                formData.append("file", encryptedFile);
-                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, formData);
+                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, FileSystemImpl.buildFormWithFile('file', encryptedFile));
             },
             async getCheckingSelfResumeStatusList(): Promise<GetAuthenticationRes> {
                 if (userInfo === null) throw "在未登录时查询简历状态";

@@ -3,6 +3,11 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
+    buildFormWithFile(fieldName: string, file: MetaFile): FormData {
+        const formData = new FormData();
+        formData.append(fieldName, file);
+        return formData;
+    },
     async readFileAsTextAsync(file: MetaFile) {
         return new Promise<string>((resolve, reject) => {
             const fileReader = new FileReader();
