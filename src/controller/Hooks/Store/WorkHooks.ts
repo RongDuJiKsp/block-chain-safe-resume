@@ -27,6 +27,7 @@ import {
     KKDownloadKeyRes,
     KKGetToBeAuditedRes,
     RequestListRes,
+    ToBeAuditedResume,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
 import {
@@ -82,6 +83,14 @@ const alovaClientJavaImpl = createAlova({
         return response.json();
     },
     baseURL: SERVER_URLS.javaBackendUrl
+});
+const alovaClientWeBaseImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    responded: (response) => {
+        return response.json();
+    },
+    baseURL: SERVER_URLS.weBaseUrl
 });
 
 
@@ -399,7 +408,7 @@ interface KeyKeeperWorkMethod {
 
     getSavedSubKeyListAsync(): Promise<GetSavedRes>;
 
-    getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes>;
+    getToBeAuditedListAsync(): Promise<JavaServerRes<ToBeAuditedResume[]>>;
 
 
 }
@@ -477,9 +486,11 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post("/UploadKeyReq", req);
             },
-            async getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes> {
+            async getToBeAuditedListAsync(): Promise<JavaServerRes<ToBeAuditedResume[]>> {
                 if (userInfo === null) throw "未登录时尝试获取";
-                return alovaClientJavaImpl.Get(`/check/uncheck?checkUsername=${userInfo.nick}`);
+                const res = await alovaClientJavaImpl.Get<JavaServerRes<ToBeAuditedResume[]>>(`/check/uncheck?checkUsername=${userInfo.nick}`);
+                console.log(res);
+                return res;
             },
             async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
                 console.log(isAccepted, result, username);
@@ -499,6 +510,12 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
 
 interface UserWithNoneStatusWorkMethod {
     findUserNameByAddress(address: string): Promise<JavaServerRes<string>>;
+
+    writeWater(file: MetaFile, context: string): Promise<JavaServerRes<string>>;
+
+    readWater(file: MetaFile): Promise<JavaServerRes<string>>;
+
+    findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void>;
 }
 
 export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
@@ -506,6 +523,18 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
         return {
             async findUserNameByAddress(address: string): Promise<JavaServerRes<string>> {
                 return alovaClientJavaImpl.Get<JavaServerRes<string>>(`/applicant/${address}`);
+            },
+            async readWater(file: MetaFile): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Post<JavaServerRes<string>>(`/watermark`, FileSystemImpl.buildFormWithFile('file', file));
+            },
+            async writeWater(file: MetaFile, context: string): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/watermark/${context}`, FileSystemImpl.buildFormWithFile('file', file));
+            },
+            async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
+                const fileWaterRes = await this.readWater(file);
+                if (!fileWaterRes.success) throw fileWaterRes.message;
+                const metaData = await alovaClientWeBaseImpl.Get(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`);
+                console.log(metaData);
             }
         };
     }

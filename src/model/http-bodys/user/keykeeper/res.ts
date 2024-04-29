@@ -64,3 +64,8 @@ export interface KKDownloadKeyRes extends BaseRes {
 export interface KKGetToBeAuditedRes extends BaseRes {
     list: AuditResumeInfo[]
 }
+
+export interface ToBeAuditedResume {
+    username: string;
+    address: string;
+}
