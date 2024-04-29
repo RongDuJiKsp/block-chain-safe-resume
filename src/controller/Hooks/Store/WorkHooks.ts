@@ -9,7 +9,7 @@ import {ChangeNameReq, GetTokenReq, LoginReq} from "../../../model/http-bodys/us
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, GetTokenRes, JavaServerRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GetAuthenticationRes,
     GetAuthenticationStringRes,
@@ -18,8 +18,7 @@ import {
     ResumeInfoRes,
     ResumeQuestListRes,
     ResumeRequestHistoryListRes,
-    SendSubKeyToKKRes,
-    UploadRes
+    SendSubKeyToKKRes
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
@@ -86,9 +85,8 @@ const alovaClientJavaImpl = createAlova({
     responded: (response) => {
         return response.json();
     },
-    baseURL: SERVER_URLS.backendUrl
+    baseURL: SERVER_URLS.javaBackendUrl
 });
-
 
 
 const userInfoAtom = atomWithStorage<BasicUserState | null>(STORAGE_KEY_CONFIG.userState, null, new BasisSyncStorage<BasicUserState | null>(), {
@@ -167,7 +165,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes>;
+    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<JavaServerRes<string>>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
 
@@ -268,17 +266,12 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
-            async encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes> {
+            async encryptedAndUpdateResumeAsync(file: MetaFile, S: string): Promise<JavaServerRes<string>> {
                 if (userInfo === null) throw "在未登录时上传简历";
-                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(File, S);
+                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(file, S);
                 const formData = new FormData();
                 formData.append("file", encryptedFile);
-                return alovaClientImpl.Post<UploadRes>("/UploadReq", formData, {
-                    params: {
-                        address: userInfo.address,
-                        userName: userInfo.nick
-                    }
-                });
+                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, formData);
             },
             async getCheckingSelfResumeStatusList(): Promise<GetAuthenticationRes> {
                 if (userInfo === null) throw "在未登录时查询简历状态";

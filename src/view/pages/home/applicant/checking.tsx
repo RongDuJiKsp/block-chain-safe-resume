@@ -3,6 +3,6 @@ import MainContainerProvider from "../../../components/provider/mainContainerPro
 
 export default function ApplicantChecking(): ReactNode {
     return <MainContainerProvider>
-        check页面
-    </MainContainerProvider>
+
+    </MainContainerProvider>;
 }

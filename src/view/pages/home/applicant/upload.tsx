@@ -22,6 +22,7 @@ function FileUploader() {
 
 
     const onUploadFile = (): void => {
+        if (isLoading) return;
         if (!SKeyInputRef.current?.input?.value) {
             message.error("Safe Key 不能为空！").then();
             return;
@@ -35,7 +36,7 @@ function FileUploader() {
         const file = selectedFiles[0];
         userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => {
             loadingAction.setFalse();
-            if (r.status) {
+            if (r.success) {
                 message.success("文件上传成功！").then();
             } else {
                 message.error("文件上传失败！原因：" + r.message).then();
@@ -58,7 +59,7 @@ function FileUploader() {
                        value={(selectedFiles.length && selectedFiles[0].type !== "") ? selectedFiles[0].name : "未选择文件"}/>
             </Form.Item>
             <div>
-                <Popconfirm
+                <Popconfirm disabled={isLoading}
                     title={"请检查上传的文件和SafeKey是否选择正确！错误的SafeKey将使得简历无法解密！"}
                     onConfirm={onUploadFile}>
                     <button className={"button-primary button button-raised button-rounded button-glow"}>

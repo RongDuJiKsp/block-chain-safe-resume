@@ -49,3 +49,10 @@ export interface ArrayRes extends BaseRes {
 export interface GetTokenRes extends BaseRes {
     balance: number;
 }
+
+export interface JavaServerRes<Data> {
+    code: number;
+    message: string;
+    success: boolean;
+    data: Data
+}
