@@ -5,8 +5,11 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://47.97.255.9:3306/safe_resume
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
 ipfs:
   multiaddr: /ip4/47.97.255.9/tcp/6001
-#  ipfs_host: http://47.97.255.9:6001
-#  ipfs_url_upload: ${ipfs_host} + "/api/v0/add"
-#  ipfs_url_download: http://47.97.255.9:8080/ipfs/
+
