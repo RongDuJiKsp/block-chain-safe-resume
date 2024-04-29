@@ -1,6 +1,5 @@
 package com.xtu.leotan.safecv.applicant;
 
-import com.xtu.leotan.safecv.applicant.domain.Applicant;
 import com.xtu.leotan.safecv.applicant.mapper.ApplicantMapper;
 import com.xtu.leotan.safecv.common.mvc.Res;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +18,7 @@ public class ApplicantController implements ApplicantApi {
     @Override
     @GetMapping("{address}")
     public Res<String> getByAddress(@PathVariable String address) {
-        Applicant applicant = applicantMapper.getByAddress(address);
-        if (applicant == null) {
-            return Res.badRequest("用户不存在");
-        }
-        return Res.success(applicant.getUsername());
+        String applicant = applicantMapper.getUsernameByAddress(address);
+        return Res.success(applicant);
     }
 }

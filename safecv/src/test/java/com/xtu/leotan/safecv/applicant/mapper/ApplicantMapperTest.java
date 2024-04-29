@@ -23,4 +23,10 @@ class ApplicantMapperTest {
         Applicant qwerty = applicantMapper.getByUsername("qwerty");
         System.out.println("qwerty = " + qwerty);
     }
+
+    @Test
+    void getUsernameByAddress(){
+        String aaaa = applicantMapper.getUsernameByAddress("aaaa");
+        System.out.println("aaaa = " + aaaa);;
+    }
 }
