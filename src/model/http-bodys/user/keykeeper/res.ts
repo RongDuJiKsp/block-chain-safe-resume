@@ -64,7 +64,3 @@ export interface KKDownloadKeyRes extends BaseRes {
 export interface KKGetToBeAuditedRes extends BaseRes {
     list: AuditResumeInfo[]
 }
-//kk允许或者打回简历
-export interface KKAcceptOrDelayRes extends BaseRes{
-
-}

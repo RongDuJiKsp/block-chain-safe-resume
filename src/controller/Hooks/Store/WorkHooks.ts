@@ -25,7 +25,6 @@ import {
     ChangeKKRes,
     GetFileMesRes,
     GetSavedRes,
-    KKAcceptOrDelayRes,
     KKDownloadKeyRes,
     KKGetToBeAuditedRes,
     RequestListRes,
@@ -107,6 +106,7 @@ interface UserWorkMethod {
     changeUserNameAsync(newName: string): Promise<ChangeNameRes>;
 
     getTokenNumberAsync(): Promise<GetTokenRes>;
+
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -391,8 +391,7 @@ interface KeyKeeperWorkMethod {
 
     downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes>;
 
-    //state 0 is delay state 1 is accepted
-    acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes>;
+    acceptOrDelayResumeAsync(isAccept: boolean, result: string, username: string): Promise<JavaServerRes<string>>;
 
     getRequestListAsync(): Promise<RequestListRes>;
 
@@ -493,15 +492,29 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                     list: []
                 };
             },
-            async acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes> {
-                console.log(state, result, username);
-                return {//TODO 接口联调
-                    status: 1,
-                    message: "ok",
+            async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
+                console.log(isAccepted, result, username);
+                return {
+                    code: 0, data: "", success: false,//TODO 接口联调
+                    message: "ok"
                 };
             }
 
         };
+    }
+    , useValue(): null {
+        return null;
+    }
+
+};
+
+interface UserWithNoneStatusWorkMethod {
+
+}
+
+export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
+    useMethod(): UserWithNoneStatusWorkMethod {
+        return {};
     }
     , useValue(): null {
         return null;
