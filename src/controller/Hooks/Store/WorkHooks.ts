@@ -321,15 +321,20 @@ interface RecruiterWorkMethod {
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
+        const noStatusServer = UserWithNoneStatusWork.useMethod();
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
                 console.log(ApAddress, ApUserName);
-                const chainMeta = await this.getFileMessageAsync(ApAddress);
+                const chainMeta = await this.getFileMessageAsync(ApAddress);//获取待下载文件信息
                 console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
-                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileType);//下载并解密文件
                 console.log("***", file);
-                await FileSystemImpl.downloadMetaFileAsync(file);
+                //为文件添加显水印
+                //为文件添加隐水印
+                const waterFile = await noStatusServer.writeWater(file, chainMeta.reslut.blockHash);
+                //下载文件
+                await FileSystemImpl.downloadMetaFileAsync(waterFile);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
                 if (userInfo === null) throw "未登录时尝试下载";
@@ -525,7 +530,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
 interface UserWithNoneStatusWorkMethod {
     findUserNameByAddress(address: string): Promise<JavaServerRes<string>>;
 
-    writeWater(file: MetaFile, context: string): Promise<JavaServerRes<string>>;
+    writeWater(file: MetaFile, context: string): Promise<MetaFile>;
 
     readWater(file: MetaFile): Promise<JavaServerRes<string>>;
 
@@ -541,8 +546,8 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
             async readWater(file: MetaFile): Promise<JavaServerRes<string>> {
                 return alovaClientJavaImpl.Post<JavaServerRes<string>>(`/watermark`, FileSystemImpl.buildFormWithFile('file', file));
             },
-            async writeWater(file: MetaFile, context: string): Promise<JavaServerRes<string>> {
-                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/watermark/${context}`, FileSystemImpl.buildFormWithFile('file', file));
+            async writeWater(file: MetaFile, context: string): Promise<MetaFile> {
+                return alovaClientJavaFileImpl.Put<MetaFile>(`/watermark/${context}`, FileSystemImpl.buildFormWithFile('file', file));
             },
             async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
                 const fileWaterRes = await this.readWater(file);
