@@ -35,7 +35,6 @@ function FileUploader() {
         loadingAction.setTrue();
         const file = selectedFiles[0];
         userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => {
-            loadingAction.setFalse();
             if (r.status) {
                 message.success("文件上传成功！").then();
             } else {
@@ -43,7 +42,7 @@ function FileUploader() {
             }
         }, e => {
             message.error(e.toString()).then();
-        });
+        }).finally(loadingAction.setFalse);
 
     };
     return <div className={" p-7 flex justify-around h-full"}>
