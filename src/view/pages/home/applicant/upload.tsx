@@ -36,7 +36,7 @@ function FileUploader() {
         const file = selectedFiles[0];
         userServerMethod.encryptedAndUpdateResumeAsync(file, inputSKey).then(r => {
             loadingAction.setFalse();
-            if (r.success) {
+            if (r.status) {
                 message.success("文件上传成功！").then();
             } else {
                 message.error("文件上传失败！原因：" + r.message).then();

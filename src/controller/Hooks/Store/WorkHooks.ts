@@ -18,7 +18,8 @@ import {
     ResumeInfoRes,
     ResumeQuestListRes,
     ResumeRequestHistoryListRes,
-    SendSubKeyToKKRes
+    SendSubKeyToKKRes,
+    UploadRes
 } from "../../../model/http-bodys/user/applicant/res.ts";
 import {
     AccessibleSubKeyListRes,
@@ -165,7 +166,7 @@ export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
 };
 
 interface ApplicantWorkMethod {
-    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<JavaServerRes<string>>;
+    encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes>;
 
     getResumeInfoAsync(): Promise<ResumeInfoRes>;
 
@@ -266,10 +267,16 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
-            async encryptedAndUpdateResumeAsync(file: MetaFile, S: string): Promise<JavaServerRes<string>> {
+            async encryptedAndUpdateResumeAsync(file: MetaFile, S: string): Promise<UploadRes> {
                 if (userInfo === null) throw "在未登录时上传简历";
                 const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(file, S);
-                return alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, FileSystemImpl.buildFormWithFile('file', encryptedFile));
+                await alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, FileSystemImpl.buildFormWithFile('file', file));
+                return alovaClientImpl.Post<UploadRes>("/UploadReq", FileSystemImpl.buildFormWithFile('file', encryptedFile), {
+                    params: {
+                        address: userInfo.address,
+                        userName: userInfo.nick
+                    }
+                });
             },
             async getCheckingSelfResumeStatusList(): Promise<GetAuthenticationRes> {
                 if (userInfo === null) throw "在未登录时查询简历状态";
@@ -509,12 +516,16 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
 };
 
 interface UserWithNoneStatusWorkMethod {
-
+    findUserNameByAddress(username: string): Promise<JavaServerRes<string>>;
 }
 
 export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
     useMethod(): UserWithNoneStatusWorkMethod {
-        return {};
+        return {
+            async findUserNameByAddress(username: string): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Get<JavaServerRes<string>>(`/applicant/${username}`);
+            }
+        };
     }
     , useValue(): null {
         return null;
