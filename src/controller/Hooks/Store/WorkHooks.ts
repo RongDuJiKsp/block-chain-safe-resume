@@ -493,11 +493,8 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return alovaClientImpl.Post("/UploadKeyReq", req);
             },
             async getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes> {
-                return {//TODO:接口联调
-                    status: 1,
-                    message: "3",
-                    list: []
-                };
+                if (userInfo === null) throw "未登录时尝试获取";
+                return alovaClientJavaImpl.Get(`/check/uncheck?checkUsername=${userInfo.nick}`);
             },
             async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
                 console.log(isAccepted, result, username);
