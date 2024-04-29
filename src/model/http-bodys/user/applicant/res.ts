@@ -45,11 +45,6 @@ export interface SendSubKeyToKKRes extends BaseRes {
 
 }
 
-export interface GetAuthenticationStringRes extends BaseRes {
-    yes: string[]
-    no: string[]
-    wait: string[]
-}
 
 export interface GetAuthenticationRes extends BaseRes {
     list: CheckingSelfResumeStatus[]

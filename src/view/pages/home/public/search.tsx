@@ -3,6 +3,7 @@ import MainContainerProvider from "../../../components/provider/mainContainerPro
 import {App, Form, Input, Table, TableProps} from "antd";
 import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 import {UserWithNoneStatusWork} from "../../../../controller/Hooks/Store/WorkHooks.ts";
+import {useBoolean} from "ahooks";
 
 interface FindNameForm {
     address: string;
@@ -14,8 +15,10 @@ export default function SearchPage() {
     const searchServer = UserWithNoneStatusWork.useMethod();
     const [formRef] = Form.useForm<FindNameForm>();
     const [searchedData, setSearchedData] = useState<FindNameForm[]>([]);
+    const [isLoading, loadingAction] = useBoolean();
     const onSearch = (data: FindNameForm) => {
-        console.log(data);
+        if (isLoading) return;
+        loadingAction.setTrue();
         searchServer.findUserNameByAddress(data.address).then(r => {
             if (r.success) {
                 message.success("查找成功！").then();
@@ -23,10 +26,12 @@ export default function SearchPage() {
             } else message.error("查找失败，原因：" + r.message).then();
             formRef.setFieldValue("name", r.data);
 
-        });
+        }).catch(e => {
+            message.error("发送错误：" + e).then();
+        }).finally(loadingAction.setFalse);
     };
     const onCopy = () => {
-        if (formRef.getFieldValue("name").length<=0) return;
+        if (formRef.getFieldValue("name").length <= 0) return;
         FileSystemImpl.writeTextToClipboard(formRef.getFieldValue("name"));
         message.success("复制成功！").then();
     };
@@ -38,7 +43,9 @@ export default function SearchPage() {
                     <Input allowClear/>
                 </Form.Item>
                 <Form.Item className={"flex flex-row justify-center"}>
-                    <button className={"button-primary button-raised button button-rounded button-pill button-small"}>查找</button>
+                    <button
+                        className={"button-primary button-raised button button-rounded button-pill button-small"}>查找
+                    </button>
                 </Form.Item>
                 <Form.Item<FindNameForm> name={"name"} label={"查找结果"} labelCol={{span: 6}}>
                     <Input readOnly onClick={onCopy}/>
