@@ -46,6 +46,7 @@ function AuditTableComponent({tableVal}: { tableVal: ToBeAuditedResume[] }) {
 
     };
     const onDelay = (item: ToBeAuditedResume) => {
+        console.log(item);
         setSelectedToDelay(item);
     };
     const onClear = () => {
@@ -101,6 +102,7 @@ function DelayWithResultModel({data, clear}: ModelPropsWithInfoAndClear<ToBeAudi
     const {message} = App.useApp();
     const [isLoading, setLoading] = useBoolean();
     const onConformDelay = (msg: string) => {
+        console.log("打回");
         if (data === null) throw Error("怪了");
         if (isLoading) return;
         setLoading.setTrue();
@@ -111,9 +113,12 @@ function DelayWithResultModel({data, clear}: ModelPropsWithInfoAndClear<ToBeAudi
             } else message.error("打回失败，原因：" + r.message).then();
         }).catch(e => {
             message.error("打回失败，原因：" + e).then();
-        }).finally(setLoading.setFalse);
+        }).finally(()=>{
+            setLoading.setFalse();
+            clear();
+        });
     };
-    return <Modal>
+    return <Modal open={data!==null} onCancel={clear} footer={null}>
         <div className={"my-3"}>
             <p className={"my-3"}>
                 请填写原因
@@ -123,10 +128,10 @@ function DelayWithResultModel({data, clear}: ModelPropsWithInfoAndClear<ToBeAudi
                     <Input.TextArea autoSize={{minRows: 5, maxRows: 5}}/>
                 </Form.Item>
                 <Form.Item>
-                    <Button type={"primary"}>{isLoading ?
+                    <button className={"button button-pill button-primary button-rounded button-raised"}>{isLoading ?
                         <span><LoadingOutlined/>&thinsp;上传中&thinsp;... </span> :
                         <span>&ensp;打回简历&ensp;</span>
-                    }</Button>
+                    }</button>
                 </Form.Item>
             </Form>
 
