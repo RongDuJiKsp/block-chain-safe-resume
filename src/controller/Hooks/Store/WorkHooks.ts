@@ -316,6 +316,7 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
 interface RecruiterWorkMethod {
     downloadResumeAsync(fileHash: string, SafeKey: string, ApUserName: string, name: string, type: string): Promise<MetaFile>;
 
+
     getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes>;
 
     autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void>;
