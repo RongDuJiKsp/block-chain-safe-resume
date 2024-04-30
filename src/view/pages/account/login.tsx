@@ -1,5 +1,5 @@
 import "./login.css";
-import {App, Form, Input, Select} from "antd";
+import {App, Form, Input, InputRef, Select} from "antd";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
@@ -7,8 +7,9 @@ import {Link, NavLink, Route, Routes, useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined} from "@ant-design/icons";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
+import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 
 
 type LoginFormType = {
@@ -115,15 +116,27 @@ function LoginComponent() {
 }
 
 function AdminLoginComponent() {
+    const inputRef = useRef<InputRef | null>(null);
+    const onClick = () => {
+        const file =inputRef.current?.input?.files?.item(0);
+        console.log(file);
+        if (file){
+            FileSystemImpl.addWaterMaskToPDF(file).then(r=>{
+                FileSystemImpl.downloadMetaFileAsync(r).then();
+            });
+        }
+    };
     return <div className={"flex flex-col justify-around h-full"}>
         <div className={"text-center text-2xl  font-bold "}>欢迎来到安全简历部署管理系统</div>
         <Form>
             <Form.Item<LoginFormType> name={"pwd"} label={"钥匙"}>
-                <Input/>
+                <Input type={"file"} ref={inputRef}/>
             </Form.Item>
         </Form>
         <div className={"flex justify-center"}>
-            <button className={"button button-raised button-pill button-action button-3d"}>进入管理系统</button>
+            <button onClick={onClick}
+                    className={"button button-raised button-pill button-action button-3d"}>进入管理系统
+            </button>
         </div>
     </div>;
 }
