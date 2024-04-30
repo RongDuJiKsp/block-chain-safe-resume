@@ -3,6 +3,9 @@ import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
 
 
 export const FileSystemImpl: UserFileSystem = {
+    async addWaterMaskToPDF(file: MetaFile): Promise<MetaFile> {
+      return file;
+    },
     buildFormWithFile(fieldName: string, file: MetaFile): FormData {
         const formData = new FormData();
         formData.append(fieldName, file);
