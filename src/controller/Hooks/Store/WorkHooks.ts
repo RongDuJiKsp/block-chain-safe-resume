@@ -342,7 +342,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 //为文件添加显水印
                 const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
                 //为文件添加隐水印
-                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.blockHash);
+                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.transactionHash);
                 //下载文件
                 await FileSystemImpl.downloadMetaFileAsync(waterFile);
             },
@@ -592,18 +592,22 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
 
                 };
                 trackResult.fileName = file.name;
+                console.log(trackResult);
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
                 trackResult.waterMaskContext = fileWaterRes.data;
+                console.log(trackResult);
                 const metaDataRes = await this.findHashMetaDataWithHash(fileWaterRes.data);
                 if (!metaDataRes.status) throw metaDataRes.message;
+                console.log(metaDataRes);
                 const chainData = metaDataRes.result["data"] as Record<string, string>;
+                console.log(chainData);
                 delete chainData["input"];
                 delete chainData["chainId"];
                 delete chainData["groupId"];
                 delete chainData["extraData"];
                 delete chainData["signature"];
-                console.log(chainData);
+                // console.log(chainData);
                 trackResult.blockCharinData = metaDataRes.result;
                 trackResult.fromAddress = chainData["from"];
                 trackResult.toAddress = chainData["to"];

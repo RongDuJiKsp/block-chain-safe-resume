@@ -38,7 +38,7 @@ export interface GetFileMesRes extends BaseRes {
     fileName: string;
     fileType: string;
     fileHash: string;
-    reslut: { blockHash: string };
+    reslut: { transactionHash: string };
 }
 
 /**
