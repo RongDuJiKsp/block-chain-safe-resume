@@ -29,3 +29,7 @@ export interface ChangeNameReq {
 export interface GetTokenReq {
     address: string;
 }
+
+export interface GetTransResultReq {
+    hash_value: string;
+}

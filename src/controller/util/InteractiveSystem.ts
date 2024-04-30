@@ -1,10 +1,26 @@
 import {UserFileSystem} from "../../model/interface/util.ts";
 import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
+import {PDFDocument} from "pdf-lib";
+import {MASKFILEBASE64} from "../../config/assets.ts";
 
 
 export const FileSystemImpl: UserFileSystem = {
     async addWaterMaskToPDF(file: MetaFile): Promise<MetaFile> {
-      return file;
+        if (file.type !== "application/pdf") return file;
+        const pdfDoc = await PDFDocument.load(await FileSystemImpl.readFileAsArrayBufferAsync(file));
+        const pdfWaterMask = await pdfDoc.embedPng(MASKFILEBASE64);
+        const pdfPage = pdfDoc.getPage(0);
+        const watermarkWidth = pdfWaterMask.width;
+        const watermarkHeight = pdfWaterMask.height;
+        const scaleFactor = 0.5; // 水印缩放比例
+        pdfPage.drawImage(pdfWaterMask, {
+            x:0,
+            y:0,
+            width: watermarkWidth * scaleFactor,
+            height: watermarkHeight * scaleFactor,
+            opacity: 0.5, // 设置透明度，可根据需要调整
+        });
+        return new File([await pdfDoc.save()], file.name, {type: file.type});
     },
     buildFormWithFile(fieldName: string, file: MetaFile): FormData {
         const formData = new FormData();

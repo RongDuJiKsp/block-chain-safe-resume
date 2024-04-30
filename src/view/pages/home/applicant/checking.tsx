@@ -8,7 +8,7 @@ import {App} from "antd";
 import {CheckingSelfResumeStatus} from "../../../../model/entity/applicant.ts";
 import dayjs from "dayjs";
 
-type ResumeStatus = "Waiting" | "Accept" | "Delay";
+type ResumeStatus = "等待审核" | "审核通过" | "简历打回";
 type StatusUnitProps = {
     status: ResumeStatus
     failReason?: string;
@@ -16,20 +16,20 @@ type StatusUnitProps = {
     title?: string;
 };
 const colorMap: Record<ResumeStatus, string> = {
-    Accept: "#68EDC6", Delay: "#E78F8E", Waiting: "#4C5B5C"
+    '审核通过': "#68EDC6", '简历打回': "#E78F8E", '等待审核': "#4C5B5C"
 
 };
 
 function calStatus(a: ResumeStatus | boolean, b: ResumeStatus | boolean, c: ResumeStatus | boolean): ResumeStatus {
-    if (a === "Accept" && b === "Accept" && c === "Accept") return "Accept";
-    if (a === "Delay" || b === "Delay" || c === "Delay") return "Delay";
-    return "Waiting";
+    if (a === "审核通过" && b === "审核通过" && c === "审核通过") return "审核通过";
+    if (a === "简历打回" || b === "简历打回" || c === "简历打回") return "简历打回";
+    return "等待审核";
 }
 
 function getStatusUnit(has: boolean, sr: CheckingSelfResumeStatus): StatusUnitProps {
-    if (!has) return {status: "Waiting"};
+    if (!has) return {status: "等待审核"};
     return {
-        status: sr.isApprove ? "Accept" : "Delay",
+        status: sr.isApprove ? "审核通过" : "简历打回",
         title: sr.checkUsername,
         failReason: sr.reason,
         handleTime: dayjs(sr.checkTime).format("YYYY-MM-DD HH:mm:ss")
@@ -42,15 +42,16 @@ export default function ApplicantChecking(): ReactNode {
     const [statuses, setStatus] = useState<CheckingSelfResumeStatus[]>([]);
     const [flag, swaps] = useSwapBoolean();
     const stateUnitState = [
-        getStatusUnit(statuses.length >= 1, statuses[1]),
-        getStatusUnit(statuses.length >= 2, statuses[2]),
-        getStatusUnit(statuses.length >= 3, statuses[3])
+        getStatusUnit(statuses.length >= 1, statuses[0]),
+        getStatusUnit(statuses.length >= 2, statuses[1]),
+        getStatusUnit(statuses.length >= 3, statuses[2])
     ];
     useEffect(() => {
         userServer.getCheckingSelfResumeStatusList().then(r => {
             if (r.success) {
                 message.success("获取数据成功！").then();
                 setStatus(r.data);
+                console.log(r);
             } else message.error(r.message).then();
         }).catch(e => {
             message.error("发送错误" + e).then();
@@ -72,6 +73,11 @@ export default function ApplicantChecking(): ReactNode {
         </div>
     </MainContainerProvider>;
 }
+const nameMap: Record<string, string> = {
+    "MOE": "教育部",
+    "HRD": "人力资源局",
+    "BCC": "背调企业"
+};
 
 
 function StatusUnit({status, failReason, handleTime, title}: StatusUnitProps): ReactNode {
@@ -79,7 +85,7 @@ function StatusUnit({status, failReason, handleTime, title}: StatusUnitProps): R
         <div className={"flex justify-center"}><TeamOutlined style={{fontSize: 52, color: colorMap[status]}}/></div>
         <div className={"flex flex-col gap-0.5 "} style={{color: colorMap[status]}}>
             <div>{status}</div>
-            {title && <div>{title}</div>}
+            {title && <div>{nameMap[title]}({title})</div>}
             {failReason && <div>{"打回原因: " + failReason}</div>}
             {handleTime && <div>{handleTime}</div>}
         </div>

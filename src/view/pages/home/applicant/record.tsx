@@ -88,7 +88,6 @@ function ResumeInfoComponent({info, firstInfo}: {
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
         <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
-                   className={"basis-1/5"}
                    value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "N/A"}/>
         <Statistic title={"最新访问时间"} prefix={componentUtils.getIcon("icon-keyhole")}
                    value={firstInfo ? dayjs.unix(Number(firstInfo.downloadTime)).format("YYYY-MM-DD HH:mm") : "N/A"}/>
