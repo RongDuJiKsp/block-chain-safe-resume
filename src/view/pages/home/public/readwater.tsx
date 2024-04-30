@@ -58,8 +58,9 @@ function TraceDataShowerModel({data, clear}: ModelPropsWithInfoAndClear<Document
         <div className={"my-8 font-bold font-sans gap-1 flex-col flex"}>
             <div>上传文件名: {data?.fileName}</div>
             <div>水印内容: {data?.waterMaskContext}</div>
-            <div>下载者信息：{data?.toName}<br/>({data?.toAddress})</div>
-            <div>拥有者信息：{data?.fromName}<br/>({data?.fromAddress})</div>
+            <div>合约信息：{data?.toAddress}</div>
+            <div>下载者信息：{data?.fromName}<br/>({data?.fromAddress})</div>
+            <div>拥有者信息：{data?.sourceName}<br/>({data?.sourceAddress})</div>
             <div>区块链信息：</div>
             <Input.TextArea autoSize={{maxRows: 7}} value={JSON.stringify(data?.blockCharinData)}/>
         </div>
