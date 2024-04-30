@@ -73,6 +73,11 @@ export default function ApplicantChecking(): ReactNode {
         </div>
     </MainContainerProvider>;
 }
+const nameMap: Record<string, string> = {
+    "MOE": "教育部",
+    "HRD": "人力资源局",
+    "BCC": "背调企业"
+};
 
 
 function StatusUnit({status, failReason, handleTime, title}: StatusUnitProps): ReactNode {
@@ -80,7 +85,7 @@ function StatusUnit({status, failReason, handleTime, title}: StatusUnitProps): R
         <div className={"flex justify-center"}><TeamOutlined style={{fontSize: 52, color: colorMap[status]}}/></div>
         <div className={"flex flex-col gap-0.5 "} style={{color: colorMap[status]}}>
             <div>{status}</div>
-            {title && <div>{title}</div>}
+            {title && <div>{nameMap[title]}({title})</div>}
             {failReason && <div>{"打回原因: " + failReason}</div>}
             {handleTime && <div>{handleTime}</div>}
         </div>
