@@ -10,7 +10,6 @@ import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined
 import {useEffect, useRef} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
-import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 
 
 type LoginFormType = {
@@ -133,7 +132,7 @@ function AdminLoginComponent() {
         }
     };
     const onCheck2 = async () => {
-       console.log( AlgorithmSystemImpl.calculateEncryptedKeyByS(String(9504)));
+
     };
 
     return <div className={"flex flex-col justify-around h-full"}>

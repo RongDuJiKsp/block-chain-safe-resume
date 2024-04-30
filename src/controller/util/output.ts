@@ -6,7 +6,7 @@ export const FileTempleHandleImpl: GetFileTemplate = {
         The KeyPair is (P,X,M) with values (${NO},${X},${M})
         `;
     },
-    getRegisterKey(SKey: string,userName:string): string {
+    getRegisterKey(SKey: string, userName: string): string {
         return `
         Dear ${userName}  
         If You Are Applicant You Need To Encrypt With SafeKey

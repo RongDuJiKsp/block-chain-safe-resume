@@ -72,12 +72,13 @@ export const UserRegisterHook: AtomHooks<UserRegisterValue, UserRegisterMethod> 
                 setRegisterData(req);
                 console.log(req);
                 const res = await alovaClientImpl.Post<RegisterRes>("/RegisterReq", req);
-                console.log(res);
+                console.log("response", res);
                 setReceivedRegisterRes(res);
                 return res;
             },
             async callFileDownloadWithData() {
                 if (receivedRegisterRes === null) throw Error("在调用时未收到信息");
+                console.log("regisRes", receivedRegisterRes);
                 const SKey = registerData.identity === UserIdentityEnum.Applicant ? AlgorithmSystemImpl.calculateEncryptedKeyByS(String(receivedRegisterRes.S)) : "";
                 const downloadFile = new Blob([FileTempleHandleImpl.getRegisterKey(SKey, registerData.userName)]);
                 await FileSystemImpl.downloadToFileFromSuffixAsync(downloadFile, `${registerData.userName}... of ${registerData.identity}`, "txt");

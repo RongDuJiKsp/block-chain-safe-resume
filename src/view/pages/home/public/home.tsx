@@ -30,8 +30,9 @@ function Instruction() {
                         本平台响应"十四五规划"中提出的建设数字中国的战略目标，打造一套基于区块链的简历安全共享全流程管理平台，旨在打造一个安全、共享、互信的在线招聘环境。
                     </div>
                 </div>
-                <div className={"ml-14 show-window-border pl-3 py-1" }>
-                    本平台以"安全、共享、互信"作为核心理念，利用Fisco Bcos区块链框架、WeBase中间件、IPFS(星际文件系统)构建其基础架构，并采用智能合约、秘密共享等核心技术，开发去中心化Web应用程序。
+                <div className={"ml-14 show-window-border pl-3 py-1"}>
+                    本平台以"安全、共享、互信"作为核心理念，利用Fisco
+                    Bcos区块链框架、WeBase中间件、IPFS(星际文件系统)构建其基础架构，并采用智能合约、秘密共享等核心技术，开发去中心化Web应用程序。
                 </div>
                 <div className={"border-de-skew show-window-border pl-11 pb-1 pt-2"}>
                     <div className={"border-skew"}>

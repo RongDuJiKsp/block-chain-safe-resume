@@ -56,7 +56,8 @@ export interface PostOnekeyReq {
     x: number
     m: number
 }
+
 //ap获取自己简历审核情况
-export interface GetAuthenticationReq{
+export interface GetAuthenticationReq {
     ApAddress: string
 }

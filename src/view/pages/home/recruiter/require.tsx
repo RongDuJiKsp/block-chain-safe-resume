@@ -52,7 +52,7 @@ function SendRequire() {
                 <div className={"flex justify-center mt-5"}>
                     <button className={"button-3d button button-pill button-primary "}>
                         {isLoading ?
-                            <span><LoadingOutlined/>&emsp;正在发送</span>:
+                            <span><LoadingOutlined/>&emsp;正在发送</span> :
                             <span>点击发送请求</span>
                         }
                     </button>

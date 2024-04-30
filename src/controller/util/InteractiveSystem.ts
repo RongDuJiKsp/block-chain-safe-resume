@@ -14,8 +14,8 @@ export const FileSystemImpl: UserFileSystem = {
         const watermarkHeight = pdfWaterMask.height;
         const scaleFactor = 0.5; // 水印缩放比例
         pdfPage.drawImage(pdfWaterMask, {
-            x:0,
-            y:0,
+            x: 0,
+            y: 0,
             width: watermarkWidth * scaleFactor,
             height: watermarkHeight * scaleFactor,
             opacity: 0.5, // 设置透明度，可根据需要调整

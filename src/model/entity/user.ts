@@ -32,5 +32,6 @@ export interface DocumentTraceabilityInformation {
     fromAddress: string;
     fromName: string | null;
     toAddress: string;
-    toName: string | null
+    sourceAddress: string | null;
+    sourceName: string | null;
 }

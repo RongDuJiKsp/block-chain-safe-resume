@@ -113,12 +113,12 @@ function DelayWithResultModel({data, clear}: ModelPropsWithInfoAndClear<ToBeAudi
             } else message.error("打回失败，原因：" + r.message).then();
         }).catch(e => {
             message.error("打回失败，原因：" + e).then();
-        }).finally(()=>{
+        }).finally(() => {
             setLoading.setFalse();
             clear();
         });
     };
-    return <Modal open={data!==null} onCancel={clear} footer={null}>
+    return <Modal open={data !== null} onCancel={clear} footer={null}>
         <div className={"my-3"}>
             <p className={"my-3"}>
                 请填写原因

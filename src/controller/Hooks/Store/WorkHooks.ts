@@ -100,7 +100,7 @@ const alovaClientJavaImpl = createAlova({
 const alovaClientJavaFileImpl = createAlova({
     statesHook: ReactHook,
     requestAdapter: GlobalFetch(),
-    baseURL: SERVER_URLS.javaBackendUrl + "/files",
+    baseURL: SERVER_URLS.javaBackendUrl,
     responded: async (response) => {
         const blob = await response.blob();
         const types = await fileTypeFromBlob(blob);
@@ -342,7 +342,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 //为文件添加显水印
                 const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
                 //为文件添加隐水印
-                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.blockHash);
+                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.transactionHash + "|" + ApAddress);
                 //下载文件
                 await FileSystemImpl.downloadMetaFileAsync(waterFile);
             },
@@ -527,8 +527,8 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 });
             },
             async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
-                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/${apName}`);
-                await alovaClientJavaFileImpl.Delete<MetaFile>(`/${apName}`);
+                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/files/${apName}`);
+                await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${apName}`);
                 return downloadResFile;
             }
 
@@ -587,28 +587,35 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
                     fromAddress: "",
                     fromName: "",
                     toAddress: "",
-                    toName: "",
-                    waterMaskContext: ""
-
+                    waterMaskContext: "",
+                    sourceAddress: "",
+                    sourceName: ""
                 };
                 trackResult.fileName = file.name;
+                console.log(trackResult);
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                trackResult.waterMaskContext = fileWaterRes.data;
-                const metaDataRes = await this.findHashMetaDataWithHash(fileWaterRes.data);
+                const [transferHash, apAddress] = fileWaterRes.data.split("|");
+                console.log(transferHash, apAddress);
+                trackResult.waterMaskContext = transferHash;
+                console.log(trackResult);
+                const metaDataRes = await this.findHashMetaDataWithHash(transferHash);
                 if (!metaDataRes.status) throw metaDataRes.message;
+                console.log(metaDataRes);
                 const chainData = metaDataRes.result["data"] as Record<string, string>;
+                console.log(chainData);
                 delete chainData["input"];
                 delete chainData["chainId"];
                 delete chainData["groupId"];
                 delete chainData["extraData"];
                 delete chainData["signature"];
-                console.log(chainData);
+                // console.log(chainData);
                 trackResult.blockCharinData = metaDataRes.result;
                 trackResult.fromAddress = chainData["from"];
                 trackResult.toAddress = chainData["to"];
+                trackResult.sourceAddress = apAddress;
                 trackResult.fromName = (await this.findUserNameByAddress(trackResult.fromAddress)).data;
-                trackResult.toName = (await this.findUserNameByAddress(trackResult.toAddress)).data;
+                trackResult.sourceName = (await this.findUserNameByAddress(trackResult.sourceAddress)).data;
                 return trackResult;
             }
         };
