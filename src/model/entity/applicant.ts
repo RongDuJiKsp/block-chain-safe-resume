@@ -10,7 +10,6 @@ export interface ResumeVisitHistoryInfo {
 }
 
 
-
 export interface CheckingSelfResumeStatus {
     isApprove: string;
     reason: string;

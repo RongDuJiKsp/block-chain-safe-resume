@@ -57,8 +57,8 @@ export default function ReadWaterPage() {
 function TraceDataShowerModel({data, clear}: ModelPropsWithInfoAndClear<DocumentTraceabilityInformation>): ReactNode {
     return <Modal open={data !== null} footer={null} onCancel={clear}>
         <div className={"flex justify-center"}>
-            <div >
-                <img alt={"logo"} src={logo} className={"h-[12vh]"} draggable={false} />
+            <div>
+                <img alt={"logo"} src={logo} className={"h-[12vh]"} draggable={false}/>
             </div>
         </div>
         <div className={"text-center text-xl font-sans font-bold"}>区块链查证信息概览</div>

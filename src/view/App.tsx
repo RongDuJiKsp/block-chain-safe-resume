@@ -10,7 +10,7 @@ function App() {
             <ConfigProvider theme={{
                 components: {
                     Layout: {
-                        headerBg:"#fff"
+                        headerBg: "#fff"
                     }
                 }
             }}>

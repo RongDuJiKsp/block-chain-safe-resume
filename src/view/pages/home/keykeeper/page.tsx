@@ -1,7 +1,7 @@
 import LayOutProvider, {ItemsAndPic} from "../../../components/provider/layOutProvider.tsx";
 import {UserGroup} from "../../../../model/entity/user.ts";
 import {componentUtils} from "../../../../controller/util/component.tsx";
-import {APPLICANT_THIS_PATH, KEYKEEPER_THIS_PATH, KeyKeeperRoutes} from "../../../routes/home.tsx";
+import {KEYKEEPER_THIS_PATH, KeyKeeperRoutes} from "../../../routes/home.tsx";
 
 const ThisUserGroup: UserGroup = {
     userIdentity: "KeyKeeper",
@@ -24,7 +24,7 @@ const headBarItems: ItemsAndPic[] = [
         routerPath: KEYKEEPER_THIS_PATH + "/audit",
         text: "审核简历"
     }, {
-        logo: componentUtils.getIcon('icon-transfer1',{fontSize: 18}),
+        logo: componentUtils.getIcon('icon-transfer1', {fontSize: 18}),
         routerPath: KEYKEEPER_THIS_PATH + '/search',
         text: "用户追溯"
     }, {

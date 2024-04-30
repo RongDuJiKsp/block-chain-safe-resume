@@ -588,15 +588,15 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
                     fromName: "",
                     toAddress: "",
                     waterMaskContext: "",
-                    sourceAddress:"",
-                    sourceName:""
+                    sourceAddress: "",
+                    sourceName: ""
                 };
                 trackResult.fileName = file.name;
                 console.log(trackResult);
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                const [transferHash,apAddress]=fileWaterRes.data.split("|");
-                console.log(transferHash,apAddress);
+                const [transferHash, apAddress] = fileWaterRes.data.split("|");
+                console.log(transferHash, apAddress);
                 trackResult.waterMaskContext = transferHash;
                 console.log(trackResult);
                 const metaDataRes = await this.findHashMetaDataWithHash(transferHash);
@@ -613,9 +613,9 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
                 trackResult.blockCharinData = metaDataRes.result;
                 trackResult.fromAddress = chainData["from"];
                 trackResult.toAddress = chainData["to"];
-                trackResult.sourceAddress=apAddress;
+                trackResult.sourceAddress = apAddress;
                 trackResult.fromName = (await this.findUserNameByAddress(trackResult.fromAddress)).data;
-                trackResult.sourceName=(await this.findUserNameByAddress(trackResult.sourceAddress)).data;
+                trackResult.sourceName = (await this.findUserNameByAddress(trackResult.sourceAddress)).data;
                 return trackResult;
             }
         };

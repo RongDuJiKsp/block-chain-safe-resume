@@ -10,7 +10,6 @@ import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined
 import {useEffect, useRef} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
-import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 
 
 type LoginFormType = {

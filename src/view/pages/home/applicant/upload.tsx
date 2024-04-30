@@ -59,8 +59,8 @@ function FileUploader() {
             </Form.Item>
             <div>
                 <Popconfirm disabled={isLoading}
-                    title={"请检查上传的文件和SafeKey是否选择正确！错误的SafeKey将使得简历无法解密！"}
-                    onConfirm={onUploadFile}>
+                            title={"请检查上传的文件和SafeKey是否选择正确！错误的SafeKey将使得简历无法解密！"}
+                            onConfirm={onUploadFile}>
                     <button className={"button-primary button button-raised button-rounded button-glow"}>
                         {isLoading ?
                             <span><LoadingOutlined/>&emsp;上传中&emsp;</span> :

@@ -9,6 +9,7 @@ export interface DownloadFileReq {
     ApUserName: string;
     ReUserName: string;
 }
+
 /**
  * @interface RecAuthorizeReq re请求授权查看简历
  * @property ApUserName ap用户名
