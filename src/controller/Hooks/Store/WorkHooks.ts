@@ -87,8 +87,9 @@ const alovaClientJavaFileImpl = createAlova({
     statesHook: ReactHook,
     requestAdapter: GlobalFetch(),
     baseURL: SERVER_URLS.javaBackendUrl + "/files",
-    responded: (response) => {
-        return response.blob();
+    responded: async (response) => {
+        console.log(response);
+        return await response.blob();
     }
 });
 const alovaClientWeBaseImpl = createAlova({
@@ -331,7 +332,7 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileType);//下载并解密文件
                 console.log("***", file);
                 //为文件添加显水印
-                const maskedFIle=await FileSystemImpl.addWaterMaskToPDF(file);
+                const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
                 //为文件添加隐水印
                 const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.blockHash);
                 //下载文件
@@ -508,15 +509,18 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 return res;
             },
             async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
-                console.log(isAccepted, result, username);
-                return {
-                    code: 0, data: "", success: false,//TODO 接口联调
-                    message: "ok"
-                };
+                if (userInfo === null) throw "未登录时尝试获取";
+                return alovaClientJavaImpl.Post(`/check/${username}`, undefined, {
+                    params: {
+                        checkUsername: userInfo.nick,
+                        isApprove: isAccepted,
+                        reason: result
+                    }
+                });
             },
             async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
                 const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/${apName}`);
-                console.log(downloadResFile);
+                await alovaClientJavaFileImpl.Delete<MetaFile>(`/${apName}`);
                 return downloadResFile;
             }
 
@@ -553,8 +557,9 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
             async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                const metaData = await alovaClientWeBaseImpl.Get(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`);
+                const metaData = await alovaClientWeBaseImpl.Get<string>(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`);
                 console.log(metaData);
+                await FileSystemImpl.downloadToFileAsNameAsync(new Blob([metaData]), `result for ${file.name}.json`);
             }
         };
     }

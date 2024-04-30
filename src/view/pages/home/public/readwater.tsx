@@ -4,9 +4,11 @@ import {useState} from "react";
 import {useBoolean} from "ahooks";
 import {LoadingOutlined} from "@ant-design/icons";
 import {App} from "antd";
+import {UserWithNoneStatusWork} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 
 export default function ReadWaterPage() {
     const {message} = App.useApp();
+    const noStatusServer = UserWithNoneStatusWork.useMethod();
     const [files, setFiles] = useState<File[]>([]);
     const [isLoading, loadingAction] = useBoolean();
     const onSearch = () => {
@@ -15,7 +17,11 @@ export default function ReadWaterPage() {
             message.error("请选择文件！").then();
         }
         loadingAction.setTrue();
-
+        noStatusServer.findHashMetaDataWithMarkedFile(files[0]).then(() => {
+            message.success("读取成功！已将信息以json保存").then();
+        }).catch(e => {
+            message.error("发生错误：" + e).then();
+        }).finally(loadingAction.setFalse);
 
     };
     return <MainContainerProvider>
