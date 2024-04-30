@@ -6,6 +6,7 @@ import {ApplicantWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.t
 import {useSwapBoolean} from "../../../../controller/Hooks/state/changeRender.ts";
 import {App} from "antd";
 import {CheckingSelfResumeStatus} from "../../../../model/entity/applicant.ts";
+import dayjs from "dayjs";
 
 type ResumeStatus = "Waiting" | "Accept" | "Delay";
 type StatusUnitProps = {
@@ -19,17 +20,32 @@ const colorMap: Record<ResumeStatus, string> = {
 
 };
 
-function calStatus(a: ResumeStatus, b: ResumeStatus, c: ResumeStatus): ResumeStatus {
+function calStatus(a: ResumeStatus | boolean, b: ResumeStatus | boolean, c: ResumeStatus | boolean): ResumeStatus {
     if (a === "Accept" && b === "Accept" && c === "Accept") return "Accept";
     if (a === "Delay" || b === "Delay" || c === "Delay") return "Delay";
     return "Waiting";
 }
 
+function getStatusUnit(has: boolean, sr: CheckingSelfResumeStatus): StatusUnitProps {
+    if (!has) return {status: "Waiting"};
+    return {
+        status: sr.isApprove ? "Accept" : "Delay",
+        title: sr.checkUsername,
+        failReason: sr.reason,
+        handleTime: dayjs(sr.checkTime).format("YYYY-MM-DD HH:mm:ss")
+    };
+}
+
 export default function ApplicantChecking(): ReactNode {
     const userServer = ApplicantWorkHooks.useMethod();
     const {message} = App.useApp();
-    const [statuss, setStatus] = useState<CheckingSelfResumeStatus[]>([]);
+    const [statuses, setStatus] = useState<CheckingSelfResumeStatus[]>([]);
     const [flag, swaps] = useSwapBoolean();
+    const stateUnitState = [
+        getStatusUnit(statuses.length >= 1, statuses[1]),
+        getStatusUnit(statuses.length >= 2, statuses[2]),
+        getStatusUnit(statuses.length >= 3, statuses[3])
+    ];
     useEffect(() => {
         userServer.getCheckingSelfResumeStatusList().then(r => {
             if (r.success) {
@@ -45,12 +61,13 @@ export default function ApplicantChecking(): ReactNode {
         <TableHeader title={'简历状态'} onFresh={swaps}/>
         <div className={"flex flex-col justify-center gap-12 h-full"}>
             <div className={"flex justify-center gap-14"}>
-                <StatusUnit status={"Accept"} title={"MOE LTD"}/>
-                <StatusUnit status={"Delay"} title={"MOE LTD"} failReason={"你这是违法行为,走,跟我去自首!"}/>
-                <StatusUnit status={"Waiting"}/>
+                <StatusUnit {...stateUnitState[0]}/>
+                <StatusUnit {...stateUnitState[1]}/>
+                <StatusUnit {...stateUnitState[2]}/>
             </div>
             <div className={"flex justify-center"}>
-                <StatusUnit status={"Waiting"}/>
+                <StatusUnit
+                    status={calStatus(stateUnitState[0].status, stateUnitState[1].status, stateUnitState[2].status)}/>
             </div>
         </div>
     </MainContainerProvider>;
