@@ -66,6 +66,7 @@ import {
 } from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
+import {fileTypeFromBlob} from "file-type/core";
 
 const alovaClientImpl = createAlova({
     statesHook: ReactHook,
@@ -88,8 +89,10 @@ const alovaClientJavaFileImpl = createAlova({
     requestAdapter: GlobalFetch(),
     baseURL: SERVER_URLS.javaBackendUrl + "/files",
     responded: async (response) => {
-        console.log(response);//TODO：重新编写拦截器。使得文件正常解析
-        return new File([await response.blob()], "file");
+        const blob = await response.blob();
+        const types = await fileTypeFromBlob(blob);
+        if (!types) return new File([blob], "unknown-file");
+        return new File([blob], "resume-file." + types.ext, {type: types.mime});
     }
 });
 const alovaClientWeBaseImpl = createAlova({
@@ -557,7 +560,11 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
             async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                const metaData = await alovaClientWeBaseImpl.Get<string>(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`);
+                const metaData = await alovaClientWeBaseImpl.Get<string>(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`, {
+                    headers: {
+                        "content-type": "text/plain",
+                    }
+                });
                 console.log(metaData);
                 await FileSystemImpl.downloadToFileAsNameAsync(new Blob([metaData]), `result for ${file.name}.json`);
             }

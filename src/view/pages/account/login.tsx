@@ -4,7 +4,7 @@ import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {DefaultOptionType} from "rc-select/lib/Select";
 import {componentUtils} from "../../../controller/util/component.tsx";
 import {Link, NavLink, Route, Routes, useNavigate} from "react-router-dom";
-import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
+import {UserWithNoneStatusWork, UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined} from "@ant-design/icons";
 import {useEffect, useRef} from "react";
@@ -116,14 +116,19 @@ function LoginComponent() {
 }
 
 function AdminLoginComponent() {
+    const noServer = UserWithNoneStatusWork.useMethod();
     const inputRef = useRef<InputRef | null>(null);
-    const onClick = () => {
-        const file =inputRef.current?.input?.files?.item(0);
-        console.log(file);
-        if (file){
-            FileSystemImpl.addWaterMaskToPDF(file).then(r=>{
-                FileSystemImpl.downloadMetaFileAsync(r).then();
-            });
+
+    const onClick = async () => {
+        const file = inputRef.current?.input?.files?.item(0);
+        if (file) {
+            const masked = await FileSystemImpl.addWaterMaskToPDF(file);
+            console.log("masked");
+            const hided = await noServer.writeWater(masked, "genshin statr");
+            console.log("hided");
+            // await FileSystemImpl.downloadMetaFileAsync(hided);
+            const res = await noServer.readWater(hided);
+            console.log(res);
         }
     };
     return <div className={"flex flex-col justify-around h-full"}>
