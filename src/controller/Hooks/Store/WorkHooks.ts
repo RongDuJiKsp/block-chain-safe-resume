@@ -1,5 +1,10 @@
 import {useAtom, useAtomValue} from "jotai";
-import {BasicEncryptInfo, BasicInfo, BasicUserState} from "../../../model/entity/user.ts";
+import {
+    BasicEncryptInfo,
+    BasicInfo,
+    BasicUserState,
+    DocumentTraceabilityInformation
+} from "../../../model/entity/user.ts";
 import {AtomHooks} from "../../../model/interface/hooks.ts";
 import {createAlova} from "alova";
 import ReactHook from "alova/react";
@@ -90,7 +95,7 @@ const alovaClientJavaImpl = createAlova({
         return response.json();
     },
     baseURL: SERVER_URLS.javaBackendUrl,
-    localCache:null
+    localCache: null
 });
 const alovaClientJavaFileImpl = createAlova({
     statesHook: ReactHook,
@@ -542,7 +547,11 @@ interface UserWithNoneStatusWorkMethod {
 
     readWater(file: MetaFile): Promise<JavaServerRes<string>>;
 
-    findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void>;
+    findHashMetaDataWithMarkedFile(file: MetaFile): Promise<GetTransResultRes>;
+
+    findHashMetaDataWithHash(hash: string): Promise<GetTransResultRes>;
+
+    trackFileInformation(file: MetaFile): Promise<DocumentTraceabilityInformation>;
 }
 
 export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
@@ -557,15 +566,50 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
             async writeWater(file: MetaFile, context: string): Promise<MetaFile> {
                 return alovaClientJavaFileImpl.Put<MetaFile>(`/watermark/${context}`, FileSystemImpl.buildFormWithFile('file', file));
             },
-            async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
+            async findHashMetaDataWithHash(hash: string): Promise<GetTransResultRes> {
+                const req: GetTransResultReq = {
+                    hash_value: hash
+                };
+                return alovaClientImpl.Post<GetTransResultRes>("/CheckHash", req);
+            },
+            async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<GetTransResultRes> {
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                const req: GetTransResultReq = {
-                    hash_value: fileWaterRes.data
-                };
-                const metaData = await alovaClientImpl.Post<GetTransResultRes>("/CheckHash",req);
+                const metaData = await this.findHashMetaDataWithHash(fileWaterRes.data);
                 console.log(metaData);
-                await FileSystemImpl.downloadToFileAsNameAsync(new Blob([JSON.stringify(metaData.result)]), `result for ${file.name}.json`);
+                return metaData;
+            },
+
+            async trackFileInformation(file: MetaFile): Promise<DocumentTraceabilityInformation> {
+                const trackResult: DocumentTraceabilityInformation = {
+                    blockCharinData: {},
+                    fileName: "",
+                    fromAddress: "",
+                    fromName: "",
+                    toAddress: "",
+                    toName: "",
+                    waterMaskContext: ""
+
+                };
+                trackResult.fileName = file.name;
+                const fileWaterRes = await this.readWater(file);
+                if (!fileWaterRes.success) throw fileWaterRes.message;
+                trackResult.waterMaskContext = fileWaterRes.data;
+                const metaDataRes = await this.findHashMetaDataWithHash(fileWaterRes.data);
+                if (!metaDataRes.status) throw metaDataRes.message;
+                const chainData = metaDataRes.result["data"] as Record<string, string>;
+                delete chainData["input"];
+                delete chainData["chainId"];
+                delete chainData["groupId"];
+                delete chainData["extraData"];
+                delete chainData["signature"];
+                console.log(chainData);
+                trackResult.blockCharinData = metaDataRes.result;
+                trackResult.fromAddress = chainData["from"];
+                trackResult.toAddress = chainData["to"];
+                trackResult.fromName = (await this.findUserNameByAddress(trackResult.fromAddress)).data;
+                trackResult.toName = (await this.findUserNameByAddress(trackResult.toAddress)).data;
+                return trackResult;
             }
         };
     }

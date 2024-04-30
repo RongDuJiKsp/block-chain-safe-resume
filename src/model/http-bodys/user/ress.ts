@@ -58,5 +58,5 @@ export interface JavaServerRes<Data> {
 }
 
 export interface GetTransResultRes extends BaseRes {
-    result: Record<string, string>;
+    result: Record<string, string | Record<string, string>>;
 }
