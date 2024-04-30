@@ -133,7 +133,7 @@ function AdminLoginComponent() {
         }
     };
     const onCheck2 = async () => {
-       console.log( AlgorithmSystemImpl.calculateEncryptedKeyByS(String(9504)));
+
     };
 
     return <div className={"flex flex-col justify-around h-full"}>
