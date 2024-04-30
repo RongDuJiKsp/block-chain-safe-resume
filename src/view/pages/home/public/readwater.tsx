@@ -56,13 +56,12 @@ export default function ReadWaterPage() {
 function TraceDataShowerModel({data, clear}: ModelPropsWithInfoAndClear<DocumentTraceabilityInformation>): ReactNode {
     return <Modal open={data !== null} footer={null} onCancel={clear}>
         <div className={"my-8 font-bold font-sans gap-1 flex-col flex"}>
-            <div>上传文件名: {data?.fileName}</div>
-            <div>水印内容: {data?.waterMaskContext}</div>
-            <div>合约信息：{data?.toAddress}</div>
-            <div>下载者信息：{data?.fromName}<br/>({data?.fromAddress})</div>
-            <div>拥有者信息：{data?.sourceName}<br/>({data?.sourceAddress})</div>
-            <div>区块链信息：</div>
-            <Input.TextArea autoSize={{maxRows: 7}} value={JSON.stringify(data?.blockCharinData)}/>
+            <div>文件名称: {data?.fileName}</div>
+            <div>水印信息: {data?.waterMaskContext}</div>
+            <div>下载方信息：{data?.fromName}<br/>({data?.fromAddress})</div>
+            <div>上传方信息：{data?.sourceName}<br/>({data?.sourceAddress})</div>
+            <div>区块链数据：</div>
+            <Input.TextArea autoSize={{maxRows: 7}} value={data ? Object.entries(data.blockCharinData.data).map(([k,v])=>`${k}:\n${v}\n`).join("\n"): undefined}/>
         </div>
     </Modal>;
 }
