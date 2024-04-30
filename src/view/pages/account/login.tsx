@@ -29,7 +29,7 @@ function LoginPage() {
     return <div>
         <div
             className={"login-container-anima login-locations hover:flex-shadow flex flex-col justify-around  basic-shadow-box"}>
-            <div className={"text-right pr-5 basis-1/6 pt-2 dark-mode-text"}>
+            <div className={"text-right pr-5 basis-1/12 pt-2 dark-mode-text"}>
                 切换
                 {[["管理端", "./admin"], ["用户端", "./user"]].map(r =>
                     <NavLink key={r[0]} to={r[1]}
@@ -85,17 +85,17 @@ function LoginComponent() {
         <div className={"text-center text-2xl font-bold"}>欢迎来到SafeCV Zone平台</div>
         <Form<LoginFormType> onFinish={onLogin} className={"px-8"}>
             <Form.Item<LoginFormType> name={"username"} colon={false}
-                                      rules={[{min: 4, max: 12},]}
-                                      label={<UserOutlined className={"text-white"} style={{fontSize: 26}}/>}>
+                                      rules={[{min: 3, max: 12},]}
+                                      label={<UserOutlined className={"text-white"} style={{fontSize: 18}}/>}>
                 <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"pwd"} colon={false}
                                       rules={[{min: 4, max: 12}, {pattern: /[0-9a-zA-Z]+/}]}
-                                      label={<KeyOutlined className={"text-white"} style={{fontSize: 26}}/>}>
-                <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
+                                      label={<KeyOutlined className={"text-white"} style={{fontSize: 18}}/>}>
+                <Input.Password allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} colon={false}
-                                      label={<IdcardOutlined className={"text-white"} style={{fontSize: 26}}/>}>
+                                      label={<IdcardOutlined className={"text-white"} style={{fontSize: 18}}/>}>
                 <Select placeholder={"请选择你的身份"} options={identityOption} size={"middle"}/>
             </Form.Item>
             <div className={"flex justify-center"}>

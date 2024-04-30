@@ -9,7 +9,7 @@ import {ChangeNameReq, GetTokenReq, LoginReq} from "../../../model/http-bodys/us
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, GetTokenRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
+import {ArrayRes, ChangeNameRes, GetTokenRes, JavaServerRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     KKInfoForSendListRes,
@@ -24,10 +24,9 @@ import {
     ChangeKKRes,
     GetFileMesRes,
     GetSavedRes,
-    KKAcceptOrDelayRes,
     KKDownloadKeyRes,
-    KKGetToBeAuditedRes,
     RequestListRes,
+    ToBeAuditedResume,
     UploadSubKeyRes
 } from "../../../model/http-bodys/user/keykeeper/res.ts";
 import {
@@ -41,7 +40,6 @@ import {
     GetFileMesReq,
     GetNeedSaveReq,
     GetSaveReq,
-    KKDownloadKeyReq,
     RemindKKReq,
     UploadKeyReq
 } from "../../../model/http-bodys/user/keykeeper/req.ts";
@@ -61,7 +59,11 @@ import {
     GetRequestReq,
     PostOnekeyReq
 } from "../../../model/http-bodys/user/applicant/req.ts";
-import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../model/entity/applicant.ts";
+import {
+    CheckingSelfResumeStatus,
+    ResumeLicenseRequestInfo,
+    ResumeVisitHistoryInfo
+} from "../../../model/entity/applicant.ts";
 import {CryptoSystemImpl} from "../../crypto/hash.ts";
 import {AlgorithmSystemImpl} from "../../crypto/algorithm.ts";
 
@@ -72,6 +74,31 @@ const alovaClientImpl = createAlova({
         return response.json();
     },
     baseURL: SERVER_URLS.backendUrl
+});
+const alovaClientJavaImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    responded: (response) => {
+        return response.json();
+    },
+    baseURL: SERVER_URLS.javaBackendUrl
+});
+const alovaClientJavaFileImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    baseURL: SERVER_URLS.javaBackendUrl + "/files",
+    responded: async (response) => {
+        console.log(response);
+        return await response.blob();
+    }
+});
+const alovaClientWeBaseImpl = createAlova({
+    statesHook: ReactHook,
+    requestAdapter: GlobalFetch(),
+    responded: (response) => {
+        return response.json();
+    },
+    baseURL: SERVER_URLS.weBaseUrl
 });
 
 
@@ -93,6 +120,7 @@ interface UserWorkMethod {
     changeUserNameAsync(newName: string): Promise<ChangeNameRes>;
 
     getTokenNumberAsync(): Promise<GetTokenRes>;
+
 }
 
 export const UserWorkHooks: AtomHooks<UserWorkValue, UserWorkMethod> = {
@@ -164,6 +192,8 @@ interface ApplicantWorkMethod {
     getKKInfoForSendListAsync(): Promise<KKInfoForSendListRes>;
 
     sendSubKeyToKKAsync(X: string, M: string, i: string, kkPublicKey: string, kkAddress: string): Promise<SendSubKeyToKKRes>;
+
+    getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus[]>>;
 }
 
 export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
@@ -250,18 +280,23 @@ export const ApplicantWorkHooks: AtomHooks<null, ApplicantWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ResumeInfoRes>("/GetMoreFileMesReq", req);
             },
-            async encryptedAndUpdateResumeAsync(File: MetaFile, S: string): Promise<UploadRes> {
+            async encryptedAndUpdateResumeAsync(file: MetaFile, S: string): Promise<UploadRes> {
                 if (userInfo === null) throw "在未登录时上传简历";
-                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(File, S);
-                const formData = new FormData();
-                formData.append("file", encryptedFile);
-                return alovaClientImpl.Post<UploadRes>("/UploadReq", formData, {
+                const encryptedFile = await CryptoSystemImpl.encryptedFileAsync(file, S);
+                await alovaClientJavaImpl.Put<JavaServerRes<string>>(`/files/${userInfo.nick}`, FileSystemImpl.buildFormWithFile('file', file));
+                console.log("文件上传成功");
+                return alovaClientImpl.Post<UploadRes>("/UploadReq", FileSystemImpl.buildFormWithFile('file', encryptedFile), {
                     params: {
                         address: userInfo.address,
                         userName: userInfo.nick
                     }
                 });
+            },
+            async getCheckingSelfResumeStatusList(): Promise<JavaServerRes<CheckingSelfResumeStatus[]>> {
+                if (userInfo === null) throw "在未登录时查询简历状态";
+                return alovaClientJavaImpl.Get<JavaServerRes<CheckingSelfResumeStatus[]>>(`/check/user?resumeUsername=${userInfo.nick}`);
             }
+
         };
     },
     useValue(): null {
@@ -287,15 +322,21 @@ interface RecruiterWorkMethod {
 export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
     useMethod(): RecruiterWorkMethod {
         const userInfo = useAtomValue(userInfoAtom);
+        const noStatusServer = UserWithNoneStatusWork.useMethod();
         return {
             async autoDownloadFile(ApAddress: string, ApUserName: string): Promise<void> {
                 console.log(ApAddress, ApUserName);
-                const chainMeta = await this.getFileMessageAsync(ApAddress);
+                const chainMeta = await this.getFileMessageAsync(ApAddress);//获取待下载文件信息
                 console.log(chainMeta);
                 if (!chainMeta.status) throw chainMeta.message;
-                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileHash);
+                const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileType);//下载并解密文件
                 console.log("***", file);
-                await FileSystemImpl.downloadMetaFileAsync(file);
+                //为文件添加显水印
+                const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
+                //为文件添加隐水印
+                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.blockHash);
+                //下载文件
+                await FileSystemImpl.downloadMetaFileAsync(waterFile);
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
                 if (userInfo === null) throw "未登录时尝试下载";
@@ -363,9 +404,9 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
 interface KeyKeeperWorkMethod {
     uploadSubKeyAsync(ApUsername: string, i: number, x: number, m: number): Promise<UploadSubKeyRes>;
 
-    downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes>;
+    downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes>;
 
-    acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes>;
+    acceptOrDelayResumeAsync(isAccept: boolean, result: string, username: string): Promise<JavaServerRes<string>>;
 
     getRequestListAsync(): Promise<RequestListRes>;
 
@@ -381,7 +422,9 @@ interface KeyKeeperWorkMethod {
 
     getSavedSubKeyListAsync(): Promise<GetSavedRes>;
 
-    getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes>;
+    getToBeAuditedListAsync(): Promise<JavaServerRes<ToBeAuditedResume[]>>;
+
+    downloadToBeAuthoredResume(apName: string): Promise<MetaFile>;
 
 
 }
@@ -411,15 +454,12 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post<ChangeKKRes>("/ChangeKKReq", req);
             },
-            async downloadSubKeyAsync(encryptPrivateKeys: string, apAddress: string): Promise<KKDownloadKeyRes> {
+            async downloadSubKeyAsync(encryptPrivateKeyFile: MetaFile, apAddress: string): Promise<KKDownloadKeyRes> {
+                console.log(encryptPrivateKeyFile);
                 if (userInfo === null) throw "未登录时尝试获取秘密份额";
-
-                const req: KKDownloadKeyReq = {
-                    KKAddress: userInfo.address,
-                    ApAddress: apAddress,
-                    encryptPrivateKeys: encryptPrivateKeys
-                };
-                return alovaClientImpl.Post<KKDownloadKeyRes>("/KKDownloadKeyReq", req);
+                const formData = new FormData();
+                formData.append("file", encryptPrivateKeyFile);
+                return alovaClientImpl.Post<KKDownloadKeyRes>(`/KKDownloadKeyReq?KKAddress=${userInfo.address}&ApAddress=${apAddress}`, formData);
             },
             async getAccessibleSubKeyListAsync(): Promise<AccessibleSubKeyListRes> {
                 if (userInfo === null) throw "未登录时尝试上传";
@@ -462,20 +502,65 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 };
                 return alovaClientImpl.Post("/UploadKeyReq", req);
             },
-            async getToBeAuditedListAsync(): Promise<KKGetToBeAuditedRes> {
-                return {//TODO:接口联调
-                    status: 1,
-                    message: "3",
-                    list: []
-                };
+            async getToBeAuditedListAsync(): Promise<JavaServerRes<ToBeAuditedResume[]>> {
+                if (userInfo === null) throw "未登录时尝试获取";
+                const res = await alovaClientJavaImpl.Get<JavaServerRes<ToBeAuditedResume[]>>(`/check/uncheck?checkUsername=${userInfo.nick}`);
+                console.log(res);
+                return res;
             },
-            async acceptOrDelayResumeAsync(state: number, result: string, username: string): Promise<KKAcceptOrDelayRes> {
-                return {//TODO 接口联调
-                    status: 1,
-                    message: "ok",
-                };
+            async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
+                if (userInfo === null) throw "未登录时尝试获取";
+                return alovaClientJavaImpl.Post(`/check/${username}`, undefined, {
+                    params: {
+                        checkUsername: userInfo.nick,
+                        isApprove: isAccepted,
+                        reason: result
+                    }
+                });
+            },
+            async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
+                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/${apName}`);
+                await alovaClientJavaFileImpl.Delete<MetaFile>(`/${apName}`);
+                return downloadResFile;
             }
 
+        };
+    }
+    , useValue(): null {
+        return null;
+    }
+
+};
+
+interface UserWithNoneStatusWorkMethod {
+    findUserNameByAddress(address: string): Promise<JavaServerRes<string>>;
+
+    writeWater(file: MetaFile, context: string): Promise<MetaFile>;
+
+    readWater(file: MetaFile): Promise<JavaServerRes<string>>;
+
+    findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void>;
+}
+
+export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMethod> = {
+    useMethod(): UserWithNoneStatusWorkMethod {
+        return {
+            async findUserNameByAddress(address: string): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Get<JavaServerRes<string>>(`/applicant/${address}`);
+            },
+            async readWater(file: MetaFile): Promise<JavaServerRes<string>> {
+                return alovaClientJavaImpl.Post<JavaServerRes<string>>(`/watermark`, FileSystemImpl.buildFormWithFile('file', file));
+            },
+            async writeWater(file: MetaFile, context: string): Promise<MetaFile> {
+                return alovaClientJavaFileImpl.Put<MetaFile>(`/watermark/${context}`, FileSystemImpl.buildFormWithFile('file', file));
+            },
+            async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
+                const fileWaterRes = await this.readWater(file);
+                if (!fileWaterRes.success) throw fileWaterRes.message;
+                const metaData = await alovaClientWeBaseImpl.Get<string>(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`);
+                console.log(metaData);
+                await FileSystemImpl.downloadToFileAsNameAsync(new Blob([metaData]), `result for ${file.name}.json`);
+            }
         };
     }
     , useValue(): null {

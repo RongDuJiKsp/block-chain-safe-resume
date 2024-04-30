@@ -73,3 +73,6 @@ html {
 .window-color-back {
     background: linear-gradient(to right bottom, #abcdef, #85b0de);
 }
+.layout-full-context-min-height{
+    min-height: calc(100vh - 64px);
+}

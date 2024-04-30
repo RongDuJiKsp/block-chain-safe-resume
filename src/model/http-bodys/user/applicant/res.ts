@@ -1,5 +1,5 @@
 import {BaseRes} from "../ress.ts";
-import {ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../entity/applicant.ts";
+import {CheckingSelfResumeStatus, ResumeLicenseRequestInfo, ResumeVisitHistoryInfo} from "../../../entity/applicant.ts";
 import {BasicEncryptInfo} from "../../../entity/user.ts";
 
 /**
@@ -40,6 +40,12 @@ export interface UploadRes extends BaseRes {
 export interface KKInfoForSendListRes extends BaseRes {
     list: BasicEncryptInfo[];
 }
-export interface SendSubKeyToKKRes extends BaseRes{
 
+export interface SendSubKeyToKKRes extends BaseRes {
+
+}
+
+
+export interface GetAuthenticationRes extends BaseRes {
+    list: CheckingSelfResumeStatus[]
 }

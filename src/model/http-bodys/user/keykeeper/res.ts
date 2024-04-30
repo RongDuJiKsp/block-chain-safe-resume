@@ -1,5 +1,5 @@
 import {BaseRes} from "../ress.ts";
-import {AccessibleSubKeyInfo, AuditResumeInfo, UploadSubKeyRequestInfo} from "../../../entity/keykeeper.ts";
+import {AccessibleSubKeyInfo, UploadSubKeyRequestInfo} from "../../../entity/keykeeper.ts";
 import {BasicInfo} from "../../../entity/user.ts";
 
 //kk上传秘密份额的响应体
@@ -38,6 +38,7 @@ export interface GetFileMesRes extends BaseRes {
     fileName: string;
     fileType: string;
     fileHash: string;
+    reslut: { blockHash: string };
 }
 
 /**
@@ -60,11 +61,8 @@ export interface KKDownloadKeyRes extends BaseRes {
     m: number
 }
 
-//kk获取待审核简历
-export interface KKGetToBeAuditedRes extends BaseRes {
-    list: AuditResumeInfo[]
-}
-//kk允许或者打回简历
-export interface KKAcceptOrDelayRes extends BaseRes{
 
+export interface ToBeAuditedResume {
+    username: string;
+    address: string;
 }

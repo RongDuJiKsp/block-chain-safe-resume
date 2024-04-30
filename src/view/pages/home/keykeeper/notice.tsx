@@ -10,6 +10,7 @@ import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {useBoolean} from "ahooks";
 import {UploadKeyReq} from "../../../../model/http-bodys/user/keykeeper/req.ts";
 import {useForm} from "antd/es/form/Form";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 
 export default function KeyKeeperNotice() {
@@ -32,14 +33,12 @@ export default function KeyKeeperNotice() {
             message.error(e.toString()).then();
         }).finally(loadingAction.setFalse);
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
-        <div className={"work-window-color basis-3/4 basic-shadow-box px-8 py-4"}>
-            <TableHeader title={"待上传请求"} onFresh={changeAction}/>
-            <Spin spinning={isLoading} delay={500}>
-                <RequestTableComponent tableVal={tableVal}/>
-            </Spin>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <TableHeader title={"待上传请求"} onFresh={changeAction}/>
+        <Spin spinning={isLoading} delay={500}>
+            <RequestTableComponent tableVal={tableVal}/>
+        </Spin>
+    </MainContainerProvider>;
 }
 
 function RequestTableComponent({tableVal}: { tableVal: UploadSubKeyRequestInfo[] }) {
@@ -95,8 +94,7 @@ function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<UploadSubKe
             if (r.status) {
                 message.success("上传成功").then();
                 clear();
-            }
-            else message.error("上传失败，原因为 " + r.message).then();
+            } else message.error("上传失败，原因为 " + r.message).then();
         }).catch(e => {
             console.error(e);
             message.error("发生错误，错误为：" + e).then();
@@ -112,7 +110,7 @@ function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<UploadSubKe
                 <p>请确认当前选择的用户 用户名 : {data?.ApUserName}</p>
                 <p>请确认上传的密钥是否正确，上传错误的密钥将会导致积分惩罚！</p>
             </div>
-            <div >
+            <div>
                 <Form<UploadKeyReq> form={formRef} onFinish={onConform} labelCol={{span: 6}} preserve={false}>
                     <Form.Item<UploadKeyReq> label={"密钥位次"} name={"i"} rules={[{required: true}]}>
                         <InputNumber min={0} max={4}/>

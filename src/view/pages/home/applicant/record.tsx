@@ -83,16 +83,13 @@ function ResumeInfoComponent({info, firstInfo}: {
     info: ResumeInfoRes | null,
     firstInfo: ResumeVisitHistoryInfo | null
 }) {
-    console.log(info);//TODO:接口联调 显示简历状态
+    console.log(info);
     return <div className={"flex justify-around"}>
         <Statistic title={"简历下载次数"} prefix={componentUtils.getIcon("icon-visitor-authorization")}
                    value={info?.downloadtimes} suffix={"次"} formatter={numberCountUpFormatter}/>
         <Statistic title={"简历更新时间"} prefix={componentUtils.getIcon("icon-iconrequirement")}
                    className={"basis-1/5"}
                    value={info && info.putTime ? dayjs.unix(info.putTime).format("YYYY-MM-DD HH:mm") : "N/A"}/>
-        <Statistic title={"简历状态"}
-                   prefix={<Tooltip title={"恭喜，简历已通过"}>{componentUtils.getIcon("icon-status")}</Tooltip>}
-                   value={"已通过"}/>
         <Statistic title={"最新访问时间"} prefix={componentUtils.getIcon("icon-keyhole")}
                    value={firstInfo ? dayjs.unix(Number(firstInfo.downloadTime)).format("YYYY-MM-DD HH:mm") : "N/A"}/>
 

@@ -21,6 +21,10 @@ export interface UserFileSystem {
 
     readFileAsTextAsync(file: MetaFile): Promise<string>;
 
+    buildFormWithFile(fieldName: string, file: MetaFile): FormData;
+
+    addWaterMaskToPDF(file: MetaFile): Promise<MetaFile>;
+
 }
 
 export type ConfigTable<List extends string | number, ValuesType> = {

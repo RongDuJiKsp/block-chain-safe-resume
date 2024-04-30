@@ -6,11 +6,11 @@ import {ColumnsType} from "antd/es/table";
 import {KeyKeeperWorkHook, UserWorkHooks} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
 import {KKDownloadKeyRes} from "../../../../model/http-bodys/user/keykeeper/res.ts";
-import {LoadingOutlined} from "@ant-design/icons";
 import {useBoolean} from "ahooks";
 import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 import {BasicInfo} from "../../../../model/entity/user.ts";
+import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
 
 
 export default function KeyKeeperGetSubKey() {
@@ -28,12 +28,10 @@ export default function KeyKeeperGetSubKey() {
             }
         });
     }, [flashFlag]);
-    return <div className={"flex flex-col justify-center gap-14 basic-window h-full-screen"}>
-        <div className={"work-window-color basis-3/4 px-8 py-4 basic-shadow-box"}>
-            <TableHeader title={"可保管秘密份额"} onFresh={changeAction}/>
-            <AccessibleSubKeyTableComponent tableVal={tableVal}/>
-        </div>
-    </div>;
+    return <MainContainerProvider>
+        <TableHeader title={"可保管秘密份额"} onFresh={changeAction}/>
+        <AccessibleSubKeyTableComponent tableVal={tableVal}/>
+    </MainContainerProvider>;
 }
 
 function AccessibleSubKeyTableComponent({tableVal}: { tableVal: BasicInfo[] }) {
@@ -101,14 +99,13 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
     const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>): void => {
         if (event.target.files === null) return;
         setSelectFiles(Array.from(event.target.files));
-        event.target.value = "";
     };
-    const onFinish = async () => {
+    const onFinish = () => {
         if (data === null) {
             message.error("登录状态异常，请退出后重试！").then();
             return;
         }
-        kkUserServer.downloadSubKeyAsync(await FileSystemImpl.readFileAsTextAsync(selectedFiles[0]), data.address).then(r => {
+        kkUserServer.downloadSubKeyAsync(selectedFiles[0], data.address).then(r => {
             if (r.status) {
                 setKeyPair(r);
             } else {
@@ -124,7 +121,9 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         <div className={"my-5"}>
             {keyPair === null ?
                 <div>
-                    <input type="file" onChange={onSelectFile}/>
+                    <div className={"flex justify-center my-3"}>
+                        <input type="file" onChange={onSelectFile}/>
+                    </div>
                     <div className={"flex justify-center"} onClick={onFinish}>
                         <button className={"button button-3d button-primary "}>解析秘密份额</button>
                     </div>

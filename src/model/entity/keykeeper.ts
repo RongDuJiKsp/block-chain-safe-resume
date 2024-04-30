@@ -9,7 +9,3 @@ export interface AccessibleSubKeyInfo {
     address: string,
     amount: number
 }
-export interface  AuditResumeInfo{
-    userName:string;
-    fileBase64:string;
-}

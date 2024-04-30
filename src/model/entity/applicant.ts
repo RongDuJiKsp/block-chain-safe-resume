@@ -8,3 +8,12 @@ export interface ResumeVisitHistoryInfo {
     ReUserName: string;
     downloadTime: string;
 }
+
+
+
+export interface CheckingSelfResumeStatus {
+    isApprove: string;
+    reason: string;
+    checkUsername: string;
+    checkTime: string;
+}

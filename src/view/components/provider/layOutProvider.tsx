@@ -2,10 +2,10 @@ import "./provider.css";
 import logo from "../../../assets/logo-p.png";
 import title from "../../../assets/title.png";
 import {PropsWithChildren, ReactNode, useEffect, useState} from "react";
-import {App, Dropdown, Form, Input, Modal} from "antd";
+import {App, Dropdown, Form, Input, Layout, Menu, Modal} from "antd";
 import {ItemType} from "antd/es/menu/hooks/useItems";
 import {componentUtils} from "../../../controller/util/component.tsx";
-import {NavLink} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {UserWorkHooks} from "../../../controller/Hooks/Store/WorkHooks.ts";
 import {useBoolean} from "ahooks";
 import {CancelableOperateHooks} from "../../../model/interface/hooks.ts";
@@ -13,6 +13,8 @@ import {useForm} from "antd/es/form/Form";
 import {UserGroup} from "../../../model/entity/user.ts";
 import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
+import Sider from "antd/es/layout/Sider";
+import {Content, Header} from "antd/es/layout/layout";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -30,37 +32,39 @@ interface ChangeNickFormProps {
     nick: string;
 }
 
-export default function HeaderBarProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
+export default function LayOutProvider({children, items, group}: PropsWithChildren<HeaderBarProps>) {
+    const [collapsed, setCollapsed] = useState(false);
+    const navi = useNavigate();
 
-    return <div>
-        <div className={"header-bar-height bg-gray-50 flex justify-between py-2 "}>
-            <div className={"item-container ml-10 flex px-3 basis-[12.5%] justify-around"}>
-                <img draggable={false} src={logo} alt={"LOGO"} className={"h-full"}/>
-                <img draggable={false} src={title} alt={"LOGO"} className={"h-2/3 my-auto"}/>
-            </div>
-            <div className={"basis-2/3"}>
-                <FunctionItems items={items}/>
-            </div>
-            <div className={"basis-[10.5%] item-container mr-11 items-col-center-flex"}>
-                <DropDownOperations group={group}/>
-            </div>
-        </div>
-        {children}
-    </div>;
+    return <Layout>
+        <Sider theme={"light"} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+            <Menu theme={"light"} mode={"inline"} onSelect={(val) => navi(val.key)} inlineCollapsed={true}
+                  items={items.map((value): ItemType => ({
+                      label: value.text,
+                      key: value.routerPath,
+                      icon: value.logo
+                  }))}/>
+        </Sider>
+        <Layout>
+            <Header>
+                <div className={"flex justify-between h-full"}>
+                    <div className={"item-container ml-10 flex px-3 basis-[12.5%] justify-around"}>
+                        <img draggable={false} src={logo} alt={"LOGO"} className={"h-full"}/>
+                        <img draggable={false} src={title} alt={"LOGO"} className={"h-2/3 my-auto"}/>
+                    </div>
+                    <div className={"basis-2/3"}/>
+                    <div className={"basis-[10.5%] item-container mr-11 items-col-center-flex"}>
+                        <DropDownOperations group={group}/>
+                    </div>
+                </div>
+            </Header>
+            <Content className={"layout-full-context-min-height"}>
+                {children}
+            </Content>
+        </Layout>
+    </Layout>;
 }
 
-function FunctionItems({items}: { items: ItemsAndPic[] }) {
-    return <div className={"flex justify-end h-full gap-7"}>
-        {items.map((value, index) => {
-            return <NavLink to={value.routerPath} draggable={false}
-                            className={({isActive}) => isActive ? "active-nav nav-button-bg-color-blue" : "basis-nav nav-button-bg-color-blue"}
-                            key={"item-map" + index}>
-                {value.logo}
-                <div className={"text-center my-auto font-mono font-bold text-lg"}>{value.text}</div>
-            </NavLink>;
-        })}
-    </div>;
-}
 
 function DropDownOperations({group}: { group: UserGroup }) {
     const {message} = App.useApp();
@@ -146,7 +150,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
             <div className={"m-8"}>
                 <Form<ChangeNickFormProps> form={form} onFinish={onSubmit}>
                     <Form.Item<ChangeNickFormProps> name={"nick"} label={"目标昵称"}
-                                                    rules={[{min: 4, max: 12}, {required: true}]}>
+                                                    rules={[{min: 3, max: 12}, {required: true}]}>
                         <Input allowClear/>
                     </Form.Item>
                 </Form>
@@ -157,14 +161,17 @@ function DropDownOperations({group}: { group: UserGroup }) {
         </Modal>
         <Dropdown menu={{items: dropDownItems}}>
             <div
-                className={"flex justify-center rounded-full shadow-float h-full mx-auto px-3 nav-button-bg-color-green"}>
-                <div className={"my-auto"}>
-                    <span>{group.userHeader}</span>
-                </div>
-                <div className={"my-auto"}>
-                    <span className={"text-lg align-middle"}>&ensp;个人信息</span>
+                className={"rounded-full shadow-float h-full  px-3 nav-button-bg-color-green flex flex-col justify-center"}>
+                <div className={"flex justify-center"}>
+                    <div>
+                        {group.userHeader}
+                    </div>
+                    <div className={"align-middle"}>
+                        &ensp;个人信息
+                    </div>
                 </div>
             </div>
         </Dropdown>
-    </>;
+    </>
+        ;
 }
