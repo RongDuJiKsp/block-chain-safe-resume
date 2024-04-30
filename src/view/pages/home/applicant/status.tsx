@@ -65,14 +65,14 @@ function ResumeRequestComponent({tableVal}: { tableVal: ResumeLicenseRequestInfo
             render(_, rec): ReactNode {
                 return <div className={"justify-around flex"}>
                     {rec.status ? <Tag color={"green"}>已授权</Tag> :
-                        <>
+                        <div className={"flex justify-around gap-6"}>
                             <Popconfirm title={"确认对用户进行授权？"} onConfirm={() => onOpResumeLicense(1, rec)}>
                                 <Button type={"primary"}>授权</Button>
                             </Popconfirm>
                             <Popconfirm title={"确认拒绝用户授权？"} onConfirm={() => onOpResumeLicense(0, rec)}>
                                 <Button type={"primary"} danger={true}>拒绝</Button>
                             </Popconfirm>
-                        </>}
+                        </div>}
                 </div>;
             },
             filters: [
