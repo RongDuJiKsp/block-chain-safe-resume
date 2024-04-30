@@ -10,6 +10,7 @@ import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined
 import {useEffect, useRef} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
+import {AlgorithmSystemImpl} from "../../../controller/crypto/algorithm.ts";
 
 
 type LoginFormType = {
@@ -131,6 +132,10 @@ function AdminLoginComponent() {
             console.log(res);
         }
     };
+    const onCheck2 = async () => {
+       console.log( AlgorithmSystemImpl.calculateEncryptedKeyByS(String(9504)));
+    };
+
     return <div className={"flex flex-col justify-around h-full"}>
         <div className={"text-center text-2xl  font-bold "}>欢迎来到安全简历部署管理系统</div>
         <Form>
@@ -139,7 +144,7 @@ function AdminLoginComponent() {
             </Form.Item>
         </Form>
         <div className={"flex justify-center"}>
-            <button onClick={onClick}
+            <button onClick={onCheck2}
                     className={"button button-raised button-pill button-action button-3d"}>进入管理系统
             </button>
         </div>
