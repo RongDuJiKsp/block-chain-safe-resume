@@ -88,8 +88,8 @@ const alovaClientJavaFileImpl = createAlova({
     requestAdapter: GlobalFetch(),
     baseURL: SERVER_URLS.javaBackendUrl + "/files",
     responded: async (response) => {
-        console.log(response);
-        return await response.blob();
+        console.log(response);//TODO：重新编写拦截器。使得文件正常解析
+        return new File([await response.blob()], "file");
     }
 });
 const alovaClientWeBaseImpl = createAlova({

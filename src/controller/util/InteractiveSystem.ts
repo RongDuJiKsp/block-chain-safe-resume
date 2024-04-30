@@ -1,10 +1,14 @@
 import {UserFileSystem} from "../../model/interface/util.ts";
 import {SyncStorage} from "jotai/vanilla/utils/atomWithStorage";
+import {PDFDocument} from "pdf-lib";
+
 
 
 export const FileSystemImpl: UserFileSystem = {
     async addWaterMaskToPDF(file: MetaFile): Promise<MetaFile> {
-      return file;
+        const pdfDoc =await PDFDocument.load(await FileSystemImpl.readFileAsArrayBufferAsync(file));
+        const page=pdfDoc.getPage(0);
+        return file;
     },
     buildFormWithFile(fieldName: string, file: MetaFile): FormData {
         const formData = new FormData();
