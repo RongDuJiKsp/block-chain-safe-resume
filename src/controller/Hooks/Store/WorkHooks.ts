@@ -100,7 +100,7 @@ const alovaClientJavaImpl = createAlova({
 const alovaClientJavaFileImpl = createAlova({
     statesHook: ReactHook,
     requestAdapter: GlobalFetch(),
-    baseURL: SERVER_URLS.javaBackendUrl + "/files",
+    baseURL: SERVER_URLS.javaBackendUrl ,
     responded: async (response) => {
         const blob = await response.blob();
         const types = await fileTypeFromBlob(blob);
@@ -527,8 +527,8 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                 });
             },
             async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
-                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/${apName}`);
-                await alovaClientJavaFileImpl.Delete<MetaFile>(`/${apName}`);
+                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/files/${apName}`);
+                await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${apName}`);
                 return downloadResFile;
             }
 
