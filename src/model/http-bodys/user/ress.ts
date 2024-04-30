@@ -56,3 +56,7 @@ export interface JavaServerRes<Data> {
     success: boolean;
     data: Data
 }
+
+export interface GetTransResultRes extends BaseRes {
+    result: Record<string, string>;
+}

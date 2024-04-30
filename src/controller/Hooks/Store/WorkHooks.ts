@@ -5,11 +5,18 @@ import {createAlova} from "alova";
 import ReactHook from "alova/react";
 import GlobalFetch from "alova/GlobalFetch";
 import {SERVER_URLS, STORAGE_KEY_CONFIG} from "../../../config/net.config.ts";
-import {ChangeNameReq, GetTokenReq, LoginReq} from "../../../model/http-bodys/user/reqs.ts";
+import {ChangeNameReq, GetTokenReq, GetTransResultReq, LoginReq} from "../../../model/http-bodys/user/reqs.ts";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 import {BasisSyncStorage, FileSystemImpl} from "../../util/InteractiveSystem.ts";
 import {atomWithStorage} from "jotai/utils";
-import {ArrayRes, ChangeNameRes, GetTokenRes, JavaServerRes, LoginRes} from "../../../model/http-bodys/user/ress.ts";
+import {
+    ArrayRes,
+    ChangeNameRes,
+    GetTokenRes,
+    GetTransResultRes,
+    JavaServerRes,
+    LoginRes
+} from "../../../model/http-bodys/user/ress.ts";
 import {
     GiveOrDelayResumeLicensingRes,
     KKInfoForSendListRes,
@@ -82,7 +89,8 @@ const alovaClientJavaImpl = createAlova({
     responded: (response) => {
         return response.json();
     },
-    baseURL: SERVER_URLS.javaBackendUrl
+    baseURL: SERVER_URLS.javaBackendUrl,
+    localCache:null
 });
 const alovaClientJavaFileImpl = createAlova({
     statesHook: ReactHook,
@@ -94,14 +102,6 @@ const alovaClientJavaFileImpl = createAlova({
         if (!types) return new File([blob], "unknown-file");
         return new File([blob], "resume-file." + types.ext, {type: types.mime});
     }
-});
-const alovaClientWeBaseImpl = createAlova({
-    statesHook: ReactHook,
-    requestAdapter: GlobalFetch(),
-    responded: (response) => {
-        return response.json();
-    },
-    baseURL: SERVER_URLS.weBaseUrl
 });
 
 
@@ -560,13 +560,12 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
             async findHashMetaDataWithMarkedFile(file: MetaFile): Promise<void> {
                 const fileWaterRes = await this.readWater(file);
                 if (!fileWaterRes.success) throw fileWaterRes.message;
-                const metaData = await alovaClientWeBaseImpl.Get<string>(`/WeBASE-Node-Manager/transaction/transInfo/1/${fileWaterRes.data}`, {
-                    headers: {
-                        "content-type": "text/plain",
-                    }
-                });
+                const req: GetTransResultReq = {
+                    hash_value: fileWaterRes.data
+                };
+                const metaData = await alovaClientImpl.Post<GetTransResultRes>("/CheckHash",req);
                 console.log(metaData);
-                await FileSystemImpl.downloadToFileAsNameAsync(new Blob([metaData]), `result for ${file.name}.json`);
+                await FileSystemImpl.downloadToFileAsNameAsync(new Blob([JSON.stringify(metaData.result)]), `result for ${file.name}.json`);
             }
         };
     }

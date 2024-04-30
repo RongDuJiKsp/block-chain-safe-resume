@@ -26,7 +26,7 @@ const headBarItems: ItemsAndPic[] = [
     }, {
         logo: componentUtils.getIcon('icon-transfer1', {fontSize: 18}),
         routerPath: APPLICANT_THIS_PATH + '/search',
-        text: "用户查找"
+        text: "用户追溯"
     }, {
         logo: componentUtils.getIcon('icon-suyuan', {fontSize: 18}),
         routerPath: APPLICANT_THIS_PATH + '/readwater',
