@@ -4,7 +4,7 @@ import FileUploaderComponent from "../../../components/comp/fileUploader.tsx";
 import {ReactNode, useState} from "react";
 import {useBoolean} from "ahooks";
 import {LoadingOutlined} from "@ant-design/icons";
-import {App, Input, Modal} from "antd";
+import {App, Modal} from "antd";
 import {UserWithNoneStatusWork} from "../../../../controller/Hooks/Store/WorkHooks.ts";
 import {DocumentTraceabilityInformation} from "../../../../model/entity/user.ts";
 import {ModelPropsWithInfoAndClear} from "../../../../model/interface/props.ts";
@@ -63,13 +63,18 @@ function TraceDataShowerModel({data, clear}: ModelPropsWithInfoAndClear<Document
         </div>
         <div className={"text-center text-xl font-sans font-bold"}>区块链溯源信息概览</div>
         <div className={"my-8 font-mono gap-1 flex-col flex "}>
-            <div><span className={"font-bold"}>文件名称:</span> {data?.fileName}</div>
-            <div><span className={"font-bold"}>水印信息:</span> {data?.waterMaskContext}</div>
-            <div><span className={"font-bold"}>下载方信息：</span>{data?.fromName}<br/>({data?.fromAddress})</div>
-            <div><span className={"font-bold"}>上传方信息：</span>{data?.sourceName}<br/>({data?.sourceAddress})</div>
-            <div><span className={"font-bold"}>区块链数据：</span></div>
-            <Input.TextArea autoSize={{maxRows: 7}}
-                            value={data ? Object.entries(data.blockCharinData.data).map(([k, v]) => `${k}:\n${v}\n`).join("\n") : undefined}/>
+            <div><span className={"font-bold font-sans"}>文件名称:</span> {data?.fileName}</div>
+            <div className={"my-2"}><span className={"font-bold font-sans"}>水印信息:</span> {data?.waterMaskContext}
+            </div>
+            <div><span className={"font-bold font-sans"}>下载方信息：</span>{data?.fromName}<br/>({data?.fromAddress})
+            </div>
+            <div><span className={"font-bold font-sans"}>上传方信息：</span>{data?.sourceName}<br/>({data?.sourceAddress})
+            </div>
+            <div className={"mt-2"}><span className={"font-bold font-sans"}>区块链数据：</span></div>
+            <div className={"border-[1px] border-gray-300 p-1 "}>
+                {data && Object.entries(data.blockCharinData.data).map(([k, v]) => <div><span
+                    className={"font-bold"}>{k}</span>:{v}</div>)}
+            </div>
         </div>
     </Modal>;
 }

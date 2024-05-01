@@ -604,11 +604,6 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
                 console.log(metaDataRes);
                 const chainData = metaDataRes.result["data"] as Record<string, string>;
                 console.log(chainData);
-                delete chainData["input"];
-                delete chainData["chainId"];
-                delete chainData["groupId"];
-                delete chainData["extraData"];
-                delete chainData["signature"];
                 // console.log(chainData);
                 trackResult.blockCharinData = metaDataRes.result;
                 trackResult.fromAddress = chainData["from"];
@@ -616,6 +611,11 @@ export const UserWithNoneStatusWork: AtomHooks<null, UserWithNoneStatusWorkMetho
                 trackResult.sourceAddress = apAddress;
                 trackResult.fromName = (await this.findUserNameByAddress(trackResult.fromAddress)).data;
                 trackResult.sourceName = (await this.findUserNameByAddress(trackResult.sourceAddress)).data;
+                delete chainData["input"];
+                delete chainData["chainId"];
+                delete chainData["groupId"];
+                delete chainData["extraData"];
+                delete chainData["signature"];
                 return trackResult;
             }
         };

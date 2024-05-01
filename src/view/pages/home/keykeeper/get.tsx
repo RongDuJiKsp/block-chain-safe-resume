@@ -119,7 +119,8 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
             {keyPair === null ?
                 <div>
                     <div className={"text-center font-sans font-bold"}>请在此载入私钥文件以解密秘密份额！</div>
-                    <div className={"text-center font-sans font-bold"}>载入的文件：{selectedFiles.length?selectedFiles[0].name:"未选择文件"}</div>
+                    <div
+                        className={"text-center font-sans font-bold"}>载入的文件：{selectedFiles.length ? selectedFiles[0].name : "未选择文件"}</div>
                     <div className={"flex justify-center my-3 py-5 bg-gray-200 border-dotted  border-2 border-black"}>
                         <FileUploaderComponent onSelect={(e) => {
                             setSelectFiles(e);
@@ -130,9 +131,11 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
                     </div>
                 </div> :
                 <div className={"py-8"}>
-                    <p className={"font-bold"}>请下载秘密份额并且妥善保管<br/>在需要上传秘密份额时及时上传秘密份额可以获得奖励，<br/>未妥善保管或上传错误将会获得处罚！</p>
+                    <p className={"font-bold"}>请下载秘密份额并且妥善保管<br/>在需要上传秘密份额时及时上传秘密份额可以获得奖励，<br/>未妥善保管或上传错误将会获得处罚！
+                    </p>
                     <div className={"flex justify-center mt-8"}>
-                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载秘密份额</button>
+                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载秘密份额
+                        </button>
                     </div>
                 </div>}
         </div>
