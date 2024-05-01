@@ -11,6 +11,7 @@ import {FileSystemImpl} from "../../../../controller/util/InteractiveSystem.ts";
 import {FileTempleHandleImpl} from "../../../../controller/util/output.ts";
 import {BasicInfo} from "../../../../model/entity/user.ts";
 import MainContainerProvider from "../../../components/provider/mainContainerProvider.tsx";
+import FileUploaderComponent from "../../../components/comp/fileUploader.tsx";
 
 
 export default function KeyKeeperGetSubKey() {
@@ -96,10 +97,6 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         });
 
     };
-    const onSelectFile = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        if (event.target.files === null) return;
-        setSelectFiles(Array.from(event.target.files));
-    };
     const onFinish = () => {
         if (data === null) {
             message.error("登录状态异常，请退出后重试！").then();
@@ -121,18 +118,21 @@ function GetAccessibleSubKey({data, clear}: ModelPropsWithInfoAndClear<BasicInfo
         <div className={"my-5"}>
             {keyPair === null ?
                 <div>
-                    <div className={"flex justify-center my-3"}>
-                        <input type="file" onChange={onSelectFile}/>
+                    <div className={"text-center font-sans font-bold"}>请在此载入私钥文件以解密秘密份额！</div>
+                    <div className={"text-center font-sans font-bold"}>载入的文件：{selectedFiles.length?selectedFiles[0].name:"未选择文件"}</div>
+                    <div className={"flex justify-center my-3 py-5 bg-gray-200 border-dotted  border-2 border-black"}>
+                        <FileUploaderComponent onSelect={(e) => {
+                            setSelectFiles(e);
+                        }}/>
                     </div>
                     <div className={"flex justify-center"} onClick={onFinish}>
                         <button className={"button button-3d button-primary "}>解析秘密份额</button>
                     </div>
                 </div> :
                 <div className={"py-8"}>
-                    <p>请下载秘密份额并且妥善保管，在需要上传秘密份额时及时上传秘密份额可以获得奖励，未妥善保管或上传错误将会获得处罚！</p>
-                    <div className={"flex justify-center my-3"}>
-                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载秘密份额
-                        </button>
+                    <p className={"font-bold"}>请下载秘密份额并且妥善保管<br/>在需要上传秘密份额时及时上传秘密份额可以获得奖励，<br/>未妥善保管或上传错误将会获得处罚！</p>
+                    <div className={"flex justify-center mt-8"}>
+                        <button className={"button button-3d button-caution "} onClick={onDownloadSubKey}>下载秘密份额</button>
                     </div>
                 </div>}
         </div>
