@@ -518,18 +518,18 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
             },
             async acceptOrDelayResumeAsync(isAccepted: boolean, result: string, username: string): Promise<JavaServerRes<string>> {
                 if (userInfo === null) throw "未登录时尝试获取";
-                return alovaClientJavaImpl.Post(`/check/${username}`, undefined, {
+                const thisRes = await alovaClientJavaImpl.Post<JavaServerRes<string>>(`/check/${username}`, undefined, {
                     params: {
                         checkUsername: userInfo.nick,
                         isApprove: isAccepted,
                         reason: result
                     }
                 });
+                if (thisRes.success && (await alovaClientImpl.Get<JavaServerRes<boolean>>(`/check/status?resumeUsername=${username}`)).data) await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${username}`);
+                return thisRes;
             },
             async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {
-                const downloadResFile = await alovaClientJavaFileImpl.Get<MetaFile>(`/files/${apName}`);
-                await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${apName}`);
-                return downloadResFile;
+                return alovaClientJavaFileImpl.Get<MetaFile>(`/files/${apName}`);
             }
 
         };
