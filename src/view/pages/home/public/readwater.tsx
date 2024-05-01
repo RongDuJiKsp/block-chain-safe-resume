@@ -61,13 +61,13 @@ function TraceDataShowerModel({data, clear}: ModelPropsWithInfoAndClear<Document
                 <img alt={"logo"} src={logo} className={"h-[12vh]"} draggable={false}/>
             </div>
         </div>
-        <div className={"text-center text-xl font-sans font-bold"}>区块链查证信息概览</div>
-        <div className={"my-8 font-mono gap-1 flex-col flex"}>
-            <div>文件名称: {data?.fileName}</div>
-            <div>水印信息: {data?.waterMaskContext}</div>
-            <div>下载方信息：{data?.fromName}<br/>({data?.fromAddress})</div>
-            <div>上传方信息：{data?.sourceName}<br/>({data?.sourceAddress})</div>
-            <div>区块链数据：</div>
+        <div className={"text-center text-xl font-sans font-bold"}>区块链溯源信息概览</div>
+        <div className={"my-8 font-mono gap-1 flex-col flex "}>
+            <div><span className={"font-bold"}>文件名称:</span> {data?.fileName}</div>
+            <div><span className={"font-bold"}>水印信息:</span> {data?.waterMaskContext}</div>
+            <div><span className={"font-bold"}>下载方信息：</span>{data?.fromName}<br/>({data?.fromAddress})</div>
+            <div><span className={"font-bold"}>上传方信息：</span>{data?.sourceName}<br/>({data?.sourceAddress})</div>
+            <div><span className={"font-bold"}>区块链数据：</span></div>
             <Input.TextArea autoSize={{maxRows: 7}}
                             value={data ? Object.entries(data.blockCharinData.data).map(([k, v]) => `${k}:\n${v}\n`).join("\n") : undefined}/>
         </div>
