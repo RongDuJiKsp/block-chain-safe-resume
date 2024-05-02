@@ -79,12 +79,12 @@ const texts: InfoContext[] = [
     {
         key: UserIdentityEnum.Applicant,
         title: "Applicant",
-        message: " Applicant是求职者用户,即简历所有者,拥有自身简历文件的绝对控制权。Applicant使用随机数密钥对简历文件进行对称加密,将加密后的简历上传至IPFS系统,并将对应的IPFS文件哈希上链存储。"
+        message: " Applicant是简历所有者,拥有自身简历文件的绝对控制权。其功能包含：上传简历与简历认证 为简历查看方授权查看简历 简历泄露水印溯源 "
     },
     {
         key: UserIdentityEnum.Recruiter,
         title: "Recruiter",
-        message: "Recruiter是企业HR用户,可向Applicant用户发出授权请求,等待对应Ap同意授权,并且Kk上交足够的秘密份额后,智能合约合成密钥并与链上IPFS文件哈希一同返回平台,平台接收密钥和加密文件后进行文件解密,使Recruiter用户成功下载对应求职者 的未经篡改的完整简历信息"
+        message: "Recruiter是企业HR用户 其功能包含 向简历所有者申请查看简历授权 查看认证后的简历 简历泄露水印溯源"
     }
 ];
 
