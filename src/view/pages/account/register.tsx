@@ -79,7 +79,7 @@ const texts: InfoContext[] = [
     {
         key: UserIdentityEnum.Applicant,
         title: "Applicant",
-        message: " Applicant是简历所有者,拥有自身简历文件的绝对控制权。其功能包含：上传简历与简历认证 为简历查看方授权查看简历 简历泄露水印溯源 "
+        message: " Applicant是简历所有者。其功能包含：上传简历与简历认证 为简历查看方授权查看简历 简历泄露水印溯源 "
     },
     {
         key: UserIdentityEnum.Recruiter,
