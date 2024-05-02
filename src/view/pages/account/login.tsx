@@ -22,7 +22,7 @@ type LoginFormType = {
 const identityOption: DefaultOptionType[] = [
     {value: "Applicant", label: componentUtils.getIconLabel("Applicant", "icon-Owner-1")},
     {value: "Recruiter", label: componentUtils.getIconLabel("Recruiter", "icon-search")},
-    {value: "KeyKeeper", label: componentUtils.getIconLabel("KeyKeeper", "icon-key")}
+    {value: "KeyKeeper", label: componentUtils.getIconLabel("BackChecker", "icon-key")}
 ];
 
 

@@ -15,6 +15,7 @@ import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import Sider from "antd/es/layout/Sider";
 import {Content, Header} from "antd/es/layout/layout";
+import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -122,7 +123,7 @@ function DropDownOperations({group}: { group: UserGroup }) {
         },
         {
             key: "identity",
-            label: componentUtils.getIconVal("icon-identity", userInfo.identity)
+            label: componentUtils.getIconVal("icon-identity", userInfo.identity === UserIdentityEnum.KeyKeeper ? "BackChecker" : userInfo.identity)
         }, {
             key: "address",
             label: componentUtils.getIconVal("icon-address-book-fill", userInfo.address.substring(0, 10) + "..."),
