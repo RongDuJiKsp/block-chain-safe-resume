@@ -79,12 +79,12 @@ const texts: InfoContext[] = [
     {
         key: UserIdentityEnum.Applicant,
         title: "Applicant",
-        message: " Applicant是简历所有者。其功能包含：上传简历与简历认证 为简历查看方授权查看简历 简历泄露水印溯源 "
+        message: "Applicant是简历所有者 提供：上传简历、简历授权、简历溯源、简历记录等功能 "
     },
     {
         key: UserIdentityEnum.Recruiter,
         title: "Recruiter",
-        message: "Recruiter是企业HR用户 其功能包含 向简历所有者申请查看简历授权 查看认证后的简历 简历泄露水印溯源"
+        message: "Recruiter是企业HR用户 提供： 上传简历、简历授权、简历溯源、简历记录等功能"
     }
 ];
 

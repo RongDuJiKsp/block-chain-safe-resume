@@ -11,7 +11,7 @@ export const FileTempleHandleImpl: GetFileTemplate = {
         Dear ${userName}  
         If You Are Applicant You Need To Encrypt With SafeKey
         SafeKey : ${SKey}
-        If You Are KeyKeeper,You Will Received A Key File,DO NOT LOST IT
+        If You Are BackChecker,You Will Received A Key File,DO NOT LOST IT
          `;
     },
     getApInfo(ApName: string, ApAddressString: string): string {
