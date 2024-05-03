@@ -525,7 +525,7 @@ export const KeyKeeperWorkHook: AtomHooks<null, KeyKeeperWorkMethod> = {
                         reason: result
                     }
                 });
-                if (thisRes.success && (await alovaClientImpl.Get<JavaServerRes<boolean>>(`/check/status?resumeUsername=${username}`)).data) await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${username}`);
+                if (thisRes.success && (await alovaClientJavaImpl.Get<JavaServerRes<boolean>>(`/check/status?resumeUsername=${username}`)).data) await alovaClientJavaFileImpl.Delete<MetaFile>(`/files/${username}`);
                 return thisRes;
             },
             async downloadToBeAuthoredResume(apName: string): Promise<MetaFile> {

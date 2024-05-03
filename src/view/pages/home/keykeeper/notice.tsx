@@ -91,8 +91,9 @@ function UploadSubKeyModel({data, clear}: ModelPropsWithInfoAndClear<UploadSubKe
         if (data === null) return;
         conformLoadingAction.setTrue();
         kkServer.uploadSubKeyAsync(data.ApUserName, val.i, val.x, val.m).then(r => {
+            console.log(r);
             if (r.status) {
-                message.success("上传成功").then();
+                message.success("上传成功,"+r.message).then();
                 clear();
             } else message.error("上传失败，原因为 " + r.message).then();
         }).catch(e => {
