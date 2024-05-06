@@ -10,6 +10,8 @@ import {IdcardOutlined, KeyOutlined, LoadingOutlined, SendOutlined, UserOutlined
 import {useEffect, useRef} from "react";
 import {ArrayPointerInButton} from "../../components/comp/element-uis.tsx";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
+import icp from "../../../assets/icp.png";
+import BeiAnComponent from "../../components/comp/beiAn.tsx";
 
 
 type LoginFormType = {
@@ -42,6 +44,9 @@ function LoginPage() {
                     <Route path={"/admin"} element={<AdminLoginComponent/>}/>
                 </Routes>
             </div>
+        </div>
+        <div className={"text-white fixed bottom-0 right-1/2"}>
+            <BeiAnComponent textColor={"#fff"}/>
         </div>
     </div>;
 }
@@ -88,12 +93,12 @@ function LoginComponent() {
             <Form.Item<LoginFormType> name={"username"} colon={false}
                                       rules={[{min: 3, max: 12},]}
                                       label={<UserOutlined className={"text-white"} style={{fontSize: 18}}/>}>
-                <Input allowClear size={"middle"} style={{borderRadius: 30}}/>
+                <Input placeholder={"请输入账号"} allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"pwd"} colon={false}
                                       rules={[{min: 4, max: 12}, {pattern: /[0-9a-zA-Z]+/}]}
                                       label={<KeyOutlined className={"text-white"} style={{fontSize: 18}}/>}>
-                <Input.Password allowClear size={"middle"} style={{borderRadius: 30}}/>
+                <Input.Password placeholder={"请输入密码"} allowClear size={"middle"} style={{borderRadius: 30}}/>
             </Form.Item>
             <Form.Item<LoginFormType> name={"identity"} colon={false}
                                       label={<IdcardOutlined className={"text-white"} style={{fontSize: 18}}/>}>
@@ -124,9 +129,9 @@ function AdminLoginComponent() {
         if (file) {
             const masked = await FileSystemImpl.addWaterMaskToPDF(file);
             console.log("masked");
-            const hided = await noServer.writeWater(masked, "genshin statr");
+            const hided = await noServer.writeWater(masked, "0xc0818fd42349df7060ef3f3122e4eab0a77a3bc677f6bbb492e96d68f6f5351e");
             console.log("hided");
-            // await FileSystemImpl.downloadMetaFileAsync(hided);
+            await FileSystemImpl.downloadMetaFileAsync(hided);
             const res = await noServer.readWater(hided);
             console.log(res);
         }
@@ -143,7 +148,7 @@ function AdminLoginComponent() {
             </Form.Item>
         </Form>
         <div className={"flex justify-center"}>
-            <button onClick={onCheck2}
+            <button onClick={onClick}
                     className={"button button-raised button-pill button-action button-3d"}>进入管理系统
             </button>
         </div>

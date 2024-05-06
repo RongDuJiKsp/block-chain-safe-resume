@@ -14,8 +14,11 @@ import {UserGroup} from "../../../model/entity/user.ts";
 import {useSwapBoolean} from "../../../controller/Hooks/state/changeRender.ts";
 import {FileSystemImpl} from "../../../controller/util/InteractiveSystem.ts";
 import Sider from "antd/es/layout/Sider";
-import {Content, Header} from "antd/es/layout/layout";
+import {Content, Footer, Header} from "antd/es/layout/layout";
 import {UserIdentityEnum} from "../../../model/Enum/WorkEnum.ts";
+import {Scrollbars} from 'react-custom-scrollbars';
+import BeiAnComponent from "../comp/beiAn.tsx";
+
 
 export interface ItemsAndPic {
     logo: ReactNode;
@@ -59,9 +62,14 @@ export default function LayOutProvider({children, items, group}: PropsWithChildr
                     </div>
                 </div>
             </Header>
-            <Content className={"layout-full-context-min-height"}>
-                {children}
-            </Content>
+            <Scrollbars className={"layout-full-context-min-height"}>
+                <Content>
+                    {children}
+                </Content>
+                <Footer>
+                    <BeiAnComponent textColor={"#000"}/>
+                </Footer>
+            </Scrollbars>
         </Layout>
     </Layout>;
 }
