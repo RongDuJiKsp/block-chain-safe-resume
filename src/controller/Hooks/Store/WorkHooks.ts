@@ -340,11 +340,16 @@ export const RecruiterWorkHooks: AtomHooks<null, RecruiterWorkMethod> = {
                 const file = await this.downloadResumeAsync(chainMeta.fileHash, AlgorithmSystemImpl.calculateEncryptedKeyByS(String(chainMeta.s)), ApUserName, chainMeta.fileName, chainMeta.fileType);//下载并解密文件
                 console.log("***", file);
                 //为文件添加显水印
-                const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
-                //为文件添加隐水印
-                const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.transactionHash + "|" + ApAddress);
-                //下载文件
-                await FileSystemImpl.downloadMetaFileAsync(waterFile);
+                try {
+                    const maskedFIle = await FileSystemImpl.addWaterMaskToPDF(file);
+                    //为文件添加隐水印
+                    const waterFile = await noStatusServer.writeWater(maskedFIle, chainMeta.reslut.transactionHash + "|" + ApAddress);
+                    //下载文件
+                    await FileSystemImpl.downloadMetaFileAsync(waterFile);
+                } catch (e) {
+                    console.log(e);
+                    throw "文件解密失败！";
+                }
             },
             async getFileMessageAsync(ApAddress: string): Promise<GetFileMesRes> {
                 if (userInfo === null) throw "未登录时尝试下载";

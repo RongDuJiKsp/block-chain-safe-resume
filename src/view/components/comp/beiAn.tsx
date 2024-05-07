@@ -5,7 +5,7 @@ type Prop = {
 }
 export default function BeiAnComponent({textColor}: Prop) {
     return <div className={"flex justify-center gap-6"}>
-        <a href="https://beian.miit.gov.cn/" target="_blank" style={{color: textColor}}>湘 ICP 备 2024057058 号 - 1</a>
+        <a href="https://beian.miit.gov.cn/" target="_blank" style={{color: textColor}} className={"flex flex-col justify-center"}><span>湘 ICP 备 2024057058 号 - 1</span></a>
 
         <a href="https://beian.mps.gov.cn/#/query/webSearch?code=43130202000311" rel="noreferrer" target="_blank"
            style={{color: textColor}}>
