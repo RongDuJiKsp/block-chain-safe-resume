@@ -44,7 +44,7 @@ function LoginPage() {
                 </Routes>
             </div>
         </div>
-        <div className={"text-white fixed bottom-0 right-1/3 bg-half-write border-2 border-gray-300 p-2"}>
+        <div className={"text-white fixed bottom-0 w-full bg-half-write border-2 border-gray-300 p-2"}>
             <BeiAnComponent textColor={"#fff"}/>
         </div>
     </div>;
